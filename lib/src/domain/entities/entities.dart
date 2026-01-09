@@ -4,6 +4,7 @@ library;
 export 'address.dart';
 export 'applicant.dart';
 export 'asset.dart';
+export 'concern.dart';
 export 'config.dart';
 export 'cover_letter.dart';
 export 'digest.dart';

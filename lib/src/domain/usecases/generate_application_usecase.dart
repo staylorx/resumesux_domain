@@ -131,6 +131,9 @@ class GenerateApplicationUsecase {
     // Save application
     progress('Saving application');
     logger.info('Saving application to output directory: $outputDir');
+    final concern = (jobReq.whereFound?.isNotEmpty ?? false)
+        ? jobReq.whereFound!
+        : 'unknown';
     final saveResult = await applicationRepository.saveApplication(
       jobReqId: jobReq.id,
       jobTitle: jobReq.title,
@@ -138,6 +141,7 @@ class GenerateApplicationUsecase {
       coverLetter: coverLetter ?? CoverLetter(content: ''),
       feedback: feedback,
       outputDir: outputDir,
+      concern: Concern(name: concern),
     );
 
     if (saveResult.isRight()) {

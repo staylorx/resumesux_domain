@@ -11,5 +11,6 @@ abstract class ApplicationRepository {
     required CoverLetter coverLetter,
     required Feedback feedback,
     required String outputDir,
+    required Concern concern,
   });
 }

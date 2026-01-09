@@ -16,6 +16,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     required CoverLetter coverLetter,
     required Feedback feedback,
     required String outputDir,
+    required Concern concern,
   }) async {
     try {
       final now = DateTime.now();
@@ -25,7 +26,13 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
           .replaceAll(' ', '_');
       final dirName = '$dateStr - $sanitizedTitle';
 
-      final appDir = Directory('$outputDir/$dirName');
+      final concernDir = concern.name.isNotEmpty
+          ? concern.name
+                .replaceAll(RegExp(r'[^\w\s-]'), '')
+                .replaceAll(' ', '_')
+          : 'unknown';
+
+      final appDir = Directory('$outputDir/$concernDir/$dirName');
       await appDir.create(recursive: true);
       logger.info(
         '[ApplicationRepositoryImpl] Created output directory: ${appDir.path}',
