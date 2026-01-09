@@ -48,6 +48,24 @@ void main() {
       expect(provider.defaultModel?.name, 'qwen/qwen2.5-coder-14b');
     });
 
+    test('get default model successfully', () async {
+      // Arrange
+      final configPath = 'test/data/config/valid_config.yaml';
+
+      // Act
+      final result = await configRepository.getDefaultModel(
+        configPath: configPath,
+      );
+
+      // Assert
+      expect(result.isRight(), true);
+      final model = result.getOrElse(
+        (_) => throw Exception('Failed to get model'),
+      )!;
+      expect(model.name, 'qwen/qwen2.5-coder-14b');
+      expect(model.isDefault, true);
+    });
+
     test('get specific provider by name', () async {
       // Arrange
       final configPath = 'test/data/config/valid_config.yaml';

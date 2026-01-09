@@ -15,6 +15,9 @@ abstract class ConfigRepository {
   /// Gets the default provider.
   Future<Either<Failure, AiProvider?>> getDefaultProvider({String? configPath});
 
+  /// Gets the default model from the default provider.
+  Future<Either<Failure, AiModel?>> getDefaultModel({String? configPath});
+
   /// Checks if the provider has a default model.
   bool hasDefaultModel({required AiProvider provider});
 }

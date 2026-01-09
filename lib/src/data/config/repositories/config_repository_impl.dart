@@ -357,6 +357,19 @@ class ConfigRepositoryImpl implements ConfigRepository {
   }
 
   @override
+  Future<Either<Failure, AiModel?>> getDefaultModel({
+    String? configPath,
+  }) async {
+    final providerResult = await getDefaultProvider(configPath: configPath);
+    return providerResult.fold((failure) => Left(failure), (provider) {
+      if (provider == null) {
+        return Right(null);
+      }
+      return Right(provider.defaultModel);
+    });
+  }
+
+  @override
   bool hasDefaultModel({required AiProvider provider}) {
     return provider.defaultModel != null;
   }
