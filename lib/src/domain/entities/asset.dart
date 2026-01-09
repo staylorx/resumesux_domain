@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'tag.dart';
 
-// TODO, what to do with skills, which are also tags? But we want to connect a skill
+// TODO, what to do with skills, which could be considered "smart" tags? But we want to connect a skill
 // to a particular gig.
 
 /// Represents an asset containing content and optional associated tags.

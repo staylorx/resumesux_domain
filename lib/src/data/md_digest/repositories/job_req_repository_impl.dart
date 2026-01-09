@@ -27,11 +27,56 @@ class JobReqRepositoryImpl implements JobReqRepository {
 
   @override
   /// Marks the job requirement as processed.
-  Future<Either<Failure, Unit>> markAsProcessed({required String id}) async {
-    // For now, just return success. In a real implementation,
-    // you'd need to find the file by ID and update its frontmatter.
-    // This would require maintaining a mapping of IDs to file paths.
-    return Right(unit);
+  Future<Either<Failure, Unit>> markAsProcessed({required String path}) async {
+    try {
+      final file = File(path);
+      if (!file.existsSync()) {
+        return Left(NotFoundFailure(message: 'Job req file not found: $path'));
+      }
+
+      final content = await file.readAsString();
+
+      // Parse existing bullets
+      Map<String, dynamic> existingFields = {};
+      String cleanContent = content;
+      final lines = content.split('\n');
+      int bodyStartIndex = 0;
+      for (int i = 0; i < lines.length; i++) {
+        final line = lines[i];
+        if (line.startsWith('- ') || line.startsWith('* ')) {
+          final bullet = line.substring(2);
+          final colonIndex = bullet.indexOf(':');
+          if (colonIndex != -1) {
+            final key = bullet.substring(0, colonIndex).trim().toLowerCase();
+            final value = bullet.substring(colonIndex + 1).trim();
+            existingFields[key] = value;
+          }
+        } else if (line.trim().isEmpty) {
+          continue;
+        } else {
+          bodyStartIndex = i;
+          break;
+        }
+      }
+      cleanContent = lines.sublist(bodyStartIndex).join('\n').trim();
+
+      // Set processed to true
+      existingFields['processed'] = 'true';
+
+      // Build bullets from merged fields
+      final bulletLines = existingFields.entries.map((entry) {
+        return '- ${entry.key}: ${entry.value}';
+      }).toList();
+
+      final bullets = bulletLines.join('\n');
+      final fullContent = '$bullets\n\n$cleanContent';
+
+      await file.writeAsString(fullContent);
+
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to mark as processed: $e'));
+    }
   }
 
   @override
