@@ -131,9 +131,7 @@ class GenerateApplicationUsecase {
     // Save application
     progress('Saving application');
     logger.info('Saving application to output directory: $outputDir');
-    final concern = (jobReq.whereFound?.isNotEmpty ?? false)
-        ? jobReq.whereFound!
-        : 'unknown';
+    final concern = jobReq.concern?.name ?? 'unknown';
     final saveResult = await applicationRepository.saveApplication(
       jobReqId: jobReq.id,
       jobTitle: jobReq.title,

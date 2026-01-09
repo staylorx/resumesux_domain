@@ -5,4 +5,5 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 abstract class JobReqDatasource {
   /// Updates an existing job requirement.
   Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq});
+  Future<Either<Failure, Unit>> clearDatabase();
 }

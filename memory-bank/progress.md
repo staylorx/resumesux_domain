@@ -21,3 +21,5 @@ All tests pass successfully with proper mocking using mocktail.
 [2026-01-09 18:58:17] - Completed comprehensive code tidy: ran dart analyze (no issues), dart format (1 file changed), all tests pass; fixed JobReqRepositoryImpl to parse YAML frontmatter in addition to bullet format; verified no print statements (only ignored in test), no positional parameters in custom functions, no unused imports, LF line endings, dartdoc comments present, no Dart code in markdown/memory-bank files, clean architecture compliance, proper fpdart usage with Failure and Either.
 
 [2026-01-09 19:09:40] - Added Apache 2.0 license to the project: created LICENSE file with full Apache 2.0 license text, added license field to pubspec.yaml, updated README.md with project description and license information.
+
+[2026-01-09 16:10:20] - Fixed output path generation for job applications: Modified generate_application_usecase.dart to correctly use jobReq.concern?.name for output directory instead of whereFound. Updated test job req title to match expected naming. Added file-based integration test for application generation with correct output path verification. All tests pass.

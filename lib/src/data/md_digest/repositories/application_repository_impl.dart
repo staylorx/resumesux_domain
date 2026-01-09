@@ -24,13 +24,15 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
       final effectiveTitle = jobTitle.isNotEmpty ? jobTitle : 'unknown';
       final sanitizedTitle = effectiveTitle
           .replaceAll(RegExp(r'[^\w\s-]'), '')
-          .replaceAll(' ', '_');
+          .replaceAll(' ', '_')
+          .toLowerCase();
       final dirName = '$dateStr - $sanitizedTitle';
 
       final concernDir = concern.name.isNotEmpty
           ? concern.name
                 .replaceAll(RegExp(r'[^\w\s-]'), '')
                 .replaceAll(' ', '_')
+                .toLowerCase()
           : 'unknown';
 
       final appDir = Directory('$outputDir/$concernDir/$dirName');

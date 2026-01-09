@@ -114,9 +114,9 @@ class JobReqRepositoryImpl implements JobReqRepository {
         content: bodyContent,
         salary: fields['salary']?.toString(),
         location: fields['location']?.toString(),
-        concern: fields['concern_name'] != null || fields['concern'] != null
+        concern: fields['concern_name'] != null || fields['concern'] != null || fields['Concern'] != null
             ? Concern(
-                name: (fields['concern_name'] ?? fields['concern']).toString(),
+                name: (fields['concern_name'] ?? fields['concern'] ?? fields['Concern']).toString(),
                 location: fields['location']?.toString(),
               )
             : null,

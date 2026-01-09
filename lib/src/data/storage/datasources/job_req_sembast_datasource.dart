@@ -56,4 +56,16 @@ class JobReqSembastDatasource implements JobReqDatasource {
       return Left(ServiceFailure(message: 'Failed to update job req: $e'));
     }
   }
+
+  /// Clears all job req records from the database.
+  @override
+  Future<Either<Failure, Unit>> clearDatabase() async {
+    try {
+      final db = await _database;
+      await _jobReqStore.delete(db);
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to clear database: $e'));
+    }
+  }
 }
