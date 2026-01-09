@@ -290,7 +290,13 @@ class ConfigRepositoryImpl implements ConfigRepository {
 
     // Validate that exactly one provider is marked as default
     final defaultProviders = providers.where((p) => p.isDefault).toList();
+    logger.info(
+      '[ConfigRepository] Found ${defaultProviders.length} default providers: ${defaultProviders.map((p) => p.id).join(', ')}',
+    );
     if (defaultProviders.length != 1) {
+      logger.severe(
+        '[ConfigRepository] Validation failed: Config must have exactly one provider with "default: true", but found ${defaultProviders.length}',
+      );
       return Left(
         ValidationFailure(
           message: 'Config must have exactly one provider with "default: true"',
