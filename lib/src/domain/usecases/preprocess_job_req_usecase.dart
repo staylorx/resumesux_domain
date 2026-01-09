@@ -41,7 +41,7 @@ class PreprocessJobReqUsecase {
       );
 
       // Build prompt
-      final prompt = _buildExtractionPrompt(content: content);
+      final prompt = _buildExtractionPrompt(content: content, path: path);
 
       // Call AI
       final aiResult = await aiService.generateContent(prompt: prompt);
@@ -92,7 +92,10 @@ class PreprocessJobReqUsecase {
     }
   }
 
-  String _buildExtractionPrompt({required String content}) {
+  String _buildExtractionPrompt({
+    required String content,
+    required String path,
+  }) {
     return '''
 Please analyze the following job requirement content and extract the following information in JSON format:
 
@@ -100,6 +103,9 @@ Please analyze the following job requirement content and extract the following i
 - salary: The salary information (if mentioned, otherwise null)
 - location: The job location (if mentioned, otherwise null)
 - concern: The company or organization name (if mentioned, otherwise null)
+
+File path: $path
+The file path may contain information about the concern (company), job title, location, etc. Use this to infer missing details if the content is ambiguous.
 
 Return only valid JSON like:
 {
@@ -109,7 +115,7 @@ Return only valid JSON like:
   "concern": "Tech Company Inc."
 }
 
-Do your best, but if information is absolutely not present, use 'Unknown'. Make no assumptions beyond the content provided.
+Do your best, but if information is absolutely not present, use 'Unknown'. Make no assumptions beyond the content provided and the file path.
 
 
 Job requirement content:
