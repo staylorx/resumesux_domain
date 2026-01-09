@@ -150,10 +150,10 @@ class ConfigRepositoryImpl implements ConfigRepository {
 
     // Output all issues to the user
     for (final error in errors) {
-      logger.severe('[ConfigRepository] Config validation error: $error');
+      logger.severe('Config validation error: $error');
     }
     for (final warning in warnings) {
-      logger.warning('[ConfigRepository] Config validation warning: $warning');
+      logger.warning('Config validation warning: $warning');
     }
 
     // If there are errors, fail with ValidationFailure
@@ -167,9 +167,7 @@ class ConfigRepositoryImpl implements ConfigRepository {
 
     // If only warnings, proceed but log them
     if (warnings.isNotEmpty) {
-      logger.warning(
-        '[ConfigRepository] Config validation completed with warnings',
-      );
+      logger.warning('Config validation completed with warnings');
     }
 
     // Second pass: Parse the config (proceed since no errors)
@@ -291,11 +289,11 @@ class ConfigRepositoryImpl implements ConfigRepository {
     // Validate that exactly one provider is marked as default
     final defaultProviders = providers.where((p) => p.isDefault).toList();
     logger.info(
-      '[ConfigRepository] Found ${defaultProviders.length} default providers: ${defaultProviders.map((p) => p.id).join(', ')}',
+      'Found ${defaultProviders.length} default providers: ${defaultProviders.map((p) => p.id).join(', ')}',
     );
     if (defaultProviders.length != 1) {
       logger.severe(
-        '[ConfigRepository] Validation failed: Config must have exactly one provider with "default: true", but found ${defaultProviders.length}',
+        'Validation failed: Config must have exactly one provider with "default: true", but found ${defaultProviders.length}',
       );
       return Left(
         ValidationFailure(

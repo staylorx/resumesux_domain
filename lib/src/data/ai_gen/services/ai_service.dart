@@ -4,10 +4,6 @@ import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-// TODO: is there any other data returned from the result, for instance, how much
-// it cost to run the request, etc.? Even if we had token counts in and out,
-// we could estimate costs.
-
 /// Service for generating content using AI providers.
 class AiService {
   final Logger logger = LoggerFactory.create('AiService');

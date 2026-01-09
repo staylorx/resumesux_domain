@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
@@ -25,17 +26,22 @@ class PreprocessJobReqUsecase {
     logger.info('[PreprocessJobReqUsecase] Preprocessing job req at $path');
 
     try {
-      // Get the job req from file
-      final jobReqResult = await jobReqRepository.getJobReq(path: path);
-      if (jobReqResult.isLeft()) {
-        return Left(jobReqResult.getLeft().toNullable()!);
+      final file = File(path);
+      if (!file.existsSync()) {
+        return Left(NotFoundFailure(message: 'Job req file not found: $path'));
       }
-      final jobReq = jobReqResult.getOrElse(
-        (_) => throw Exception('Unexpected error'),
+
+      final content = await file.readAsString();
+
+      // Try to get existing JobReq, but if parsing fails, proceed with empty
+      final existingJobReqResult = await jobReqRepository.getJobReq(path: path);
+      final existingJobReq = existingJobReqResult.fold(
+        (_) => null,
+        (jobReq) => jobReq,
       );
 
       // Build prompt
-      final prompt = _buildExtractionPrompt(content: jobReq.content);
+      final prompt = _buildExtractionPrompt(content: content);
 
       // Call AI
       final aiResult = await aiService.generateContent(prompt: prompt);
@@ -55,8 +61,10 @@ class PreprocessJobReqUsecase {
       }
 
       // Create updated JobReq
-      final preprocessedJobReq = jobReq.copyWith(
-        title: extractedData['title'] as String? ?? jobReq.title,
+      final preprocessedJobReq = JobReq(
+        id: existingJobReq?.id ?? '',
+        title: extractedData['title'] as String? ?? existingJobReq?.title ?? '',
+        content: content,
         salary: extractedData['salary'] as String?,
         location: extractedData['location'] as String?,
         concern: extractedData['concern'] != null
@@ -64,11 +72,13 @@ class PreprocessJobReqUsecase {
                 name: extractedData['concern'] as String,
                 location: extractedData['location'] as String?,
               )
-            : jobReq.concern,
+            : existingJobReq?.concern,
         state: 'pre-processed',
+        createdDate: existingJobReq?.createdDate ?? DateTime.now(),
+        whereFound: existingJobReq?.whereFound ?? 'Unknown',
       );
 
-      // Save to Sembast
+      // Save to repository
       final saveResult = await jobReqRepository.updateJobReq(
         jobReq: preprocessedJobReq,
       );
@@ -98,6 +108,9 @@ Return only valid JSON like:
   "location": "San Francisco, CA",
   "concern": "Tech Company Inc."
 }
+
+Do your best, but if information is absolutely not present, use 'Unknown'. Make no assumptions beyond the content provided.
+
 
 Job requirement content:
 $content

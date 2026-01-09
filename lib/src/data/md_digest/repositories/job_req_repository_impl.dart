@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:yaml/yaml.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of the JobReqRepository.
@@ -25,14 +26,6 @@ class JobReqRepositoryImpl implements JobReqRepository {
 
       final content = await file.readAsString();
 
-      // Validate content
-      if (content.trim().startsWith('---')) {
-        return Left(
-          ValidationFailure(
-            message: 'YAML frontmatter not supported in job req files',
-          ),
-        );
-      }
       if (content.trim().isEmpty) {
         return Left(ValidationFailure(message: 'Job req content is empty'));
       }
@@ -42,79 +35,106 @@ class JobReqRepositoryImpl implements JobReqRepository {
         return Left(ValidationFailure(message: 'Invalid Markdown syntax: $e'));
       }
 
-      final jobReq = _parseJobReq(content: content);
-      if (jobReq == null) {
-        return Left(ParsingFailure(message: 'Failed to parse job req: $path'));
-      }
-
-      return Right(jobReq);
+      return _parseJobReq(content: content);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to read job req: $e'));
     }
   }
 
-  JobReq? _parseJobReq({required String content}) {
-    try {
-      final lines = content.split('\n');
-      if (lines.isEmpty) return null;
+  Either<Failure, JobReq> _parseJobReq({required String content}) {
+    final lines = content.split('\n');
+    if (lines.isEmpty) {
+      return Left(const ParsingFailure(message: 'Job req content is empty'));
+    }
 
-      String bodyContent;
-      Map<String, dynamic> fields = {};
+    String bodyContent;
+    Map<String, dynamic> fields = {};
 
-      if (lines[0].startsWith('- ') || lines[0].startsWith('* ')) {
-        // Bullet format
-        final bulletLines = <String>[];
-        int bodyStartIndex = 0;
-
-        for (int i = 0; i < lines.length; i++) {
-          final line = lines[i];
-          if (line.startsWith('- ') || line.startsWith('* ')) {
-            bulletLines.add(line.substring(2)); // Remove bullet prefix
-          } else if (line.trim().isEmpty) {
-            continue;
-          } else {
-            bodyStartIndex = i;
-            break;
-          }
+    if (content.trim().startsWith('---')) {
+      // YAML frontmatter format
+      final endIndex = content.indexOf('\n---', 3);
+      if (endIndex == -1) {
+        return Left(
+          ValidationFailure(
+            message: 'Invalid YAML frontmatter: missing closing ---',
+          ),
+        );
+      }
+      final yamlContent = content.substring(3, endIndex);
+      try {
+        final yamlMap = loadYaml(yamlContent) as Map?;
+        if (yamlMap != null) {
+          fields = Map<String, dynamic>.from(yamlMap);
         }
+      } catch (e) {
+        return Left(ValidationFailure(message: 'Invalid YAML syntax: $e'));
+      }
+      bodyContent = content.substring(endIndex + 4).trim();
+    } else if (lines[0].startsWith('- ') || lines[0].startsWith('* ')) {
+      // Bullet format
+      final bulletLines = <String>[];
+      int bodyStartIndex = 0;
 
-        for (final bullet in bulletLines) {
-          final colonIndex = bullet.indexOf(':');
-          if (colonIndex != -1) {
-            final key = bullet.substring(0, colonIndex).trim().toLowerCase();
-            final value = bullet.substring(colonIndex + 1).trim();
-            fields[key] = value;
-          }
+      for (int i = 0; i < lines.length; i++) {
+        final line = lines[i];
+        if (line.startsWith('- ') || line.startsWith('* ')) {
+          bulletLines.add(line.substring(2)); // Remove bullet prefix
+        } else if (line.trim().isEmpty) {
+          continue;
+        } else {
+          bodyStartIndex = i;
+          break;
         }
-
-        bodyContent = lines.sublist(bodyStartIndex).join('\n').trim();
-      } else {
-        bodyContent = content;
       }
 
-      return JobReq(
-        id: (fields['job req id'] ?? fields['id'] ?? '').toString(),
-        title: (fields['job title'] ?? fields['title'] ?? '').toString(),
+      for (final bullet in bulletLines) {
+        final colonIndex = bullet.indexOf(':');
+        if (colonIndex != -1) {
+          final key = bullet.substring(0, colonIndex).trim().toLowerCase();
+          final value = bullet.substring(colonIndex + 1).trim();
+          fields[key] = value;
+        }
+      }
+
+      bodyContent = lines.sublist(bodyStartIndex).join('\n').trim();
+    } else {
+      bodyContent = content;
+    }
+
+    return Right(
+      JobReq(
+        id: (fields['job_req_id'] ?? fields['job req id'] ?? fields['id'] ?? '')
+            .toString(),
+        title:
+            (fields['job_title'] ??
+                    fields['job title'] ??
+                    fields['title'] ??
+                    '')
+                .toString(),
         content: bodyContent,
         salary: fields['salary']?.toString(),
         location: fields['location']?.toString(),
-        concern: fields['concern'] != null
+        concern: fields['concern_name'] != null || fields['concern'] != null
             ? Concern(
-                name: fields['concern'].toString(),
+                name: (fields['concern_name'] ?? fields['concern']).toString(),
                 location: fields['location']?.toString(),
               )
             : null,
         state: (fields['state'] ?? 'raw').toString(),
-        createdDate: fields['created date'] != null
+        createdDate: fields['created_date'] != null
+            ? DateTime.tryParse(fields['created_date'].toString())
+            : fields['created date'] != null
             ? DateTime.tryParse(fields['created date'].toString())
             : fields['posted'] != null
             ? DateTime.tryParse(fields['posted'].toString())
             : null,
-        whereFound: (fields['where found'] ?? fields['company'] ?? '')
-            .toString(),
-      );
-    } catch (e) {
-      return null;
-    }
+        whereFound:
+            (fields['where_found'] ??
+                    fields['where found'] ??
+                    fields['company'] ??
+                    '')
+                .toString(),
+      ),
+    );
   }
 }

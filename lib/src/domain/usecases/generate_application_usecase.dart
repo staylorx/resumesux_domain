@@ -10,7 +10,7 @@ class GenerateApplicationUsecase {
   final GenerateResumeUsecase generateResumeUsecase;
   final GenerateCoverLetterUsecase generateCoverLetterUsecase;
   final GenerateFeedbackUsecase generateFeedbackUsecase;
-  final GenerateJobReqFrontmatterUsecase generateJobReqFrontmatterUsecase;
+  final PreprocessJobReqUsecase preprocessJobReqUsecase;
 
   /// Creates a new instance of [GenerateApplicationUsecase].
   GenerateApplicationUsecase({
@@ -19,7 +19,7 @@ class GenerateApplicationUsecase {
     required this.generateResumeUsecase,
     required this.generateCoverLetterUsecase,
     required this.generateFeedbackUsecase,
-    required this.generateJobReqFrontmatterUsecase,
+    required this.preprocessJobReqUsecase,
   });
 
   /// Generates an application for the given job requirement.
@@ -60,13 +60,13 @@ class GenerateApplicationUsecase {
     if (jobReqResult.isLeft()) {
       final failure = jobReqResult.getLeft().toNullable()!;
       if (failure is ParsingFailure) {
-        progress('Parsing failed, generating frontmatter for job: $jobReqPath');
-        logger.info('Parsing failed, generating frontmatter for $jobReqPath');
-        final frontmatterResult = await generateJobReqFrontmatterUsecase(
+        progress('Parsing failed, preprocessing job req for: $jobReqPath');
+        logger.info('Parsing failed, preprocessing job req for $jobReqPath');
+        final preprocessResult = await preprocessJobReqUsecase(
           path: jobReqPath,
         );
-        if (frontmatterResult.isLeft()) {
-          return frontmatterResult.map((_) => unit);
+        if (preprocessResult.isLeft()) {
+          return preprocessResult.map((_) => unit);
         }
         // Retry getJobReq
         jobReqResult = await jobReqRepository.getJobReq(path: jobReqPath);
