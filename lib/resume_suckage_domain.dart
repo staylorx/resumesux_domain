@@ -3,6 +3,7 @@ library;
 // Core
 export 'src/core/failure.dart';
 export 'src/core/logger.dart';
+export 'src/core/yaml_to_bullets.dart';
 
 // Domain
 export 'src/domain/domain.dart';
