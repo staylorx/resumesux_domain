@@ -1,4 +1,6 @@
 /// Exports for domain entities.
+library;
+
 export 'address.dart';
 export 'applicant.dart';
 export 'asset.dart';
