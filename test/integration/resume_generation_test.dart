@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/data/storage/datasources/job_req_sembast_datasource.dart';
 
 void main() {
   late DigestRepository digestRepository;
@@ -11,7 +12,9 @@ void main() {
 
   setUp(() {
     digestRepository = DigestRepositoryImpl(digestPath: 'test/data/digest');
-    jobReqRepository = JobReqRepositoryImpl();
+    jobReqRepository = JobReqRepositoryImpl(
+      jobReqDatasource: JobReqSembastDatasource(),
+    );
 
     final model = AiModel(
       name: 'qwen/qwen2.5-coder-14b',

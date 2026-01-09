@@ -1,11 +1,9 @@
----
 title: Senior Data Scientist
 company: DataDriven Analytics
 location: Seattle, WA
 type: Full-time
 salary: $130,000 - $170,000
 posted: 2023-10-05
----
 
 ## Job Description
 

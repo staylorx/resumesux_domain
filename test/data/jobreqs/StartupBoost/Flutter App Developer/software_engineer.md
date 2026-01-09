@@ -8,6 +8,7 @@
 We need a skilled Flutter developer to build a comprehensive e-commerce mobile app for our startup. The app should include user authentication, product catalog, shopping cart, payment processing, and order tracking.
 
 Requirements:
+
 - Develop cross-platform mobile app using Flutter
 - Integrate with Firebase for backend services
 - Implement secure payment gateway (Stripe/PayPal)
@@ -16,12 +17,14 @@ Requirements:
 - Provide clean, documented code
 
 Deliverables:
+
 - Complete Flutter project with source code
 - APK/IPA files for testing
 - Documentation for setup and deployment
 - 1 month post-launch support
 
 Client Expectations:
+
 - Weekly progress updates
 - Agile development approach
 - High-quality, bug-free code

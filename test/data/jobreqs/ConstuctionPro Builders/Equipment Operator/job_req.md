@@ -1,11 +1,9 @@
----
 title: Heavy Equipment Operator
 company: ConstructionPro Builders
 location: Denver, CO
 type: Full-time
 salary: $45,000 - $65,000
 posted: 2023-10-10
----
 
 ## Job Description
 

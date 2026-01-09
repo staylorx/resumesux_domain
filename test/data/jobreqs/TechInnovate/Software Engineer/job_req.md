@@ -1,11 +1,9 @@
----
 title: Senior Software Engineer
 company: TechInnovate Inc.
 location: San Francisco, CA
 type: Full-time
 salary: $120,000 - $160,000
 posted: 2023-10-01
----
 
 ## Job Description
 

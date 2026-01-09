@@ -147,9 +147,6 @@ class GenerateApplicationUsecase {
     if (saveResult.isRight()) {
       progress('Application saved successfully');
       logger.info('Application saved successfully');
-      // Mark job req as processed
-      await jobReqRepository.markAsProcessed(path: jobReqPath);
-      logger.fine('Job req marked as processed');
     } else {
       final failure = saveResult.getLeft().toNullable()!;
       progress('Failed to save application: ${failure.message}');

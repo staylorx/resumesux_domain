@@ -63,14 +63,7 @@ class GenerateJobReqFrontmatterUsecase {
         existingJobReq: existingJobReq,
       );
 
-      final updateResult = await jobReqRepository.updateFrontmatter(
-        path: path,
-        jobReq: updatedJobReq,
-      );
-      if (updateResult.isLeft()) {
-        return Left(updateResult.getLeft().toNullable()!);
-      }
-
+      // Note: Not saving to file anymore, just returning the parsed JobReq
       return Right(updatedJobReq);
     } catch (e) {
       return Left(
@@ -102,7 +95,6 @@ $content
 Instructions:
 - job_req_id: Generate a unique ID based on the filename if not present or improve if exists. Format: something like "JOB-XXXX" where XXXX is derived from filename.
 - job_title: Extract or improve the job title from the content.
-- processed: Always set to false.
 - created_date: Use current date in ISO 8601 format (YYYY-MM-DD) if not present.
 - where_found: Extract the source if mentioned in content, otherwise 'Unknown'.
 - concern_name: Extract the company, organization, or team name if mentioned in content, otherwise 'Unknown'.
@@ -110,7 +102,6 @@ Instructions:
 Return only the YAML frontmatter without the --- delimiters, like:
 job_req_id: "JOB-EXAMPLE"
 job_title: "Example Job Title"
-processed: false
 created_date: "2023-12-12"
 where_found: "Unknown"
 concern_name: "The Best Company In The World, Inc."
@@ -149,7 +140,7 @@ concern_name: "The Best Company In The World, Inc."
       id: (fields['job_req_id'] as String?) ?? existingJobReq?.id ?? '',
       title: (fields['job_title'] as String?) ?? existingJobReq?.title ?? '',
       content: bodyContent,
-      processed: (fields['processed'] as bool?) ?? false,
+      state: 'raw',
       createdDate:
           (fields['created_date'] as DateTime?) ??
           existingJobReq?.createdDate ??

@@ -1,11 +1,8 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-/// Repository for job requirement-related operations.
-abstract class JobReqRepository {
-  /// Retrieves a job requirement from the given path.
-  Future<Either<Failure, JobReq>> getJobReq({required String path});
-
+/// Abstract datasource for job requirement storage operations.
+abstract class JobReqDatasource {
   /// Saves a preprocessed job requirement.
   Future<Either<Failure, Unit>> savePreprocessedJobReq({
     required JobReq jobReq,
