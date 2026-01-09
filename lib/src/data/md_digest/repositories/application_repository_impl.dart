@@ -21,7 +21,8 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     try {
       final now = DateTime.now();
       final dateStr = DateFormat('yyyyMMdd').format(now);
-      final sanitizedTitle = jobTitle
+      final effectiveTitle = jobTitle.isNotEmpty ? jobTitle : 'unknown';
+      final sanitizedTitle = effectiveTitle
           .replaceAll(RegExp(r'[^\w\s-]'), '')
           .replaceAll(' ', '_');
       final dirName = '$dateStr - $sanitizedTitle';

@@ -48,6 +48,7 @@ class GenerateJobReqFrontmatterUsecase {
         existingId: existingJobReq?.id,
         existingTitle: existingJobReq?.title,
         existingWhereFound: existingJobReq?.whereFound,
+        existingConcernName: existingJobReq?.concern?.name,
         filename: path.split(Platform.pathSeparator).last,
       );
 
@@ -77,6 +78,7 @@ class GenerateJobReqFrontmatterUsecase {
     String? existingId,
     String? existingTitle,
     String? existingWhereFound,
+    String? existingConcernName,
     required String filename,
   }) {
     return '''
@@ -86,6 +88,7 @@ Existing frontmatter (if any):
 - job_req_id: ${existingId ?? 'Not present'}
 - job_title: ${existingTitle ?? 'Not present'}
 - where_found: ${existingWhereFound ?? 'Not present'}
+- concern_name: ${existingConcernName ?? 'Not present'}
 
 Filename: $filename
 
@@ -105,6 +108,8 @@ job_title: "Example Job Title"
 created_date: "2023-12-12"
 where_found: "Unknown"
 concern_name: "The Best Company In The World, Inc."
+
+Do your best, but if information is absolutely not present, use 'Unknown'. Make no assumptions beyond the content provided.
 ''';
   }
 
@@ -140,6 +145,9 @@ concern_name: "The Best Company In The World, Inc."
       id: (fields['job_req_id'] as String?) ?? existingJobReq?.id ?? '',
       title: (fields['job_title'] as String?) ?? existingJobReq?.title ?? '',
       content: bodyContent,
+      concern: fields['concern_name'] != null
+          ? Concern(name: fields['concern_name'] as String)
+          : existingJobReq?.concern,
       state: 'raw',
       createdDate:
           (fields['created_date'] as DateTime?) ??
