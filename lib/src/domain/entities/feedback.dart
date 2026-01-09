@@ -4,12 +4,15 @@ import 'doc.dart';
 
 /// Represents feedback document with its content.
 class Feedback extends Doc with EquatableMixin {
-  final String content;
+  Feedback({required super.content, super.createdAt, super.updatedAt});
 
-  Feedback({required this.content});
-
+  @override
   Feedback copyWith({String? content}) {
-    return Feedback(content: content ?? this.content);
+    return Feedback(
+      content: content ?? this.content,
+      createdAt: createdAt,
+      updatedAt: DateTime.now(),
+    );
   }
 
   @override

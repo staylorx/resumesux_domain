@@ -165,7 +165,9 @@ class ConfigRepositoryImpl implements ConfigRepository {
 
     // If only warnings, proceed but log them
     if (warnings.isNotEmpty) {
-      logger.warning('[ConfigRepository] Config validation completed with warnings');
+      logger.warning(
+        '[ConfigRepository] Config validation completed with warnings',
+      );
     }
 
     // Second pass: Parse the config (proceed since no errors)

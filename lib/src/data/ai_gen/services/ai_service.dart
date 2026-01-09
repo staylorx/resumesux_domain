@@ -61,10 +61,14 @@ class AiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final content = data['choices'][0]['message']['content'] as String;
-        logger.fine('[AiService] AI response content length: ${content.length}');
+        logger.fine(
+          '[AiService] AI response content length: ${content.length}',
+        );
         return Right(content);
       } else {
-        logger.severe('[AiService] AI API request failed: ${response.statusCode}');
+        logger.severe(
+          '[AiService] AI API request failed: ${response.statusCode}',
+        );
         return Left(
           ServiceFailure(
             message:
