@@ -21,7 +21,7 @@ void main() {
 
     final provider = AiProvider(
       id: 'lmstudio',
-      url: 'http://127.0.0.1:1234',
+      url: 'http://127.0.0.1:1234/v1',
       key: 'dummy-key',
       models: [model],
       defaultModel: model,

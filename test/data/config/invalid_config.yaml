@@ -1,0 +1,28 @@
+config:
+  outputDir: "output"
+  includeCover: true
+  includeFeedback: true
+  applicant:
+    name: "John Doe"
+    preferred_name: "John"
+    email: "john.doe@example.com"
+    address:
+      street1: "123 Main St"
+      city: "Anytown"
+      state: "CA"
+      zip: "12345"
+    phone: "(555) 123-4567"
+    linkedin: "https://linkedin.com/in/johndoe"
+    github: "https://github.com/johndoe"
+  providers:
+    lmstudio:
+      url: "http://127.0.0.1:1234"
+      key: "dummy-key"
+      default: true
+      models:
+        - name: "qwen/qwen2.5-coder-14b"
+          default: true
+          settings:
+            temperature: 0.8
+        - name: "another-model"
+          default: true  # Invalid: multiple defaults
