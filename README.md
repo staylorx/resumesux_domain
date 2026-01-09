@@ -1,6 +1,6 @@
 # Resume Suckage Domain
 
-A clean architecture Dart package for resume and job application generation using AI. This package provides the domain and data layers for the ResumeSux application, including entities, use cases, and data repositories with AI service integration. Supports multiple AI providers like LM Studio.
+A clean architecture Dart package for resume and job application generation using AI. This package provides the domain and data layers for the ResumesUX application, including entities, use cases, and data repositories with AI service integration. Supports multiple AI providers like LM Studio.
 
 ## Features
 
