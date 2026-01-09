@@ -18,6 +18,7 @@ config:
     testprovider:
       url: "http://localhost:3000"
       key: "test-key"
+      default: true
       models:
         - name: "test-model"
           default: true

@@ -288,6 +288,16 @@ class ConfigRepositoryImpl implements ConfigRepository {
       providers.add(provider);
     }
 
+    // Validate that exactly one provider is marked as default
+    final defaultProviders = providers.where((p) => p.isDefault).toList();
+    if (defaultProviders.length != 1) {
+      return Left(
+        ValidationFailure(
+          message: 'Config must have exactly one provider with "default: true"',
+        ),
+      );
+    }
+
     return Right(
       Config(
         outputDir: outputDir,

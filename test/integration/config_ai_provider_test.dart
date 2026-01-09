@@ -115,7 +115,7 @@ void main() {
       expect(provider.id, 'testprovider');
       expect(provider.models.length, 1);
       expect(provider.defaultModel?.name, 'test-model');
-      expect(provider.isDefault, false); // no default specified
+      expect(provider.isDefault, true); // default specified
     });
 
     test('fail to load invalid config file', () async {
@@ -130,6 +130,21 @@ void main() {
       final failure = result.getLeft().toNullable()!;
       expect(failure, isA<ValidationFailure>());
       expect(failure.message, contains('must have exactly one model with'));
+    });
+
+    test('fail to load config with multiple default providers', () async {
+      // Arrange
+      final configPath =
+          'test/data/config/invalid_multiple_defaults_config.yaml';
+
+      // Act
+      final result = await configRepository.loadConfig(configPath: configPath);
+
+      // Assert
+      expect(result.isLeft(), true);
+      final failure = result.getLeft().toNullable()!;
+      expect(failure, isA<ValidationFailure>());
+      expect(failure.message, contains('must have exactly one provider with'));
     });
 
     test('fail to load non-existent config file', () async {
