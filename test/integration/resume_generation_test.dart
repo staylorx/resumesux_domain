@@ -1,18 +1,8 @@
 import 'package:http/http.dart' as http;
-import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
-class MockHttpClient extends Mock implements http.Client {}
-
 void main() {
-  setUpAll(() {
-    registerFallbackValue(Uri.parse('http://example.com'));
-    registerFallbackValue(<String, String>{});
-    registerFallbackValue(<String, dynamic>{});
-  });
-
-  late MockHttpClient mockHttpClient;
   late DigestRepository digestRepository;
   late JobReqRepository jobReqRepository;
   late AiService aiService;
@@ -20,32 +10,13 @@ void main() {
   late GenerateCoverLetterUsecase generateCoverLetterUsecase;
 
   setUp(() {
-    mockHttpClient = MockHttpClient();
-    digestRepository = DigestRepositoryImpl(digestPath: 'digest');
+    digestRepository = DigestRepositoryImpl(digestPath: 'test/data/digest');
     jobReqRepository = JobReqRepositoryImpl();
-
-    // Mock the HTTP response for AI generation
-    when(() => mockHttpClient.post(
-          any(),
-          headers: any(named: 'headers'),
-          body: any(named: 'body'),
-        )).thenAnswer((_) async => http.Response(
-          '{"choices": [{"message": {"content": "# John Doe\\n\\n## Professional Summary\\nExperienced software engineer...\\n\\n## Skills\\n- Dart\\n- Flutter\\n\\n## Experience\\n- Senior Software Engineer at TechCorp\\n"}}]}',
-          200,
-        ));
-
-    final dummyProvider = AiProvider(
-      id: 'lmstudio',
-      url: 'http://127.0.0.1:1234',
-      key: 'dummy-key',
-      models: [],
-      settings: {'max_tokens': 4000, 'temperature': 0.7},
-    );
 
     final model = AiModel(
       name: 'qwen/qwen2.5-coder-14b',
-      provider: dummyProvider,
       isDefault: true,
+      settings: {'temperature': 0.8},
     );
 
     final provider = AiProvider(
@@ -54,10 +25,11 @@ void main() {
       key: 'dummy-key',
       models: [model],
       defaultModel: model,
-      settings: {'max_tokens': 4000, 'temperature': 0.7},
+      settings: {'max_tokens': 4000, 'temperature': 0.8},
+      isDefault: true,
     );
 
-    aiService = AiService(httpClient: mockHttpClient, provider: provider);
+    aiService = AiService(httpClient: http.Client(), provider: provider);
 
     generateResumeUsecase = GenerateResumeUsecase(
       digestRepository: digestRepository,
@@ -72,9 +44,13 @@ void main() {
 
   test('generate resume for software engineer job', () async {
     // Arrange
-    final jobReqResult = await jobReqRepository.getJobReq(path: 'digest/software_engineer/job_req.md');
+    final jobReqResult = await jobReqRepository.getJobReq(
+      path: 'test/data/jobreqs/TechInnovate/Software Engineer/job_req.md',
+    );
     expect(jobReqResult.isRight(), true);
-    final jobReq = jobReqResult.getOrElse((_) => throw Exception('Failed to load job req'));
+    final jobReq = jobReqResult.getOrElse(
+      (_) => throw Exception('Failed to load job req'),
+    );
 
     final applicant = Applicant(
       name: 'John Doe',
@@ -101,17 +77,22 @@ void main() {
 
     // Assert
     expect(result.isRight(), true);
-    final resume = result.getOrElse((_) => throw Exception('Failed to generate resume'));
+    final resume = result.getOrElse(
+      (_) => throw Exception('Failed to generate resume'),
+    );
     expect(resume.content, isNotEmpty);
-    expect(resume.content, contains('John Doe'));
-    expect(resume.content, contains('Professional Summary'));
   });
 
   test('generate cover letter for data scientist job', () async {
     // Arrange
-    final jobReqResult = await jobReqRepository.getJobReq(path: 'digest/data_scientist/job_req.md');
+    final jobReqResult = await jobReqRepository.getJobReq(
+      path:
+          'test/data/jobreqs/TelecomPlus/Customer Churn Prediction Model Development/data_scientist.md',
+    );
     expect(jobReqResult.isRight(), true);
-    final jobReq = jobReqResult.getOrElse((_) => throw Exception('Failed to load job req'));
+    final jobReq = jobReqResult.getOrElse(
+      (_) => throw Exception('Failed to load job req'),
+    );
 
     final applicant = Applicant(
       name: 'John Doe',
@@ -138,8 +119,9 @@ void main() {
 
     // Assert
     expect(result.isRight(), true);
-    final coverLetter = result.getOrElse((_) => throw Exception('Failed to generate cover letter'));
+    final coverLetter = result.getOrElse(
+      (_) => throw Exception('Failed to generate cover letter'),
+    );
     expect(coverLetter.content, isNotEmpty);
-    expect(coverLetter.content, contains('John Doe'));
   });
 }

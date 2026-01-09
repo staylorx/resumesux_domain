@@ -11,7 +11,7 @@ export 'doc.dart';
 export 'feedback.dart';
 export 'gig.dart';
 export 'job_req.dart';
-export 'ai_model.dart';
+export '../value_objects/ai_model.dart';
 export 'ai_provider.dart';
 export 'resume.dart';
 export 'tag.dart';

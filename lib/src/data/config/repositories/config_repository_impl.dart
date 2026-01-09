@@ -253,7 +253,6 @@ class ConfigRepositoryImpl implements ConfigRepository {
 
         final model = AiModel(
           name: name,
-          provider: tempProvider,
           isDefault: modelIsDefault,
           settings: modelSettings,
         );
