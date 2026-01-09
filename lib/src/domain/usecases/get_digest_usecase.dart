@@ -1,8 +1,10 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:logging/logging.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
 /// Use case for retrieving digest data including gigs and assets.
 class GetDigestUsecase {
+  final Logger logger = LoggerFactory.create('GetDigestUsecase');
   final GigRepository gigRepository;
   final AssetRepository assetRepository;
 

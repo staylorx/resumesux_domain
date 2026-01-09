@@ -1,8 +1,10 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:logging/logging.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
 /// Use case for generating a complete job application including resume, cover letter, and feedback.
 class GenerateApplicationUsecase {
+  final Logger logger = LoggerFactory.create('GenerateApplicationUsecase');
   final JobReqRepository jobReqRepository;
   final ApplicationRepository applicationRepository;
   final GenerateResumeUsecase generateResumeUsecase;
@@ -52,7 +54,7 @@ class GenerateApplicationUsecase {
   }) async {
     progress('Starting application generation for job: $jobReqPath');
     logger.info(
-      '[GenerateApplicationUsecase] Starting application generation for job: $jobReqPath',
+      'Starting application generation for job: $jobReqPath',
     );
 
     // Get job req
@@ -62,7 +64,7 @@ class GenerateApplicationUsecase {
       if (failure is ParsingFailure) {
         progress('Parsing failed, generating frontmatter for job: $jobReqPath');
         logger.info(
-          '[GenerateApplicationUsecase] Parsing failed, generating frontmatter for $jobReqPath',
+          'Parsing failed, generating frontmatter for $jobReqPath',
         );
         final frontmatterResult = await generateJobReqFrontmatterUsecase(
           path: jobReqPath,
@@ -81,7 +83,7 @@ class GenerateApplicationUsecase {
     final jobReq = (jobReqResult as Right<Failure, JobReq>).value;
 
     progress('Generating resume');
-    logger.info('[GenerateApplicationUsecase] Generating resume');
+    logger.info('Generating resume');
     // Generate resume
     final resumeResult = await generateResumeUsecase(
       jobReq: jobReq,
@@ -92,13 +94,13 @@ class GenerateApplicationUsecase {
 
     final resume = (resumeResult as Right<Failure, Resume>).value;
     progress('Resume generated successfully');
-    logger.info('[GenerateApplicationUsecase] Resume generated successfully');
+    logger.info('Resume generated successfully');
 
     // Generate cover letter if requested
     CoverLetter? coverLetter;
     if (includeCover) {
       progress('Generating cover letter');
-      logger.info('[GenerateApplicationUsecase] Generating cover letter');
+      logger.info('Generating cover letter');
       final coverResult = await generateCoverLetterUsecase(
         jobReq: jobReq,
         applicant: applicant,
@@ -113,7 +115,7 @@ class GenerateApplicationUsecase {
     Feedback feedback;
     if (includeFeedback) {
       progress('Generating feedback');
-      logger.info('[GenerateApplicationUsecase] Generating feedback');
+      logger.info('Generating feedback');
       final feedbackResult = await generateFeedbackUsecase(
         jobReq: jobReq,
         resume: resume,
@@ -133,7 +135,7 @@ class GenerateApplicationUsecase {
     // Save application
     progress('Saving application');
     logger.info(
-      '[GenerateApplicationUsecase] Saving application to output directory: $outputDir',
+      'Saving application to output directory: $outputDir',
     );
     final saveResult = await applicationRepository.saveApplication(
       jobReqId: jobReq.id,
@@ -147,16 +149,16 @@ class GenerateApplicationUsecase {
     if (saveResult.isRight()) {
       progress('Application saved successfully');
       logger.info(
-        '[GenerateApplicationUsecase] Application saved successfully',
+        'Application saved successfully',
       );
       // Mark job req as processed
       await jobReqRepository.markAsProcessed(id: jobReq.id);
-      logger.fine('[GenerateApplicationUsecase] Job req marked as processed');
+      logger.fine('Job req marked as processed');
     } else {
       final failure = saveResult.getLeft().toNullable()!;
       progress('Failed to save application: ${failure.message}');
       logger.severe(
-        '[GenerateApplicationUsecase] Failed to save application: ${failure.message}',
+        'Failed to save application: ${failure.message}',
       );
     }
 

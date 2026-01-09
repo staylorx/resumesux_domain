@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:json_schema/json_schema.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
@@ -9,6 +10,7 @@ import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 const String kAppName = 'resumesux';
 
 class ConfigRepositoryImpl implements ConfigRepository {
+  final Logger logger = LoggerFactory.create('ConfigRepositoryImpl');
   final ConfigDatasource configDatasource;
 
   ConfigRepositoryImpl({required this.configDatasource});

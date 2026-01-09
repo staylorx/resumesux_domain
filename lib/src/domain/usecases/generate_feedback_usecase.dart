@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:logging/logging.dart';
 
 import '../../core/failure.dart';
 import '../../core/logger.dart';
@@ -15,6 +16,7 @@ import '../../data/ai_gen/services/ai_service.dart';
 
 /// Use case for generating feedback on an application.
 class GenerateFeedbackUsecase {
+  final Logger logger = LoggerFactory.create('GenerateFeedbackUsecase');
   final AiService aiService;
 
   /// Creates a new instance of [GenerateFeedbackUsecase].

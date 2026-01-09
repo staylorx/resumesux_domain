@@ -1,8 +1,10 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:logging/logging.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
 /// Use case for retrieving and enriching applicant information.
 class GetApplicantUsecase {
+  final Logger logger = LoggerFactory.create('GetApplicantUsecase');
   final ApplicantRepository applicantRepository;
 
   /// Creates a new instance of [GetApplicantUsecase].

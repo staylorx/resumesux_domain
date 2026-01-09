@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
 class ApplicationRepositoryImpl implements ApplicationRepository {
+  final Logger logger = LoggerFactory.create('ApplicationRepositoryImpl');
   @override
   Future<Either<Failure, Unit>> saveApplication({
     required String jobReqId,

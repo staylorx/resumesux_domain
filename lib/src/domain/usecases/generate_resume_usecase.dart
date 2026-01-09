@@ -1,8 +1,10 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:logging/logging.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
 /// Use case for generating a resume.
 class GenerateResumeUsecase {
+  final Logger logger = LoggerFactory.create('GenerateResumeUsecase');
   final DigestRepository digestRepository;
   final AiService aiService;
 

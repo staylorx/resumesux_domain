@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:fpdart/fpdart.dart';
+import 'package:logging/logging.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
 // TODO: is there any other data returned from the result, for instance, how much
@@ -9,6 +10,7 @@ import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
 /// Service for generating content using AI providers.
 class AiService {
+  final Logger logger = LoggerFactory.create('AiService');
   final http.Client httpClient;
   final AiProvider provider;
 

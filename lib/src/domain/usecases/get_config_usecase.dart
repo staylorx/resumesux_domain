@@ -1,8 +1,10 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:logging/logging.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
 /// Use case for loading application configuration.
 class GetConfigUsecase {
+  final Logger logger = LoggerFactory.create('GetConfigUsecase');
   final ConfigRepository configRepository;
 
   /// Creates a new instance of [GetConfigUsecase].

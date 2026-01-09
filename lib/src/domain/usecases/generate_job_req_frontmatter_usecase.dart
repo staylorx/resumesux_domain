@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
+import 'package:logging/logging.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
 /// Use case for generating or improving frontmatter for a job requirement file.
 class GenerateJobReqFrontmatterUsecase {
+  final Logger logger = LoggerFactory.create('GenerateJobReqFrontmatterUsecase');
   final JobReqRepository jobReqRepository;
   final AiService aiService;
 
