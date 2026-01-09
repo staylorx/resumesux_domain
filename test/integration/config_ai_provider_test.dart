@@ -38,12 +38,17 @@ void main() {
 
       // Assert
       expect(result.isRight(), true);
-      final config = result.getOrElse((_) => throw Exception('Failed to load config'));
+      final config = result.getOrElse(
+        (_) => throw Exception('Failed to load config'),
+      );
 
       expect(config.outputDir, 'output');
       expect(config.includeCover, true);
       expect(config.includeFeedback, true);
-      expect(config.customPrompt, 'Generate professional content tailored to the job requirements.');
+      expect(
+        config.customPrompt,
+        'Generate professional content tailored to the job requirements.',
+      );
       expect(config.digestPath, 'digest');
       expect(config.appendPrompt, false); // default value
 
@@ -58,14 +63,18 @@ void main() {
       // Check providers
       expect(config.providers.length, 2);
 
-      final lmstudioProvider = config.providers.firstWhere((p) => p.id == 'lmstudio');
+      final lmstudioProvider = config.providers.firstWhere(
+        (p) => p.id == 'lmstudio',
+      );
       expect(lmstudioProvider.url, 'http://127.0.0.1:1234');
       expect(lmstudioProvider.key, 'dummy-key');
       expect(lmstudioProvider.isDefault, true);
       expect(lmstudioProvider.models.length, 1);
       expect(lmstudioProvider.defaultModel?.name, 'qwen/qwen2.5-coder-14b');
 
-      final openaiProvider = config.providers.firstWhere((p) => p.id == 'openai');
+      final openaiProvider = config.providers.firstWhere(
+        (p) => p.id == 'openai',
+      );
       expect(openaiProvider.url, 'https://api.openai.com/v1');
       expect(openaiProvider.key, 'sk-test-key');
       expect(openaiProvider.isDefault, false);
@@ -82,7 +91,9 @@ void main() {
 
       // Assert
       expect(result.isRight(), true);
-      final config = result.getOrElse((_) => throw Exception('Failed to load config'));
+      final config = result.getOrElse(
+        (_) => throw Exception('Failed to load config'),
+      );
 
       expect(config.outputDir, 'output');
       expect(config.includeCover, false);
@@ -93,7 +104,10 @@ void main() {
 
       // Check applicant
       expect(config.applicant.name, 'Jane Smith');
-      expect(config.applicant.address!.zip, '67890'); // number converted to string
+      expect(
+        config.applicant.address!.zip,
+        '67890',
+      ); // number converted to string
 
       // Check providers
       expect(config.providers.length, 1);
@@ -138,11 +152,15 @@ void main() {
       final configPath = 'test/data/config/valid_config.yaml';
 
       // Act
-      final result = await configRepository.getDefaultProvider(configPath: configPath);
+      final result = await configRepository.getDefaultProvider(
+        configPath: configPath,
+      );
 
       // Assert
       expect(result.isRight(), true);
-      final provider = result.getOrElse((_) => throw Exception('Failed to get provider'))!;
+      final provider = result.getOrElse(
+        (_) => throw Exception('Failed to get provider'),
+      )!;
       expect(provider.id, 'lmstudio');
       expect(provider.isDefault, true);
       expect(provider.defaultModel?.name, 'qwen/qwen2.5-coder-14b');
@@ -160,7 +178,9 @@ void main() {
 
       // Assert
       expect(result.isRight(), true);
-      final provider = result.getOrElse((_) => throw Exception('Failed to get provider'));
+      final provider = result.getOrElse(
+        (_) => throw Exception('Failed to get provider'),
+      );
       expect(provider.id, 'openai');
       expect(provider.isDefault, false);
       expect(provider.defaultModel?.name, 'gpt-4');
@@ -186,9 +206,13 @@ void main() {
     test('check if provider has default model', () async {
       // Arrange
       final configPath = 'test/data/config/valid_config.yaml';
-      final configResult = await configRepository.loadConfig(configPath: configPath);
+      final configResult = await configRepository.loadConfig(
+        configPath: configPath,
+      );
       expect(configResult.isRight(), true);
-      final config = configResult.getOrElse((_) => throw Exception('Failed to load config'));
+      final config = configResult.getOrElse(
+        (_) => throw Exception('Failed to load config'),
+      );
       final provider = config.providers.firstWhere((p) => p.id == 'lmstudio');
 
       // Act
@@ -241,30 +265,32 @@ void main() {
 }
 ''');
 
-      when(() => mockHttpClient.post(
-        any(),
-        headers: any(named: 'headers'),
-        body: any(named: 'body'),
-      )).thenAnswer((_) async => mockResponse);
+      when(
+        () => mockHttpClient.post(
+          any(),
+          headers: any(named: 'headers'),
+          body: any(named: 'body'),
+        ),
+      ).thenAnswer((_) async => mockResponse);
 
       // Act
-      final result = await aiService.generateContent(
-        prompt: 'Test prompt',
-      );
+      final result = await aiService.generateContent(prompt: 'Test prompt');
 
       // Assert
       expect(result.isRight(), true);
       final content = result.getOrElse((_) => '');
       expect(content, 'Generated content from AI');
 
-      verify(() => mockHttpClient.post(
-        Uri.parse('http://127.0.0.1:1234/chat/completions'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer dummy-key',
-        },
-        body: any(named: 'body'),
-      )).called(1);
+      verify(
+        () => mockHttpClient.post(
+          Uri.parse('http://127.0.0.1:1234/chat/completions'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer dummy-key',
+          },
+          body: any(named: 'body'),
+        ),
+      ).called(1);
     });
 
     test('handle API failure response', () async {
@@ -281,16 +307,16 @@ void main() {
       when(() => mockResponse.statusCode).thenReturn(500);
       when(() => mockResponse.body).thenReturn('Internal Server Error');
 
-      when(() => mockHttpClient.post(
-        any(),
-        headers: any(named: 'headers'),
-        body: any(named: 'body'),
-      )).thenAnswer((_) async => mockResponse);
+      when(
+        () => mockHttpClient.post(
+          any(),
+          headers: any(named: 'headers'),
+          body: any(named: 'body'),
+        ),
+      ).thenAnswer((_) async => mockResponse);
 
       // Act
-      final result = await aiService.generateContent(
-        prompt: 'Test prompt',
-      );
+      final result = await aiService.generateContent(prompt: 'Test prompt');
 
       // Assert
       expect(result.isLeft(), true);
@@ -309,16 +335,16 @@ void main() {
         httpClient: mockHttpClient,
       );
 
-      when(() => mockHttpClient.post(
-        any(),
-        headers: any(named: 'headers'),
-        body: any(named: 'body'),
-      )).thenThrow(Exception('Network error'));
+      when(
+        () => mockHttpClient.post(
+          any(),
+          headers: any(named: 'headers'),
+          body: any(named: 'body'),
+        ),
+      ).thenThrow(Exception('Network error'));
 
       // Act
-      final result = await aiService.generateContent(
-        prompt: 'Test prompt',
-      );
+      final result = await aiService.generateContent(prompt: 'Test prompt');
 
       // Assert
       expect(result.isLeft(), true);
@@ -329,22 +355,28 @@ void main() {
   });
 
   group('End-to-End Functional Tests', () {
-    test('complete workflow: load config, select provider, generate content', () async {
-      // Arrange
-      final configPath = 'test/data/config/valid_config.yaml';
+    test(
+      'complete workflow: load config, select provider, generate content',
+      () async {
+        // Arrange
+        final configPath = 'test/data/config/valid_config.yaml';
 
-      // Get default provider
-      final providerResult = await configRepository.getDefaultProvider(configPath: configPath);
-      expect(providerResult.isRight(), true);
-      final provider = providerResult.getOrElse((_) => throw Exception('Failed to get provider'))!;
+        // Get default provider
+        final providerResult = await configRepository.getDefaultProvider(
+          configPath: configPath,
+        );
+        expect(providerResult.isRight(), true);
+        final provider = providerResult.getOrElse(
+          (_) => throw Exception('Failed to get provider'),
+        )!;
 
-      // Create AI service
-      aiService = AiService(httpClient: mockHttpClient, provider: provider);
+        // Create AI service
+        aiService = AiService(httpClient: mockHttpClient, provider: provider);
 
-      // Mock successful AI response
-      final mockResponse = MockResponse();
-      when(() => mockResponse.statusCode).thenReturn(200);
-      when(() => mockResponse.body).thenReturn('''
+        // Mock successful AI response
+        final mockResponse = MockResponse();
+        when(() => mockResponse.statusCode).thenReturn(200);
+        when(() => mockResponse.body).thenReturn('''
 {
   "choices": [
     {
@@ -356,22 +388,26 @@ void main() {
 }
 ''');
 
-      when(() => mockHttpClient.post(
-        any(),
-        headers: any(named: 'headers'),
-        body: any(named: 'body'),
-      )).thenAnswer((_) async => mockResponse);
+        when(
+          () => mockHttpClient.post(
+            any(),
+            headers: any(named: 'headers'),
+            body: any(named: 'body'),
+          ),
+        ).thenAnswer((_) async => mockResponse);
 
-      // Act
-      final contentResult = await aiService.generateContent(
-        prompt: 'Generate a professional resume for a software engineer position',
-      );
+        // Act
+        final contentResult = await aiService.generateContent(
+          prompt:
+              'Generate a professional resume for a software engineer position',
+        );
 
-      // Assert
-      expect(contentResult.isRight(), true);
-      final content = contentResult.getOrElse((_) => '');
-      expect(content, isNotEmpty);
-      expect(content, contains('Professional resume content'));
-    });
+        // Assert
+        expect(contentResult.isRight(), true);
+        final content = contentResult.getOrElse((_) => '');
+        expect(content, isNotEmpty);
+        expect(content, contains('Professional resume content'));
+      },
+    );
   });
 }

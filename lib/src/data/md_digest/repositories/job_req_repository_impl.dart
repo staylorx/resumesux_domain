@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:yaml/yaml.dart';
 
 /// Implementation of the JobReqRepository.
 class JobReqRepositoryImpl implements JobReqRepository {
@@ -140,49 +141,73 @@ class JobReqRepositoryImpl implements JobReqRepository {
   JobReq? _parseJobReq({required String content}) {
     try {
       final lines = content.split('\n');
-      if (lines.isEmpty ||
-          (!lines[0].startsWith('- ') && !lines[0].startsWith('* '))) {
-        return null;
-      }
+      if (lines.isEmpty) return null;
 
-      final bulletLines = <String>[];
-      int bodyStartIndex = 0;
+      String? frontmatterContent;
+      String bodyContent;
+      Map<String, dynamic> fields = {};
 
-      for (int i = 0; i < lines.length; i++) {
-        final line = lines[i];
-        if (line.startsWith('- ') || line.startsWith('* ')) {
-          bulletLines.add(line.substring(2)); // Remove bullet prefix
-        } else if (line.trim().isEmpty) {
-          continue;
+      if (lines[0].trim() == '---') {
+        // YAML frontmatter
+        int endIndex = -1;
+        for (int i = 1; i < lines.length; i++) {
+          if (lines[i].trim() == '---') {
+            endIndex = i;
+            break;
+          }
+        }
+        if (endIndex != -1) {
+          frontmatterContent = lines.sublist(1, endIndex).join('\n');
+          bodyContent = lines.sublist(endIndex + 1).join('\n').trim();
+          final yamlMap = loadYaml(frontmatterContent) as Map?;
+          if (yamlMap != null) {
+            fields = Map<String, dynamic>.from(yamlMap);
+          }
         } else {
-          bodyStartIndex = i;
-          break;
+          bodyContent = content;
         }
-      }
+      } else if (lines[0].startsWith('- ') || lines[0].startsWith('* ')) {
+        // Bullet format
+        final bulletLines = <String>[];
+        int bodyStartIndex = 0;
 
-      if (bulletLines.isEmpty) return null;
-
-      final fields = <String, String>{};
-      for (final bullet in bulletLines) {
-        final colonIndex = bullet.indexOf(':');
-        if (colonIndex != -1) {
-          final key = bullet.substring(0, colonIndex).trim().toLowerCase();
-          final value = bullet.substring(colonIndex + 1).trim();
-          fields[key] = value;
+        for (int i = 0; i < lines.length; i++) {
+          final line = lines[i];
+          if (line.startsWith('- ') || line.startsWith('* ')) {
+            bulletLines.add(line.substring(2)); // Remove bullet prefix
+          } else if (line.trim().isEmpty) {
+            continue;
+          } else {
+            bodyStartIndex = i;
+            break;
+          }
         }
-      }
 
-      final actualContent = lines.sublist(bodyStartIndex).join('\n').trim();
+        for (final bullet in bulletLines) {
+          final colonIndex = bullet.indexOf(':');
+          if (colonIndex != -1) {
+            final key = bullet.substring(0, colonIndex).trim().toLowerCase();
+            final value = bullet.substring(colonIndex + 1).trim();
+            fields[key] = value;
+          }
+        }
+
+        bodyContent = lines.sublist(bodyStartIndex).join('\n').trim();
+      } else {
+        bodyContent = content;
+      }
 
       return JobReq(
-        id: fields['job req id'] ?? '',
-        title: fields['job title'] ?? '',
-        content: actualContent,
-        processed: fields['processed']?.toLowerCase() == 'true',
+        id: (fields['job req id'] ?? fields['id'] ?? '').toString(),
+        title: (fields['job title'] ?? fields['title'] ?? '').toString(),
+        content: bodyContent,
+        processed: (fields['processed'] ?? false).toString().toLowerCase() == 'true',
         createdDate: fields['created date'] != null
-            ? DateTime.tryParse(fields['created date']!)
-            : null,
-        whereFound: fields['where found'],
+            ? DateTime.tryParse(fields['created date'].toString())
+            : fields['posted'] != null
+                ? DateTime.tryParse(fields['posted'].toString())
+                : null,
+        whereFound: (fields['where found'] ?? fields['company'] ?? '').toString(),
       );
     } catch (e) {
       return null;
