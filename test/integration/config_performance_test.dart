@@ -1,7 +1,17 @@
 import 'package:test/test.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:logging/logging.dart';
 
 void main() {
+  Logger.root.level = Level.INFO;
+  Logger.root.onRecord.listen((record) {
+    // ignore: avoid_print
+    print(
+      '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}',
+    );
+  });
+  final logger = LoggerFactory.create('ConfigPerformanceTest');
+
   late ConfigRepositoryImpl configRepository;
   late ConfigDatasource configDatasource;
 
@@ -23,8 +33,11 @@ void main() {
 
       // Assert
       expect(result.isRight(), true);
-      expect(stopwatch.elapsedMilliseconds, lessThan(200)); // Should load in under 200ms (accounting for schema validation)
-      print('Config loading took: ${stopwatch.elapsedMilliseconds}ms');
+      expect(
+        stopwatch.elapsedMilliseconds,
+        lessThan(200),
+      ); // Should load in under 200ms (accounting for schema validation)
+      logger.info('Config loading took: ${stopwatch.elapsedMilliseconds}ms');
     });
 
     test('config loading performance - minimal config', () async {
@@ -40,7 +53,9 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       expect(stopwatch.elapsedMilliseconds, lessThan(50)); // Should load faster
-      print('Minimal config loading took: ${stopwatch.elapsedMilliseconds}ms');
+      logger.info(
+        'Minimal config loading took: ${stopwatch.elapsedMilliseconds}ms',
+      );
     });
 
     test('multiple config loads performance', () async {
@@ -52,7 +67,9 @@ void main() {
       // Act
       stopwatch.start();
       for (int i = 0; i < iterations; i++) {
-        final result = await configRepository.loadConfig(configPath: configPath);
+        final result = await configRepository.loadConfig(
+          configPath: configPath,
+        );
         expect(result.isRight(), true);
       }
       stopwatch.stop();
@@ -60,13 +77,17 @@ void main() {
       // Assert
       final averageTime = stopwatch.elapsedMilliseconds / iterations;
       expect(averageTime, lessThan(50)); // Average should be under 50ms
-      print('Average config loading time over $iterations runs: ${averageTime}ms');
+      logger.info(
+        'Average config loading time over $iterations runs: ${averageTime}ms',
+      );
     });
 
     test('provider selection performance', () async {
       // Arrange
       final configPath = 'test/data/config/valid_config.yaml';
-      final configResult = await configRepository.loadConfig(configPath: configPath);
+      final configResult = await configRepository.loadConfig(
+        configPath: configPath,
+      );
       expect(configResult.isRight(), true);
 
       final iterations = 100;
@@ -86,7 +107,9 @@ void main() {
       // Assert
       final averageTime = stopwatch.elapsedMilliseconds / iterations;
       expect(averageTime, lessThan(10)); // Should be very fast
-      print('Average provider selection time over $iterations runs: ${averageTime}ms');
+      logger.info(
+        'Average provider selection time over $iterations runs: ${averageTime}ms',
+      );
     });
 
     test('default provider retrieval performance', () async {
@@ -98,7 +121,9 @@ void main() {
       // Act
       stopwatch.start();
       for (int i = 0; i < iterations; i++) {
-        final result = await configRepository.getDefaultProvider(configPath: configPath);
+        final result = await configRepository.getDefaultProvider(
+          configPath: configPath,
+        );
         expect(result.isRight(), true);
         expect(result.getOrElse((_) => null), isNotNull);
       }
@@ -107,7 +132,9 @@ void main() {
       // Assert
       final averageTime = stopwatch.elapsedMilliseconds / iterations;
       expect(averageTime, lessThan(10)); // Should be very fast
-      print('Average default provider retrieval time over $iterations runs: ${averageTime}ms');
+      logger.info(
+        'Average default provider retrieval time over $iterations runs: ${averageTime}ms',
+      );
     });
   });
 }

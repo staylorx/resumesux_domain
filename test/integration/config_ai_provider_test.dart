@@ -333,11 +333,6 @@ void main() {
       // Arrange
       final configPath = 'test/data/config/valid_config.yaml';
 
-      // Load config
-      final configResult = await configRepository.loadConfig(configPath: configPath);
-      expect(configResult.isRight(), true);
-      final config = configResult.getOrElse((_) => throw Exception('Failed to load config'));
-
       // Get default provider
       final providerResult = await configRepository.getDefaultProvider(configPath: configPath);
       expect(providerResult.isRight(), true);
