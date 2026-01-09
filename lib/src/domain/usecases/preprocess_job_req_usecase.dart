@@ -30,7 +30,9 @@ class PreprocessJobReqUsecase {
       if (jobReqResult.isLeft()) {
         return Left(jobReqResult.getLeft().toNullable()!);
       }
-      final jobReq = jobReqResult.getOrElse((_) => throw Exception('Unexpected error'));
+      final jobReq = jobReqResult.getOrElse(
+        (_) => throw Exception('Unexpected error'),
+      );
 
       // Build prompt
       final prompt = _buildExtractionPrompt(content: jobReq.content);
@@ -47,7 +49,9 @@ class PreprocessJobReqUsecase {
       // Parse JSON
       final extractedData = _parseAiResponse(aiResponse);
       if (extractedData == null) {
-        return Left(ParsingFailure(message: 'Failed to parse AI response as JSON'));
+        return Left(
+          ParsingFailure(message: 'Failed to parse AI response as JSON'),
+        );
       }
 
       // Create updated JobReq
@@ -65,7 +69,7 @@ class PreprocessJobReqUsecase {
       );
 
       // Save to Sembast
-      final saveResult = await jobReqRepository.savePreprocessedJobReq(
+      final saveResult = await jobReqRepository.updateJobReq(
         jobReq: preprocessedJobReq,
       );
       if (saveResult.isLeft()) {

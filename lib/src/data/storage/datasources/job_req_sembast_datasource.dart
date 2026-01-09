@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:path/path.dart' as path;
-import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:sembast/sembast_memory.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
@@ -30,9 +29,7 @@ class JobReqSembastDatasource implements JobReqDatasource {
   }
 
   @override
-  Future<Either<Failure, Unit>> savePreprocessedJobReq({
-    required JobReq jobReq,
-  }) async {
+  Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq}) async {
     try {
       final db = await _database;
       final record = _jobReqStore.record(jobReq.id);
@@ -56,7 +53,7 @@ class JobReqSembastDatasource implements JobReqDatasource {
       await record.put(db, data);
       return Right(unit);
     } catch (e) {
-      return Left(ServiceFailure(message: 'Failed to save preprocessed job req: $e'));
+      return Left(ServiceFailure(message: 'Failed to update job req: $e'));
     }
   }
 }

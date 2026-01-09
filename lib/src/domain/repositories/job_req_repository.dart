@@ -6,8 +6,6 @@ abstract class JobReqRepository {
   /// Retrieves a job requirement from the given path.
   Future<Either<Failure, JobReq>> getJobReq({required String path});
 
-  /// Saves a preprocessed job requirement.
-  Future<Either<Failure, Unit>> savePreprocessedJobReq({
-    required JobReq jobReq,
-  });
+  /// Updates an existing job requirement.
+  Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq});
 }

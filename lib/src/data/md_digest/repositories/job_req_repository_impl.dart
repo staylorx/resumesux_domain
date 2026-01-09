@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:resumesux_domain/resumesux_domain.dart';
-import '../../storage/datasources/job_req_datasource.dart';
 
 /// Implementation of the JobReqRepository.
 class JobReqRepositoryImpl implements JobReqRepository {
@@ -10,11 +9,9 @@ class JobReqRepositoryImpl implements JobReqRepository {
 
   JobReqRepositoryImpl({required this.jobReqDatasource});
   @override
-  /// Saves a preprocessed job requirement.
-  Future<Either<Failure, Unit>> savePreprocessedJobReq({
-    required JobReq jobReq,
-  }) async {
-    return await jobReqDatasource.savePreprocessedJobReq(jobReq: jobReq);
+  /// Updates an existing job requirement.
+  Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq}) async {
+    return await jobReqDatasource.updateJobReq(jobReq: jobReq);
   }
 
   @override
@@ -55,10 +52,6 @@ class JobReqRepositoryImpl implements JobReqRepository {
       return Left(ServiceFailure(message: 'Failed to read job req: $e'));
     }
   }
-
-
-
-
 
   JobReq? _parseJobReq({required String content}) {
     try {

@@ -1,7 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
-import 'package:resumesux_domain/src/data/storage/datasources/job_req_sembast_datasource.dart';
 
 void main() {
   late DigestRepository digestRepository;

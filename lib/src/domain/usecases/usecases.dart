@@ -10,3 +10,4 @@ export 'generate_cover_letter_usecase.dart';
 export 'generate_feedback_usecase.dart';
 export 'generate_job_req_frontmatter_usecase.dart';
 export 'preprocess_job_req_usecase.dart';
+export 'update_job_req_usecase.dart';
