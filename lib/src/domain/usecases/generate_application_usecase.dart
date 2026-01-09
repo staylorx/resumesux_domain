@@ -53,9 +53,7 @@ class GenerateApplicationUsecase {
     required void Function(String) progress,
   }) async {
     progress('Starting application generation for job: $jobReqPath');
-    logger.info(
-      'Starting application generation for job: $jobReqPath',
-    );
+    logger.info('Starting application generation for job: $jobReqPath');
 
     // Get job req
     var jobReqResult = await jobReqRepository.getJobReq(path: jobReqPath);
@@ -63,9 +61,7 @@ class GenerateApplicationUsecase {
       final failure = jobReqResult.getLeft().toNullable()!;
       if (failure is ParsingFailure) {
         progress('Parsing failed, generating frontmatter for job: $jobReqPath');
-        logger.info(
-          'Parsing failed, generating frontmatter for $jobReqPath',
-        );
+        logger.info('Parsing failed, generating frontmatter for $jobReqPath');
         final frontmatterResult = await generateJobReqFrontmatterUsecase(
           path: jobReqPath,
         );
@@ -134,9 +130,7 @@ class GenerateApplicationUsecase {
 
     // Save application
     progress('Saving application');
-    logger.info(
-      'Saving application to output directory: $outputDir',
-    );
+    logger.info('Saving application to output directory: $outputDir');
     final saveResult = await applicationRepository.saveApplication(
       jobReqId: jobReq.id,
       jobTitle: jobReq.title,
@@ -148,18 +142,14 @@ class GenerateApplicationUsecase {
 
     if (saveResult.isRight()) {
       progress('Application saved successfully');
-      logger.info(
-        'Application saved successfully',
-      );
+      logger.info('Application saved successfully');
       // Mark job req as processed
       await jobReqRepository.markAsProcessed(id: jobReq.id);
       logger.fine('Job req marked as processed');
     } else {
       final failure = saveResult.getLeft().toNullable()!;
       progress('Failed to save application: ${failure.message}');
-      logger.severe(
-        'Failed to save application: ${failure.message}',
-      );
+      logger.severe('Failed to save application: ${failure.message}');
     }
 
     return saveResult;

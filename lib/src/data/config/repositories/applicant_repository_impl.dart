@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
+/// Implementation of the ApplicantRepository.
 class ApplicantRepositoryImpl implements ApplicantRepository {
   final ConfigRepository configRepository;
   final DigestRepository digestRepository;
@@ -11,6 +12,7 @@ class ApplicantRepositoryImpl implements ApplicantRepository {
   });
 
   @override
+  /// Retrieves the applicant with updated digest information.
   Future<Either<Failure, Applicant>> getApplicant({
     required Applicant applicant,
   }) async {

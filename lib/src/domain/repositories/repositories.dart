@@ -1,3 +1,4 @@
+/// Exports for domain repositories.
 export 'gig_repository.dart';
 export 'asset_repository.dart';
 export 'job_req_repository.dart';

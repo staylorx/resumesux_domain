@@ -3,7 +3,9 @@ import 'package:fpdart/fpdart.dart';
 import 'package:yaml/yaml.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
+/// A datasource for loading configuration files.
 class ConfigDatasource {
+  /// Loads a configuration file from the given file path.
   Future<Either<Failure, Map<String, dynamic>>> loadConfigFile(
     String filePath,
   ) async {

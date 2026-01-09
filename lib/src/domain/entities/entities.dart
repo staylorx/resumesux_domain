@@ -1,3 +1,4 @@
+/// Exports for domain entities.
 export 'address.dart';
 export 'applicant.dart';
 export 'asset.dart';

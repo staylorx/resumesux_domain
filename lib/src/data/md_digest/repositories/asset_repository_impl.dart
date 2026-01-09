@@ -3,12 +3,14 @@ import 'package:fpdart/fpdart.dart';
 
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
+/// Implementation of the AssetRepository.
 class AssetRepositoryImpl implements AssetRepository {
   final String digestPath;
 
   AssetRepositoryImpl({required this.digestPath});
 
   @override
+  /// Retrieves all assets from the digest path.
   Future<Either<Failure, List<Asset>>> getAllAssets() async {
     try {
       final assetsDir = Directory('$digestPath/assets');

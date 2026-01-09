@@ -4,9 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
+/// Implementation of the ApplicationRepository.
 class ApplicationRepositoryImpl implements ApplicationRepository {
   final Logger logger = LoggerFactory.create('ApplicationRepositoryImpl');
   @override
+  /// Saves the application files to the output directory.
   Future<Either<Failure, Unit>> saveApplication({
     required String jobReqId,
     required String jobTitle,

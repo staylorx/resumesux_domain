@@ -2,12 +2,14 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
+/// Implementation of the DigestRepository.
 class DigestRepositoryImpl implements DigestRepository {
   final String digestPath;
 
   DigestRepositoryImpl({required this.digestPath});
 
   @override
+  /// Retrieves all digests from the digest path.
   Future<Either<Failure, List<Digest>>> getAllDigests() async {
     try {
       final gigs = await _getAllGigs();

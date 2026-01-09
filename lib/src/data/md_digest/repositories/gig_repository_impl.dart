@@ -2,12 +2,14 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
+/// Implementation of the GigRepository.
 class GigRepositoryImpl implements GigRepository {
   final String digestPath;
 
   GigRepositoryImpl({required this.digestPath});
 
   @override
+  /// Retrieves all gigs from the digest path.
   Future<Either<Failure, List<Gig>>> getAllGigs() async {
     try {
       final gigsDir = Directory('$digestPath/gigs');

@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:resume_suckage_domain/resume_suckage_domain.dart';
 
+/// Implementation of the JobReqRepository.
 class JobReqRepositoryImpl implements JobReqRepository {
   @override
+  /// Retrieves a job requirement from the given path.
   Future<Either<Failure, JobReq>> getJobReq({required String path}) async {
     try {
       final file = File(path);
@@ -24,6 +26,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
   }
 
   @override
+  /// Marks the job requirement as processed.
   Future<Either<Failure, Unit>> markAsProcessed({required String id}) async {
     // For now, just return success. In a real implementation,
     // you'd need to find the file by ID and update its frontmatter.
@@ -32,6 +35,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
   }
 
   @override
+  /// Updates the frontmatter of the job requirement file.
   Future<Either<Failure, Unit>> updateFrontmatter({
     required String path,
     required JobReq jobReq,
