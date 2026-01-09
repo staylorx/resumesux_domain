@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:resume_suckage_domain/src/domain/entities/entities.dart';
+import 'package:resumesux_domain/src/domain/entities/entities.dart';
 
 /// Represents an applicant with personal and professional information.
 class Applicant with EquatableMixin {

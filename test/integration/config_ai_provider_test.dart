@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
-import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 // Mock classes
 class MockHttpClient extends Mock implements http.Client {}

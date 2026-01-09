@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:yaml/yaml.dart';
-import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// A datasource for loading configuration files.
 class ConfigDatasource {

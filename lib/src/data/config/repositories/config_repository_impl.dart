@@ -4,7 +4,7 @@ import 'package:json_schema/json_schema.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 // Odd name for now
 const String kAppName = 'resumesux';

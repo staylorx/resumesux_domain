@@ -20,3 +20,5 @@ This file tracks the project's progress...
 All tests pass successfully with proper mocking using mocktail.
 
 [2026-01-09 18:58:17] - Completed comprehensive code tidy: ran dart analyze (no issues), dart format (1 file changed), all tests pass; fixed JobReqRepositoryImpl to parse YAML frontmatter in addition to bullet format; verified no print statements (only ignored in test), no positional parameters in custom functions, no unused imports, LF line endings, dartdoc comments present, no Dart code in markdown/memory-bank files, clean architecture compliance, proper fpdart usage with Failure and Either.
+
+[2026-01-09 19:09:40] - Added Apache 2.0 license to the project: created LICENSE file with full Apache 2.0 license text, added license field to pubspec.yaml, updated README.md with project description and license information.

@@ -1,6 +1,7 @@
-name: resume_suckage_domain
+name: resumesux_domain
 description: The cleanarch domain and data layers for Resume Suckage
 version: 1.0.0
+license: Apache-2.0
 # repository: https://github.com/my_org/my_repo
 publish_to: none # Remove this line if you wish to publish to pub.dev
 

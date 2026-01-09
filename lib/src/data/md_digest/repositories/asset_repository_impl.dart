@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 
-import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of the AssetRepository.
 class AssetRepositoryImpl implements AssetRepository {

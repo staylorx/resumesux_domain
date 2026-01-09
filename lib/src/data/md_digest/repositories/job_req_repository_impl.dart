@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
-import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:yaml/yaml.dart';
 
 /// Implementation of the JobReqRepository.
@@ -201,13 +201,15 @@ class JobReqRepositoryImpl implements JobReqRepository {
         id: (fields['job req id'] ?? fields['id'] ?? '').toString(),
         title: (fields['job title'] ?? fields['title'] ?? '').toString(),
         content: bodyContent,
-        processed: (fields['processed'] ?? false).toString().toLowerCase() == 'true',
+        processed:
+            (fields['processed'] ?? false).toString().toLowerCase() == 'true',
         createdDate: fields['created date'] != null
             ? DateTime.tryParse(fields['created date'].toString())
             : fields['posted'] != null
-                ? DateTime.tryParse(fields['posted'].toString())
-                : null,
-        whereFound: (fields['where found'] ?? fields['company'] ?? '').toString(),
+            ? DateTime.tryParse(fields['posted'].toString())
+            : null,
+        whereFound: (fields['where found'] ?? fields['company'] ?? '')
+            .toString(),
       );
     } catch (e) {
       return null;

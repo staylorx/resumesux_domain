@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Repository for application-related operations.
 abstract class ApplicationRepository {

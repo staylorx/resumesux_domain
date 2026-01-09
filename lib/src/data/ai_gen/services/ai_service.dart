@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
-import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 // TODO: is there any other data returned from the result, for instance, how much
 // it cost to run the request, etc.? Even if we had token counts in and out,

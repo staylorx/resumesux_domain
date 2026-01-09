@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
-import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 void main() {
   late DigestRepository digestRepository;

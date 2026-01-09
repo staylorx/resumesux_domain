@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
-import 'package:resume_suckage_domain/resume_suckage_domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for generating a complete job application including resume, cover letter, and feedback.
 class GenerateApplicationUsecase {
