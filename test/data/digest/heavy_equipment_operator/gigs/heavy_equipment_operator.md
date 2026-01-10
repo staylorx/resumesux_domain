@@ -1,9 +1,7 @@
----
 title: Heavy Equipment Operator
 concern: Construction Masters Inc.
 location: Denver, CO
 dates: February 2019 - Present
----
 
 - Operated excavators for foundation and utility trenching on commercial projects
 - Performed precise grading work for road construction and site development

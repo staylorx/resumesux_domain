@@ -42,11 +42,10 @@ void main() {
       expect(result.isRight(), true);
       final provider = result.getOrElse(
         (_) => throw Exception('Failed to get provider'),
-      )!;
+      );
       expect(provider.id, 'lmstudio');
       expect(provider.isDefault, true);
-      // TODO: don't assume a default here... if there isn't one, then toss a Failure out
-      expect(provider.defaultModel?.name, 'qwen/qwen2.5-coder-14b');
+      expect(provider.defaultModel!.name, 'qwen/qwen2.5-coder-14b');
     });
 
     test('get default model successfully', () async {
@@ -62,7 +61,7 @@ void main() {
       expect(result.isRight(), true);
       final model = result.getOrElse(
         (_) => throw Exception('Failed to get model'),
-      )!;
+      );
       expect(model.name, 'qwen/qwen2.5-coder-14b');
       expect(model.isDefault, true);
     });
@@ -269,7 +268,7 @@ void main() {
         expect(providerResult.isRight(), true);
         final provider = providerResult.getOrElse(
           (_) => throw Exception('Failed to get provider'),
-        )!;
+        );
 
         // Create AI service
         aiService = AiServiceImpl(

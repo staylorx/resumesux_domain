@@ -90,8 +90,12 @@ class GenerateApplicationUsecase {
     final appDirPath = appDirResult.getOrElse((_) => '');
 
     // Save AI response to application directory
+    final aiResponseFilePath = outputDirectoryService.getAiResponseFilePath(
+      appDirPath,
+      'jobreq',
+    );
     final saveAiResult = await jobReqRepository.saveAiResponse(
-      outputDir: appDirPath,
+      filePath: aiResponseFilePath,
     );
     if (saveAiResult.isLeft()) {
       final failure = saveAiResult.getLeft().toNullable()!;

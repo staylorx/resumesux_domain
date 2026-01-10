@@ -31,7 +31,9 @@ class OutputDirectoryService {
 
       return Right(appDirPath);
     } catch (e) {
-      return Left(ServiceFailure(message: 'Failed to create application directory: $e'));
+      return Left(
+        ServiceFailure(message: 'Failed to create application directory: $e'),
+      );
     }
   }
 
@@ -53,8 +55,9 @@ class OutputDirectoryService {
   }
 
   /// Gets the path for the AI response file in the application directory.
-  String getAiResponseFilePath(String appDir) {
-    return '$appDir/ai_response.json';
+  /// The file name includes the type to distinguish between different AI calls.
+  String getAiResponseFilePath(String appDir, String type) {
+    return '$appDir/${type}_ai_response.json';
   }
 
   /// Validates that the base output directory is accessible.
@@ -72,7 +75,9 @@ class OutputDirectoryService {
 
       return Right(unit);
     } catch (e) {
-      return Left(ServiceFailure(message: 'Output directory not accessible: $e'));
+      return Left(
+        ServiceFailure(message: 'Output directory not accessible: $e'),
+      );
     }
   }
 

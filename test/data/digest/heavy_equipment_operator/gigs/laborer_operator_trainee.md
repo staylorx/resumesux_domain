@@ -1,9 +1,7 @@
----
 title: Laborer/Operator Trainee
 concern: BuildRight Construction
 location: Pueblo, CO
 dates: June 2012 - April 2015
----
 
 - Started as general laborer, progressed to equipment operation
 - Assisted with equipment maintenance and repairs

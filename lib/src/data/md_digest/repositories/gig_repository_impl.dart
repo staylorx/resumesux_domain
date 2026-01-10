@@ -1,12 +1,93 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
+import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of the GigRepository.
 class GigRepositoryImpl implements GigRepository {
+  final Logger logger = LoggerFactory.create('GigRepositoryImpl');
   final String digestPath;
+  final AiService aiService;
+  String? _lastAiResponse;
 
-  GigRepositoryImpl({required this.digestPath});
+  GigRepositoryImpl({required this.digestPath, required this.aiService});
+
+  Future<Either<Failure, Map<String, dynamic>>> _extractGigData({
+    required String content,
+    required String path,
+  }) async {
+    try {
+      final prompt = _buildExtractionPrompt(content: content, path: path);
+
+      final aiResult = await aiService.generateContent(prompt: prompt);
+      if (aiResult.isLeft()) {
+        return Left(aiResult.getLeft().toNullable()!);
+      }
+
+      final aiResponse = aiResult.getOrElse((_) => '');
+      _lastAiResponse = aiResponse;
+
+      final extractedData = _parseAiResponse(aiResponse);
+      if (extractedData == null) {
+        return Left(
+          ParsingFailure(message: 'Failed to parse AI response as JSON'),
+        );
+      }
+
+      return Right(extractedData);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to extract gig data: $e'));
+    }
+  }
+
+  String _buildExtractionPrompt({
+    required String content,
+    required String path,
+  }) {
+    return '''
+Please analyze the following gig content and extract the following information in JSON format:
+
+- title: The job title or position
+- concern: The company or organization name (if mentioned, otherwise null)
+- location: The job location (if mentioned, otherwise null)
+- dates: The employment dates (if mentioned, otherwise null)
+- achievements: A summary of achievements or responsibilities (if mentioned, otherwise null)
+
+File path: $path
+The file path may contain information about the concern (company), job title, location, etc. Use this to infer missing details if the content is ambiguous.
+
+Return only valid JSON like:
+{
+  "title": "Software Engineer",
+  "concern": "StartupXYZ",
+  "location": "Remote",
+  "dates": "June 2018 - December 2020",
+  "achievements": "Developed RESTful APIs using Node.js and Express, Built responsive web applications with React, Integrated third-party services and payment gateways, Collaborated with design team for pixel-perfect implementations"
+}
+
+Do your best, but if information is absolutely not present, use null. Make no assumptions beyond the content provided and the file path.
+
+Gig content:
+$content
+''';
+  }
+
+  Map<String, dynamic>? _parseAiResponse(String response) {
+    try {
+      // Try to extract JSON from response
+      final jsonStart = response.indexOf('{');
+      final jsonEnd = response.lastIndexOf('}') + 1;
+      if (jsonStart == -1 || jsonEnd == 0) return null;
+      final jsonString = response.substring(jsonStart, jsonEnd);
+      return jsonDecode(jsonString) as Map<String, dynamic>;
+    } catch (e) {
+      logger.warning(
+        'Failed to parse AI response: $e\nResponse was: $response',
+      );
+      return null;
+    }
+  }
 
   @override
   /// Retrieves all gigs from the digest path.
@@ -24,10 +105,29 @@ class GigRepositoryImpl implements GigRepository {
 
       for (final file in files) {
         final content = await file.readAsString();
-        final gig = _parseGig(content: content);
-        if (gig != null) {
-          gigs.add(gig);
+        final extractResult = await _extractGigData(
+          content: content,
+          path: file.path,
+        );
+        final data = extractResult.getOrElse((_) => {});
+        if (extractResult.isLeft()) {
+          logger.warning(
+            'Failed to extract gig data from ${file.path}: ${extractResult.getLeft().toNullable()?.message}',
+          );
+          continue;
         }
+        if (data.isNotEmpty) {
+          logger.fine('Extracted gig data: $data');
+        }
+
+        final gig = Gig(
+          title: data['title'] as String? ?? 'Unknown',
+          concern: data['concern'] as String?,
+          location: data['location'] as String?,
+          dates: data['dates'] as String?,
+          achievements: data['achievements'] as String?,
+        );
+        gigs.add(gig);
       }
 
       return Right(gigs);
@@ -36,49 +136,20 @@ class GigRepositoryImpl implements GigRepository {
     }
   }
 
-  Gig? _parseGig({required String content}) {
+  @override
+  Future<Either<Failure, Unit>> saveAiResponse({
+    required String filePath,
+  }) async {
     try {
-      final lines = content.split('\n');
-      if (lines.isEmpty || !lines[0].startsWith('- ')) {
-        return null;
+      if (_lastAiResponse == null) {
+        return Left(ServiceFailure(message: 'No AI response to save'));
       }
-
-      final bulletLines = <String>[];
-      int bodyStartIndex = 0;
-
-      for (int i = 0; i < lines.length; i++) {
-        final line = lines[i];
-        if (line.startsWith('- ')) {
-          bulletLines.add(line.substring(2)); // Remove '- ' prefix
-        } else {
-          bodyStartIndex = i;
-          break;
-        }
-      }
-
-      if (bulletLines.isEmpty) return null;
-
-      final fields = <String, String>{};
-      for (final bullet in bulletLines) {
-        final colonIndex = bullet.indexOf(':');
-        if (colonIndex != -1) {
-          final key = bullet.substring(0, colonIndex).trim().toLowerCase();
-          final value = bullet.substring(colonIndex + 1).trim();
-          fields[key] = value;
-        }
-      }
-
-      final body = lines.sublist(bodyStartIndex).join('\n').trim();
-
-      return Gig(
-        concern: fields['concern'] ?? '',
-        location: fields['location'] ?? '',
-        title: fields['title'] ?? '',
-        dates: fields['dates'] ?? '',
-        achievements: body,
-      );
+      final file = File(filePath);
+      await file.writeAsString(_lastAiResponse!);
+      logger.info('Saved AI response to ${file.path}');
+      return Right(unit);
     } catch (e) {
-      return null;
+      return Left(ServiceFailure(message: 'Failed to save AI response: $e'));
     }
   }
 }

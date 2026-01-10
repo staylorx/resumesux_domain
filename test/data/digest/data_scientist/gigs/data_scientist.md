@@ -1,9 +1,7 @@
----
 title: Data Scientist
 concern: TechAnalytics LLC
 location: Remote
 dates: July 2017 - February 2020
----
 
 - Designed A/B testing frameworks for product features
 - Implemented NLP models for customer sentiment analysis

@@ -134,13 +134,14 @@ $content
   }
 
   @override
-  Future<Either<Failure, Unit>> saveAiResponse({required String outputDir}) async {
+  Future<Either<Failure, Unit>> saveAiResponse({
+    required String filePath,
+  }) async {
     try {
       if (_lastAiResponse == null) {
         return Left(ServiceFailure(message: 'No AI response to save'));
       }
-      // Directory should already exist from OutputDirectoryService
-      final file = File('$outputDir/ai_response.json');
+      final file = File(filePath);
       await file.writeAsString(_lastAiResponse!);
       logger.info('Saved AI response to ${file.path}');
       return Right(unit);

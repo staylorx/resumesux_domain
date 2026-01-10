@@ -5,4 +5,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 abstract class GigRepository {
   /// Retrieves all gigs.
   Future<Either<Failure, List<Gig>>> getAllGigs();
+
+  /// Saves the last AI response to the specified file path.
+  Future<Either<Failure, Unit>> saveAiResponse({required String filePath});
 }

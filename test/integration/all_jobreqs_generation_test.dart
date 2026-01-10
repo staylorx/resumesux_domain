@@ -31,7 +31,7 @@ void main() {
 
     // Clear the database before the test group
     final datasource = JobReqSembastDatasource(
-      dbPath: TempDirFactory.instance.setUpDbPath,
+      dbPath: TestDirFactory.instance.setUpDbPath,
     );
     final result = await datasource.clearDatabase();
     result.fold(
@@ -46,12 +46,22 @@ void main() {
   });
 
   setUp(() {
-    aiService = AiServiceImpl(httpClient: http.Client(), provider: TestAiHelper.defaultProvider);
+    aiService = AiServiceImpl(
+      httpClient: http.Client(),
+      provider: TestAiHelper.defaultProvider,
+    );
 
-    digestRepository = DigestRepositoryImpl(digestPath: 'test/data/digest');
+    final gigRepository = GigRepositoryImpl(
+      digestPath: 'test/data/digest',
+      aiService: aiService,
+    );
+    digestRepository = DigestRepositoryImpl(
+      digestPath: 'test/data/digest',
+      gigRepository: gigRepository,
+    );
     jobReqRepository = JobReqRepositoryImpl(
       jobReqDatasource: JobReqSembastDatasource(
-        dbPath: TempDirFactory.instance.setUpDbPath,
+        dbPath: TestDirFactory.instance.setUpDbPath,
       ),
       aiService: aiService,
     );
@@ -94,7 +104,7 @@ void main() {
   test(
     'generate applications for all jobreqs in test/data/jobreqs',
     () async {
-      final outputDir = TempDirFactory.instance.outputDir;
+      final outputDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
       final applicant = Applicant(
         name: 'John Doe',

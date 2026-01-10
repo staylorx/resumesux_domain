@@ -1,9 +1,7 @@
----
 title: Senior Data Scientist
 concern: DataInsights Corp.
 location: Seattle, WA
 dates: March 2020 - Present
----
 
 - Led ML initiatives resulting in 15% improvement in customer retention
 - Developed predictive models for sales forecasting with 92% accuracy

@@ -27,23 +27,25 @@ class GenerateResumeUsecase {
     required Applicant applicant,
     required String prompt,
   }) async {
-    logger.info('[GenerateResumeUsecase] Generating resume');
+    logger.info('Generating resume');
 
     final digestResult = await digestRepository.getAllDigests();
     if (digestResult.isLeft()) {
-      logger.severe('[GenerateResumeUsecase] Failed to get digests: ${digestResult.getLeft().toNullable()!.message}');
+      logger.severe(
+        'Failed to get digests: ${digestResult.getLeft().toNullable()!.message}',
+      );
       return Left(digestResult.getLeft().toNullable()!);
     }
 
     final digests = digestResult.getOrElse((failure) => []);
     if (digests.isEmpty) {
-      logger.severe('[GenerateResumeUsecase] No digests found');
+      logger.severe('No digests found');
       return Left(ValidationFailure(message: 'No digest found'));
     }
 
     final digest = digests.first;
     logger.info(
-      '[GenerateResumeUsecase] Using digest with ${digest.gigsContent.length} gigs and ${digest.assetsContent.length} assets',
+      'Using digest with ${digest.gigsContent.length} gigs and ${digest.assetsContent.length} assets',
     );
 
     final fullPrompt = _buildResumePrompt(
@@ -54,22 +56,20 @@ class GenerateResumeUsecase {
       applicant: applicant,
     );
 
-    logger.info(
-      '[GenerateResumeUsecase] Full prompt length: ${fullPrompt.length}',
-    );
-    logger.fine('[GenerateResumeUsecase] Full prompt: $fullPrompt');
+    logger.info('Full prompt length: ${fullPrompt.length}');
+    logger.fine('Full prompt: $fullPrompt');
 
-    logger.info('[GenerateResumeUsecase] Calling AI service for resume generation');
+    logger.info('Calling AI service for resume generation');
     final result = await aiService.generateContent(prompt: fullPrompt);
     if (result.isLeft()) {
-      logger.severe('[GenerateResumeUsecase] AI service failed: ${result.getLeft().toNullable()!.message}');
+      logger.severe(
+        'AI service failed: ${result.getLeft().toNullable()!.message}',
+      );
       return Left(result.getLeft().toNullable()!);
     }
     final content = result.getOrElse((_) => '');
-    logger.info(
-      '[GenerateResumeUsecase] AI response length: ${content.length}',
-    );
-    logger.fine('[GenerateResumeUsecase] AI response: $content');
+    logger.info('AI response length: ${content.length}');
+    logger.fine('AI response: $content');
     return Right(Resume(content: content));
   }
 

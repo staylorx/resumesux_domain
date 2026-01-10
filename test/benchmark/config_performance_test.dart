@@ -125,7 +125,7 @@ void main() {
           configPath: configPath,
         );
         expect(result.isRight(), true);
-        expect(result.getOrElse((_) => null), isNotNull);
+        expect(result.isRight(), true);
       }
       stopwatch.stop();
 

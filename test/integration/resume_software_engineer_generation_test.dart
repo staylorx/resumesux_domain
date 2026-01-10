@@ -27,11 +27,11 @@ void main() {
       );
     });
 
-    logger = Logger('ResumeGenerationTest');
+    logger = Logger('ResumeSoftwareEngineerGenerationTest');
 
     // Clear the database before the test group
     final datasource = JobReqSembastDatasource(
-      dbPath: TempDirFactory.instance.setUpAllDbPath,
+      dbPath: TestDirFactory.instance.setUpAllDbPath,
     );
     final result = await datasource.clearDatabase();
     result.fold(
@@ -46,12 +46,22 @@ void main() {
   });
 
   setUp(() {
-    aiService = AiServiceImpl(httpClient: http.Client(), provider: TestAiHelper.defaultProvider);
+    aiService = AiServiceImpl(
+      httpClient: http.Client(),
+      provider: TestAiHelper.defaultProvider,
+    );
 
-    digestRepository = DigestRepositoryImpl(digestPath: 'test/data/digest');
+    final gigRepository = GigRepositoryImpl(
+      digestPath: 'test/data/digest/software_engineer',
+      aiService: aiService,
+    );
+    digestRepository = DigestRepositoryImpl(
+      digestPath: 'test/data/digest/software_engineer',
+      gigRepository: gigRepository,
+    );
     jobReqRepository = JobReqRepositoryImpl(
       jobReqDatasource: JobReqSembastDatasource(
-        dbPath: TempDirFactory.instance.setUpDbPath,
+        dbPath: TestDirFactory.instance.setUpDbPath,
       ),
       aiService: aiService,
     );
@@ -178,7 +188,7 @@ void main() {
     'generate application for TechInnovate Software Engineer job with correct output path',
     () async {
       // Arrange
-      final outputDir = TempDirFactory.instance.outputDir;
+      final outputDir = TestDirFactory.instance.outputDir;
 
       final applicant = Applicant(
         name: 'John Doe',
@@ -221,7 +231,8 @@ void main() {
       // Find the most recent app dir (should contain senior_software_engineer)
       final appDir = subDirs.firstWhere(
         (dir) => dir.path.contains('senior_software_engineer'),
-        orElse: () => throw Exception('No app dir found for senior_software_engineer'),
+        orElse: () =>
+            throw Exception('No app dir found for senior_software_engineer'),
       );
       // Check files exist
       final files = appDir.listSync().whereType<File>();

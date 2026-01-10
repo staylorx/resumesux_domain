@@ -26,7 +26,10 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
       );
 
       // Save resume
-      final resumeFilePath = outputDirectoryService.getResumeFilePath(appDirPath, jobTitle);
+      final resumeFilePath = outputDirectoryService.getResumeFilePath(
+        appDirPath,
+        jobTitle,
+      );
       final resumeFile = File(resumeFilePath);
       await resumeFile.writeAsString(resume.content);
       logger.info(
@@ -35,7 +38,10 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
 
       // Save cover letter if provided
       if (coverLetter.content.isNotEmpty) {
-        final coverFilePath = outputDirectoryService.getCoverLetterFilePath(appDirPath, jobTitle);
+        final coverFilePath = outputDirectoryService.getCoverLetterFilePath(
+          appDirPath,
+          jobTitle,
+        );
         final coverFile = File(coverFilePath);
         await coverFile.writeAsString(coverLetter.content);
         logger.info(
@@ -45,7 +51,9 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
 
       // Save feedback if provided
       if (feedback.content.isNotEmpty) {
-        final feedbackFilePath = outputDirectoryService.getFeedbackFilePath(appDirPath);
+        final feedbackFilePath = outputDirectoryService.getFeedbackFilePath(
+          appDirPath,
+        );
         final feedbackFile = File(feedbackFilePath);
         await feedbackFile.writeAsString(feedback.content);
         logger.info(
