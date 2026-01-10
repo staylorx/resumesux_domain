@@ -59,9 +59,10 @@ class AiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final content = data['choices'][0]['message']['content'] as String;
-        logger.fine(
+        logger.info(
           '[AiService] AI response content length: ${content.length}',
         );
+        logger.fine('[AiService] AI response content: $content');
         return Right(content);
       } else {
         logger.severe(

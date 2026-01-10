@@ -40,6 +40,9 @@ class GenerateResumeUsecase {
     }
 
     final digest = digests.first;
+    logger.info(
+      '[GenerateResumeUsecase] Using digest with ${digest.gigsContent.length} gigs and ${digest.assetsContent.length} assets',
+    );
 
     final fullPrompt = _buildResumePrompt(
       jobReq: jobReq.content,
@@ -49,11 +52,17 @@ class GenerateResumeUsecase {
       applicant: applicant,
     );
 
+    logger.info(
+      '[GenerateResumeUsecase] Full prompt length: ${fullPrompt.length}',
+    );
+    logger.fine('[GenerateResumeUsecase] Full prompt: $fullPrompt');
+
     final result = await aiService.generateContent(prompt: fullPrompt);
     return result.map((content) {
-      logger.fine(
-        '[GenerateResumeUsecase] Resume content length: ${content.length}',
+      logger.info(
+        '[GenerateResumeUsecase] AI response length: ${content.length}',
       );
+      logger.fine('[GenerateResumeUsecase] AI response: $content');
       return Resume(content: content);
     });
   }
@@ -88,16 +97,17 @@ Do not include any work experience or assets that are not directly related to or
   }
 
   String _buildApplicantHeader(Applicant applicant) {
+    final address = applicant.address;
     return '''
 Applicant Information:
-Name: {{ name }}
-Preferred Name: {{ preferred_name }}
-Email: {{ email }}
-Phone: {{ phone }}
-{% if address %}Address: {{ address.street1 }}{% if address.street2 %}, {{ address.street2 }}{% endif %}, {{ address.city }}, {{ address.state }} {{ address.zip }}
-{% endif %}LinkedIn: {{ linkedin }}
-GitHub: {{ github }}
-Portfolio: {{ portfolio }}
+Name: ${applicant.name}
+Preferred Name: ${applicant.preferredName}
+Email: ${applicant.email}
+Phone: ${applicant.phone}
+${address != null ? 'Address: ${address.street1}${address.street2 != null ? ', ${address.street2}' : ''}, ${address.city}, ${address.state} ${address.zip}' : ''}
+LinkedIn: ${applicant.linkedin}
+GitHub: ${applicant.github}
+Portfolio: ${applicant.portfolio}
 ''';
   }
 }
