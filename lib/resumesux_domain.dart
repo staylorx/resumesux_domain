@@ -19,5 +19,7 @@ export 'src/data/md_digest/repositories/asset_repository_impl.dart';
 export 'src/data/md_digest/repositories/digest_repository_impl.dart';
 export 'src/data/md_digest/repositories/gig_repository_impl.dart';
 export 'src/data/md_digest/repositories/job_req_repository_impl.dart';
+export 'src/data/storage/datasources/file_job_req_datasource.dart';
+export 'src/data/storage/datasources/file_job_req_datasource_impl.dart';
 export 'src/data/storage/datasources/job_req_datasource.dart';
 export 'src/data/storage/datasources/job_req_sembast_datasource.dart';

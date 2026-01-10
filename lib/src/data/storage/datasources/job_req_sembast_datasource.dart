@@ -29,6 +29,34 @@ class JobReqSembastDatasource implements JobReqDatasource {
   }
 
   @override
+  Future<Either<Failure, JobReq>> createJobReq({required JobReq jobReq}) async {
+    try {
+      final db = await _database;
+      final record = _jobReqStore.record(jobReq.id);
+      final data = {
+        'id': jobReq.id,
+        'title': jobReq.title,
+        'content': jobReq.content,
+        'salary': jobReq.salary,
+        'location': jobReq.location,
+        'concern': jobReq.concern != null
+            ? {
+                'name': jobReq.concern!.name,
+                'description': jobReq.concern!.description,
+                'location': jobReq.concern!.location,
+              }
+            : null,
+        'createdDate': jobReq.createdDate?.toIso8601String(),
+        'whereFound': jobReq.whereFound,
+      };
+      await record.put(db, data);
+      return Right(jobReq);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to create job req: $e'));
+    }
+  }
+
+  @override
   Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq}) async {
     try {
       final db = await _database;
@@ -46,7 +74,6 @@ class JobReqSembastDatasource implements JobReqDatasource {
                 'location': jobReq.concern!.location,
               }
             : null,
-        'state': jobReq.state,
         'createdDate': jobReq.createdDate?.toIso8601String(),
         'whereFound': jobReq.whereFound,
       };

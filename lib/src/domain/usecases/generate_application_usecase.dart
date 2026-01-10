@@ -10,7 +10,7 @@ class GenerateApplicationUsecase {
   final GenerateResumeUsecase generateResumeUsecase;
   final GenerateCoverLetterUsecase generateCoverLetterUsecase;
   final GenerateFeedbackUsecase generateFeedbackUsecase;
-  final PreprocessJobReqUsecase preprocessJobReqUsecase;
+  final CreateJobReqUsecase createJobReqUsecase;
 
   /// Creates a new instance of [GenerateApplicationUsecase].
   GenerateApplicationUsecase({
@@ -19,7 +19,7 @@ class GenerateApplicationUsecase {
     required this.generateResumeUsecase,
     required this.generateCoverLetterUsecase,
     required this.generateFeedbackUsecase,
-    required this.preprocessJobReqUsecase,
+    required this.createJobReqUsecase,
   });
 
   /// Generates an application for the given job requirement.
@@ -62,9 +62,7 @@ class GenerateApplicationUsecase {
       if (failure is ParsingFailure) {
         progress('Parsing failed, preprocessing job req for: $jobReqPath');
         logger.info('Parsing failed, preprocessing job req for $jobReqPath');
-        final preprocessResult = await preprocessJobReqUsecase(
-          path: jobReqPath,
-        );
+        final preprocessResult = await createJobReqUsecase(path: jobReqPath);
         if (preprocessResult.isLeft()) {
           return preprocessResult.map((_) => unit);
         }

@@ -9,7 +9,6 @@ class JobReq with EquatableMixin {
   final String? salary;
   final String? location;
   final Concern? concern;
-  final String state;
   final DateTime? createdDate;
   final String? whereFound;
 
@@ -20,7 +19,6 @@ class JobReq with EquatableMixin {
     this.salary,
     this.location,
     this.concern,
-    this.state = 'raw',
     this.createdDate,
     this.whereFound,
   });
@@ -32,7 +30,6 @@ class JobReq with EquatableMixin {
     String? salary,
     String? location,
     Concern? concern,
-    String? state,
     DateTime? createdDate,
     String? whereFound,
   }) {
@@ -43,7 +40,6 @@ class JobReq with EquatableMixin {
       salary: salary ?? this.salary,
       location: location ?? this.location,
       concern: concern ?? this.concern,
-      state: state ?? this.state,
       createdDate: createdDate ?? this.createdDate,
       whereFound: whereFound ?? this.whereFound,
     );
@@ -57,7 +53,6 @@ class JobReq with EquatableMixin {
     salary,
     location,
     concern,
-    state,
     createdDate,
     whereFound,
   ];

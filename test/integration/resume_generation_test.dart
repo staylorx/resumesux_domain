@@ -14,12 +14,26 @@ void main() {
   late GenerateResumeUsecase generateResumeUsecase;
   late GenerateCoverLetterUsecase generateCoverLetterUsecase;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
-  late PreprocessJobReqUsecase preprocessJobReqUsecase;
+  late CreateJobReqUsecase createJobReqUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
   late Logger logger;
 
   setUpAll(() async {
-    tempDir = p.join('build', DateTime.now().toUtc().toIso8601String());
+    tempDir = p.join(
+      'build',
+      DateTime.now().toUtc().toIso8601String().replaceAll(':', '-'),
+    );
+
+    // Set up logging
+    Logger.root.level = Level.INFO;
+    Logger.root.onRecord.listen((record) {
+      // ignore: avoid_print
+      print(
+        '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}',
+      );
+    });
+
+    logger = Logger('ResumeGenerationTest');
 
     // Clear the database before the test group
     final datasource = JobReqSembastDatasource(
@@ -35,26 +49,9 @@ void main() {
       true,
       reason: 'Failed to clear database before test group',
     );
-
-    // Set up logging
-    Logger.root.level = Level.INFO;
-    Logger.root.onRecord.listen((record) {
-      // ignore: avoid_print
-      print(
-        '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}',
-      );
-    });
   });
 
   setUp(() {
-    digestRepository = DigestRepositoryImpl(digestPath: 'test/data/digest');
-    jobReqRepository = JobReqRepositoryImpl(
-      jobReqDatasource: JobReqSembastDatasource(
-        dbPath: p.join(tempDir, 'setUp', 'jobreqs.db'),
-      ),
-    );
-    applicationRepository = ApplicationRepositoryImpl();
-
     final model = AiModel(
       name: 'qwen/qwen2.5-coder-14b',
       isDefault: true,
@@ -73,6 +70,15 @@ void main() {
 
     aiService = AiService(httpClient: http.Client(), provider: provider);
 
+    digestRepository = DigestRepositoryImpl(digestPath: 'test/data/digest');
+    jobReqRepository = JobReqRepositoryImpl(
+      jobReqDatasource: JobReqSembastDatasource(
+        dbPath: p.join(tempDir, 'setUp', 'jobreqs.db'),
+      ),
+      fileJobReqDatasource: FileJobReqDatasourceImpl(),
+    );
+    applicationRepository = ApplicationRepositoryImpl();
+
     generateResumeUsecase = GenerateResumeUsecase(
       digestRepository: digestRepository,
       aiService: aiService,
@@ -85,7 +91,7 @@ void main() {
 
     generateFeedbackUsecase = GenerateFeedbackUsecase(aiService: aiService);
 
-    preprocessJobReqUsecase = PreprocessJobReqUsecase(
+    createJobReqUsecase = CreateJobReqUsecase(
       jobReqRepository: jobReqRepository,
       aiService: aiService,
     );
@@ -96,7 +102,7 @@ void main() {
       generateResumeUsecase: generateResumeUsecase,
       generateCoverLetterUsecase: generateCoverLetterUsecase,
       generateFeedbackUsecase: generateFeedbackUsecase,
-      preprocessJobReqUsecase: preprocessJobReqUsecase,
+      createJobReqUsecase: createJobReqUsecase,
     );
 
     logger = Logger('ResumeGenerationTest');
@@ -230,9 +236,11 @@ void main() {
       expect(subDirs.length, 1);
 
       final appDir = subDirs.first;
-      expect(appDir.path, contains('software_engineer'));
+      expect(appDir.path, contains('senior_software_engineer'));
       // Check files exist
-      final resumeFile = File('${appDir.path}/resume_software_engineer.md');
+      final resumeFile = File(
+        '${appDir.path}/resume_senior_software_engineer.md',
+      );
       expect(resumeFile.existsSync(), true);
     },
   );
