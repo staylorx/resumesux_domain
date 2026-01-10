@@ -20,7 +20,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   }) async {
     try {
       final now = DateTime.now();
-      final dateStr = DateFormat('yyyyMMdd').format(now);
+      final dateStr = DateFormat('yyyyMMdd_HHmmss').format(now);
       final effectiveTitle = jobTitle.isNotEmpty ? jobTitle : 'unknown';
       final sanitizedTitle = effectiveTitle
           .replaceAll(RegExp(r'[^\w\s-]'), '')
