@@ -24,6 +24,12 @@ class JobReqRepositoryImpl implements JobReqRepository {
   @override
   /// Retrieves a job requirement from the given path.
   Future<Either<Failure, JobReq>> getJobReq({required String path}) async {
-    return await fileJobReqDatasource.getJobReq(path: path);
+    final result = await fileJobReqDatasource.getJobReq(path: path);
+    if (result.isRight()) {
+      final jobReq = result.getOrElse((_) => throw '');
+      // Save to database for persistence
+      await jobReqDatasource.updateJobReq(jobReq: jobReq);
+    }
+    return result;
   }
 }

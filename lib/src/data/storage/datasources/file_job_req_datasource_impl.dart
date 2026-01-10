@@ -78,13 +78,15 @@ class FileJobReqDatasourceImpl implements FileJobReqDatasource {
             fields['concern_name'] != null ||
                 fields['concern'] != null ||
                 fields['Concern'] != null ||
-                fields['company'] != null
+                fields['company'] != null ||
+                fields['client'] != null
             ? Concern(
                 name:
                     (fields['concern_name'] ??
                             fields['concern'] ??
                             fields['Concern'] ??
-                            fields['company']?.split(' ').first)
+                            fields['company']?.split(' ').first ??
+                            fields['client'])
                         ?.toString() ??
                     '',
                 location: fields['location']?.toString(),

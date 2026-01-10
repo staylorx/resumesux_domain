@@ -45,7 +45,9 @@ class CreateJobReqUsecase {
     String? finalWhereFound = whereFound;
 
     if (path != null) {
-      logger.info('[CreateJobReqUsecase] Extracting job req data from path: $path');
+      logger.info(
+        '[CreateJobReqUsecase] Extracting job req data from path: $path',
+      );
       final extractResult = await _extractJobReqData(path: path);
       if (extractResult.isLeft()) {
         return extractResult.map((_) => throw '');
@@ -55,15 +57,23 @@ class CreateJobReqUsecase {
       finalContent = data['content'] as String? ?? '';
       finalSalary = data['salary'] as String?;
       finalLocation = data['location'] as String?;
-      finalConcern = data['concern'] != null ? Concern(name: data['concern'] as String) : null;
+      finalConcern = data['concern'] != null
+          ? Concern(name: data['concern'] as String)
+          : null;
       finalWhereFound = data['whereFound'] as String?;
     } else {
       if (finalTitle.isEmpty || finalContent.isEmpty) {
-        return Left(ValidationFailure(message: 'title and content are required when path is not provided'));
+        return Left(
+          ValidationFailure(
+            message: 'title and content are required when path is not provided',
+          ),
+        );
       }
     }
 
-    logger.info('[CreateJobReqUsecase] Creating job req with title $finalTitle');
+    logger.info(
+      '[CreateJobReqUsecase] Creating job req with title $finalTitle',
+    );
 
     final id = DateTime.now().toIso8601String();
     final createdDate = DateTime.now();

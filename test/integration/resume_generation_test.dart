@@ -4,9 +4,9 @@ import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
+import '../test_utils.dart';
 
 void main() {
-  late String tempDir;
   late DigestRepository digestRepository;
   late JobReqRepository jobReqRepository;
   late ApplicationRepository applicationRepository;
@@ -19,11 +19,6 @@ void main() {
   late Logger logger;
 
   setUpAll(() async {
-    tempDir = p.join(
-      'build',
-      DateTime.now().toUtc().toIso8601String().replaceAll(':', '-'),
-    );
-
     // Set up logging
     Logger.root.level = Level.INFO;
     Logger.root.onRecord.listen((record) {
@@ -37,7 +32,7 @@ void main() {
 
     // Clear the database before the test group
     final datasource = JobReqSembastDatasource(
-      dbPath: p.join(tempDir, 'setUpAll', 'jobreqs.db'),
+      dbPath: TempDirFactory.instance.setUpAllDbPath,
     );
     final result = await datasource.clearDatabase();
     result.fold(
@@ -73,7 +68,7 @@ void main() {
     digestRepository = DigestRepositoryImpl(digestPath: 'test/data/digest');
     jobReqRepository = JobReqRepositoryImpl(
       jobReqDatasource: JobReqSembastDatasource(
-        dbPath: p.join(tempDir, 'setUp', 'jobreqs.db'),
+        dbPath: TempDirFactory.instance.setUpDbPath,
       ),
       fileJobReqDatasource: FileJobReqDatasourceImpl(),
     );
@@ -195,7 +190,7 @@ void main() {
     'generate application for TechInnovate Software Engineer job with correct output path',
     () async {
       // Arrange
-      final outputDir = p.join(tempDir, 'output');
+      final outputDir = TempDirFactory.instance.outputDir;
 
       final applicant = Applicant(
         name: 'John Doe',
