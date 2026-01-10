@@ -27,7 +27,7 @@ class GenerateCoverLetterUsecase {
     required Applicant applicant,
     required String prompt,
   }) async {
-    logger.info('[GenerateCoverLetterUsecase] Generating cover letter');
+    logger.info('Generating cover letter');
 
     final digestResult = await digestRepository.getAllDigests();
     if (digestResult.isLeft()) {
@@ -76,8 +76,8 @@ Assets (Education, Skills, etc.):
 ${assets.join('\n\n')}
 
 Please generate a professional cover letter in markdown format.
-Do not halucinate any information. Use only the provided data.
-Perform strict relevance checking before inclusion: only include work experience (gigs) and assets that are directly relevant to the job requirements. Omit any irrelevant or unrelated content entirely, such as non-tech certifications for tech-focused jobs or unrelated personal qualifications. Do not include any work experience or assets that are not directly related to or explicitly mentioned in the job requirements. Prioritize recent work experience (last 10 years) and modern technologies. Exclude any experiences or skills from before 2010 or legacy technologies like SOA, Oracle WebLogic, BPEL unless they are directly relevant to the job requirements. Keep the cover letter concise, under 250 words, with 3-4 paragraphs and bullet points for specific achievements. Focus on job-relevant experiences and avoid repetition.
+Do not hallucinate any information. Use only the provided data.
+Include all provided work experiences and qualifications. Do not add any skills, experiences, or qualifications not explicitly provided in the Work Experience and Assets sections. If the provided data does not match the job requirements, still use only the provided data without modification or addition. Keep the cover letter concise, under 250 words, with 3-4 paragraphs and bullet points for specific achievements. Avoid repetition.
 ''';
   }
 

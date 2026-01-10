@@ -6,15 +6,12 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 import '../test_utils.dart';
 
 void main() {
-  late DigestRepository digestRepository;
   late JobReqRepository jobReqRepository;
   late ApplicationRepository applicationRepository;
   late AiServiceImpl aiService;
-  late GenerateResumeUsecase generateResumeUsecase;
-  late GenerateCoverLetterUsecase generateCoverLetterUsecase;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
   late CreateJobReqUsecase createJobReqUsecase;
-  late GenerateApplicationUsecase generateApplicationUsecase;
+  late OutputDirectoryService outputDirectoryService;
   late Logger logger;
 
   setUpAll(() async {
@@ -28,6 +25,7 @@ void main() {
     });
 
     logger = Logger('AllJobReqsGenerationTest');
+    outputDirectoryService = OutputDirectoryService();
 
     // Clear the database before the test group
     final datasource = JobReqSembastDatasource(
@@ -51,31 +49,14 @@ void main() {
       provider: TestAiHelper.defaultProvider,
     );
 
-    // TODO: this isn't doing what we think it should do...
-    // digests are assumed to be one person, here we are mixing multiple people
-    digestRepository = DigestRepositoryImpl(
-      digestPath: 'test/data/digest',
-      aiService: aiService,
-    );
     jobReqRepository = JobReqRepositoryImpl(
       jobReqDatasource: JobReqSembastDatasource(
         dbPath: TestDirFactory.instance.setUpDbPath,
       ),
       aiService: aiService,
     );
-    final outputDirectoryService = OutputDirectoryService();
     applicationRepository = ApplicationRepositoryImpl(
       outputDirectoryService: outputDirectoryService,
-    );
-
-    generateResumeUsecase = GenerateResumeUsecase(
-      digestRepository: digestRepository,
-      aiService: aiService,
-    );
-
-    generateCoverLetterUsecase = GenerateCoverLetterUsecase(
-      digestRepository: digestRepository,
-      aiService: aiService,
     );
 
     generateFeedbackUsecase = GenerateFeedbackUsecase(aiService: aiService);
@@ -84,17 +65,6 @@ void main() {
       jobReqRepository: jobReqRepository,
       aiService: aiService,
       fileReader: FileReaderImpl(),
-    );
-
-    generateApplicationUsecase = GenerateApplicationUsecase(
-      jobReqRepository: jobReqRepository,
-      applicationRepository: applicationRepository,
-      generateResumeUsecase: generateResumeUsecase,
-      generateCoverLetterUsecase: generateCoverLetterUsecase,
-      generateFeedbackUsecase: generateFeedbackUsecase,
-      createJobReqUsecase: createJobReqUsecase,
-      outputDirectoryService: outputDirectoryService,
-      digestRepository: digestRepository,
     );
 
     logger = Logger('AllJobReqsGenerationTest');
@@ -121,8 +91,8 @@ void main() {
         portfolio: 'https://johndoe.dev',
       );
 
-      // List of all jobreq paths
-      final jobReqPaths = [
+      // list of all jobreq paths
+      final allJobReqPaths = [
         'test/data/jobreqs/ConstuctionPro Builders/Equipment Operator/job_req.md',
         'test/data/jobreqs/DataDriven Analytics/Senior Data Scientist/job_req.md',
         'test/data/jobreqs/StartupBoost/Flutter App Developer/software_engineer.md',
@@ -130,23 +100,75 @@ void main() {
         'test/data/jobreqs/TelecomPlus/Customer Churn Prediction Model Development/data_scientist.md',
       ];
 
-      // Generate application for each jobreq
-      for (final jobReqPath in jobReqPaths) {
-        final result = await generateApplicationUsecase.call(
-          jobReqPath: jobReqPath,
-          applicant: applicant,
-          prompt: 'Generate a professional application.',
-          outputDir: outputDir,
-          includeCover: true,
-          includeFeedback: true,
-          progress: (message) => logger.info(message),
-        );
+      // scenarios structure: each scenario has name, digestPath, and jobReqPaths
+      final scenarios = [
+        {
+          'name': 'Equipment Operator',
+          'digestPath': 'test/data/digest/heavy_equipment_operator',
+          'jobReqPaths': allJobReqPaths,
+        },
+        {
+          'name': 'Data Scientist',
+          'digestPath': 'test/data/digest/data_scientist',
+          'jobReqPaths': allJobReqPaths,
+        },
+        {
+          'name': 'Software Engineer',
+          'digestPath': 'test/data/digest/software_engineer',
+          'jobReqPaths': allJobReqPaths,
+        },
+      ];
 
-        expect(
-          result.isRight(),
-          true,
-          reason: 'Failed to generate application for $jobReqPath',
-        );
+      // Generate application for each jobreq
+      for (final scenario in scenarios) {
+        final scenarioName = scenario['name'] as String;
+        final digestPath = scenario['digestPath'] as String;
+        for (final jobReqPath in scenario['jobReqPaths'] as List<String>) {
+          logger.info(
+            "Applying for jobreq at $jobReqPath using digest at $digestPath for scenario $scenarioName",
+          );
+          final digestRepository = DigestRepositoryImpl(
+            digestPath: digestPath,
+            aiService: aiService,
+          );
+
+          final generateResumeUsecase = GenerateResumeUsecase(
+            digestRepository: digestRepository,
+            aiService: aiService,
+          );
+
+          final generateCoverLetterUsecase = GenerateCoverLetterUsecase(
+            digestRepository: digestRepository,
+            aiService: aiService,
+          );
+
+          final generateApplicationUsecase = GenerateApplicationUsecase(
+            jobReqRepository: jobReqRepository,
+            applicationRepository: applicationRepository,
+            generateResumeUsecase: generateResumeUsecase,
+            generateCoverLetterUsecase: generateCoverLetterUsecase,
+            generateFeedbackUsecase: generateFeedbackUsecase,
+            createJobReqUsecase: createJobReqUsecase,
+            outputDirectoryService: outputDirectoryService,
+            digestRepository: digestRepository,
+          );
+
+          final result = await generateApplicationUsecase.call(
+            jobReqPath: jobReqPath,
+            applicant: applicant,
+            prompt: 'Generate a professional application.',
+            outputDir: outputDir,
+            includeCover: true,
+            includeFeedback: true,
+            progress: (message) => logger.info(message),
+          );
+
+          expect(
+            result.isRight(),
+            true,
+            reason: 'Failed to generate application for $jobReqPath',
+          );
+        }
       }
 
       // Assert that output directory structure is correct
@@ -157,15 +179,21 @@ void main() {
           .listSync()
           .whereType<Directory>()
           .toList();
-      expect(companyDirs.length, 5, reason: 'Expected 5 company directories');
+      logger.info(
+        'Found ${companyDirs.length} company directories: ${companyDirs.map((d) => d.path.split(Platform.pathSeparator).last).toList()}',
+      );
+      expect(companyDirs.length, 6, reason: 'Expected 6 company directories');
 
       // Check that each company directory has the expected substructure
       for (final companyDir in companyDirs) {
         final subDirs = companyDir.listSync().whereType<Directory>().toList();
+        logger.info(
+          'Company ${companyDir.path.split(Platform.pathSeparator).last} has ${subDirs.length} subdirectories: ${subDirs.map((d) => d.path.split(Platform.pathSeparator).last).toList()}',
+        );
         expect(
           subDirs.length,
-          1,
-          reason: 'Expected 1 application directory in ${companyDir.path}',
+          3,
+          reason: 'Expected 3 application directories in ${companyDir.path}',
         );
 
         final appDir = subDirs.first;

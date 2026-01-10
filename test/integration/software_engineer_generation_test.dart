@@ -21,6 +21,7 @@ void main() {
   late GenerateFeedbackUsecase generateFeedbackUsecase;
   late CreateJobReqUsecase createJobReqUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
+  late OutputDirectoryService outputDirectoryService;
   late Logger logger;
 
   setUpAll(() async {
@@ -34,6 +35,7 @@ void main() {
     });
 
     logger = Logger('ResumeSoftwareEngineerGenerationTest');
+    outputDirectoryService = OutputDirectoryService();
 
     // Clear the database before the test group
     final datasource = JobReqSembastDatasource(
@@ -67,7 +69,6 @@ void main() {
       ),
       aiService: aiService,
     );
-    final outputDirectoryService = OutputDirectoryService();
     applicationRepository = ApplicationRepositoryImpl(
       outputDirectoryService: outputDirectoryService,
     );
@@ -155,9 +156,18 @@ void main() {
 
     // Save resume to output folder
     final outputDir = TestDirFactory.instance.outputDir;
+
+    // Create application directory for consistency
+    final appDirResult = outputDirectoryService.createApplicationDirectory(
+      baseOutputDir: outputDir,
+      jobReq: jobReq,
+    );
+    expect(appDirResult.isRight(), true);
+    final appDir = appDirResult.getOrElse((_) => '');
+
     final saveResult = await resumeRepository.saveResume(
       resume: resume,
-      outputDir: outputDir,
+      outputDir: appDir,
       jobTitle: 'software_engineer',
     );
     expect(saveResult.isRight(), true);
@@ -210,9 +220,18 @@ void main() {
 
     // Save cover letter to output folder
     final outputDir = TestDirFactory.instance.outputDir;
+
+    // Create application directory for consistency
+    final appDirResult = outputDirectoryService.createApplicationDirectory(
+      baseOutputDir: outputDir,
+      jobReq: jobReq,
+    );
+    expect(appDirResult.isRight(), true);
+    final appDir = appDirResult.getOrElse((_) => '');
+
     final saveResult = await coverLetterRepository.saveCoverLetter(
       coverLetter: coverLetter,
-      outputDir: outputDir,
+      outputDir: appDir,
       jobTitle: 'data_scientist',
     );
     expect(saveResult.isRight(), true);

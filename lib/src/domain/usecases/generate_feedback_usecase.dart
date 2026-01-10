@@ -36,7 +36,7 @@ class GenerateFeedbackUsecase {
     double tone = 0.5,
     double length = 0.5,
   }) async {
-    logger.info('[GenerateFeedbackUsecase] Generating feedback');
+    logger.info('Generating feedback');
 
     final fullPrompt = _buildFeedbackPrompt(
       jobReq: jobReq.content,

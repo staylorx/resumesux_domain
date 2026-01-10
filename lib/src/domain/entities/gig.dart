@@ -7,7 +7,7 @@ class Gig with EquatableMixin {
   final String? location;
   final String title;
   final String? dates;
-  final String? achievements;
+  final List<String>? achievements;
 
   const Gig({
     this.concern,
@@ -22,7 +22,7 @@ class Gig with EquatableMixin {
     String? location,
     String? title,
     String? dates,
-    String? achievements,
+    List<String>? achievements,
   }) {
     return Gig(
       concern: concern ?? this.concern,

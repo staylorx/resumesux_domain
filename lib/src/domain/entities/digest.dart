@@ -19,7 +19,10 @@ class Digest with EquatableMixin {
 
   List<String> get gigsContent =>
       gigs
-          ?.map((gig) => '${gig.concern} - ${gig.title}\n${gig.achievements}')
+          ?.map(
+            (gig) =>
+                '${gig.concern} - ${gig.title}\n${gig.achievements?.join('\n') ?? ''}',
+          )
           .toList() ??
       [];
 

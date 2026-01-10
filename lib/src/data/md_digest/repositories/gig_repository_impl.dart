@@ -52,7 +52,7 @@ Please analyze the following gig content and extract the following information i
 - concern: The company or organization name (if mentioned, otherwise null)
 - location: The job location (if mentioned, otherwise null)
 - dates: The employment dates (if mentioned, otherwise null)
-- achievements: A summary of achievements or responsibilities (if mentioned, otherwise null)
+- achievements: An array of achievements or responsibilities (if mentioned, otherwise null)
 
 File path: $path
 The file path may contain information about the concern (company), job title, location, etc. Use this to infer missing details if the content is ambiguous.
@@ -63,7 +63,7 @@ Return only valid JSON like:
   "concern": "StartupXYZ",
   "location": "Remote",
   "dates": "June 2018 - December 2020",
-  "achievements": "Developed RESTful APIs using Node.js and Express, Built responsive web applications with React, Integrated third-party services and payment gateways, Collaborated with design team for pixel-perfect implementations"
+  "achievements": ["Developed RESTful APIs using Node.js and Express", "Built responsive web applications with React", "Integrated third-party services and payment gateways", "Collaborated with design team for pixel-perfect implementations"]
 }
 
 Do your best, but if information is absolutely not present, use null. Make no assumptions beyond the content provided and the file path.
@@ -125,7 +125,8 @@ $content
           concern: data['concern'] as String?,
           location: data['location'] as String?,
           dates: data['dates'] as String?,
-          achievements: data['achievements'] as String?,
+          achievements: (data['achievements'] as List<dynamic>?)
+              ?.cast<String>(),
         );
         gigs.add(gig);
       }

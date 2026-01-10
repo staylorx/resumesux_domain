@@ -21,9 +21,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     required String appDirPath,
   }) async {
     try {
-      logger.info(
-        '[ApplicationRepositoryImpl] Saving to application directory: $appDirPath',
-      );
+      logger.info('Saving to application directory: $appDirPath');
 
       // Save resume
       final resumeFilePath = outputDirectoryService.getResumeFilePath(
@@ -33,7 +31,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
       final resumeFile = File(resumeFilePath);
       await resumeFile.writeAsString(resume.content);
       logger.info(
-        '[ApplicationRepositoryImpl] Saved resume file: $resumeFilePath (${resume.content.length} chars)',
+        'Saved resume file: $resumeFilePath (${resume.content.length} chars)',
       );
 
       // Save cover letter if provided
@@ -45,7 +43,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
         final coverFile = File(coverFilePath);
         await coverFile.writeAsString(coverLetter.content);
         logger.info(
-          '[ApplicationRepositoryImpl] Saved cover letter file: $coverFilePath (${coverLetter.content.length} chars)',
+          'Saved cover letter file: $coverFilePath (${coverLetter.content.length} chars)',
         );
       }
 
@@ -57,7 +55,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
         final feedbackFile = File(feedbackFilePath);
         await feedbackFile.writeAsString(feedback.content);
         logger.info(
-          '[ApplicationRepositoryImpl] Saved feedback file: $feedbackFilePath (${feedback.content.length} chars)',
+          'Saved feedback file: $feedbackFilePath (${feedback.content.length} chars)',
         );
       }
 

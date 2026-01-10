@@ -97,7 +97,7 @@ ${assets.map((a) => '---\n$a').join('\n')}
 
 Please generate a resume in markdown format optimized for ATS systems.
 Do not hallucinate any information. Use only the provided data.
-Include all provided work experiences and qualifications, as they are pre-selected for relevance to the job requirements. Prioritize recent work experience (last 10 years) and modern technologies. Limit the resume to 1-2 pages. Quantify achievements where possible and ensure focus on modern backend/API skills.
+Include all provided work experiences and qualifications. Do not add any skills, experiences, or qualifications not explicitly provided in the Work Experiences and Qualifications sections. If the provided data does not match the job requirements, still use only the provided data without modification or addition. Limit the resume to 1-2 pages. Quantify achievements where possible.
 ''';
   }
 
