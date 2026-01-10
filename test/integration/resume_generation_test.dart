@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:path/path.dart' as p;
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
@@ -70,7 +69,7 @@ void main() {
       jobReqDatasource: JobReqSembastDatasource(
         dbPath: TempDirFactory.instance.setUpDbPath,
       ),
-      fileJobReqDatasource: FileJobReqDatasourceImpl(),
+      aiService: aiService,
     );
     applicationRepository = ApplicationRepositoryImpl();
 
