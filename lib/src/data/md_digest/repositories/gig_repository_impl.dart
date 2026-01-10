@@ -9,7 +9,7 @@ class GigRepositoryImpl implements GigRepository {
   final Logger logger = LoggerFactory.create('GigRepositoryImpl');
   final String digestPath;
   final AiService aiService;
-  String? _lastAiResponse;
+  final List<String> _allAiResponses = [];
 
   GigRepositoryImpl({required this.digestPath, required this.aiService});
 
@@ -26,7 +26,7 @@ class GigRepositoryImpl implements GigRepository {
       }
 
       final aiResponse = aiResult.getOrElse((_) => '');
-      _lastAiResponse = aiResponse;
+      _allAiResponses.add(aiResponse);
 
       final extractedData = _parseAiResponse(aiResponse);
       if (extractedData == null) {
@@ -141,15 +141,19 @@ $content
     required String filePath,
   }) async {
     try {
-      if (_lastAiResponse == null) {
-        return Left(ServiceFailure(message: 'No AI response to save'));
+      if (_allAiResponses.isEmpty) {
+        return Left(ServiceFailure(message: 'No AI responses to save'));
       }
-      final file = File(filePath);
-      await file.writeAsString(_lastAiResponse!);
-      logger.info('Saved AI response to ${file.path}');
+      final basePath = filePath.replaceFirst('gig_ai_response.json', '');
+      for (int i = 0; i < _allAiResponses.length; i++) {
+        final file = File('${basePath}gig_${i}_ai_response.json');
+        await file.writeAsString(_allAiResponses[i]);
+        logger.info('Saved AI response to ${file.path}');
+      }
+      _allAiResponses.clear();
       return Right(unit);
     } catch (e) {
-      return Left(ServiceFailure(message: 'Failed to save AI response: $e'));
+      return Left(ServiceFailure(message: 'Failed to save AI responses: $e'));
     }
   }
 }

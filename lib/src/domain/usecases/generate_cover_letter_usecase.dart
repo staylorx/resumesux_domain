@@ -60,7 +60,7 @@ class GenerateCoverLetterUsecase {
     required String customPrompt,
     required Applicant applicant,
   }) {
-    final header = _buildApplicantHeader(applicant);
+    final header = _buildApplicantHeader(applicant: applicant);
     return '''
 $header
 
@@ -81,7 +81,7 @@ Perform strict relevance checking before inclusion: only include work experience
 ''';
   }
 
-  String _buildApplicantHeader(Applicant applicant) {
+  String _buildApplicantHeader({required Applicant applicant}) {
     return '''
 Applicant Information:
 Name: ${applicant.name}

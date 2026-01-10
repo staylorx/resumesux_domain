@@ -39,7 +39,7 @@ class AiServiceImpl implements AiService {
   Future<Either<Failure, String>> generateContent({
     required String prompt,
   }) async {
-    logger.fine('[AiService] Using default model: ${provider.defaultModel}');
+    logger.fine('Using default model: ${provider.defaultModel}');
     try {
       final response = await httpClient.post(
         Uri.parse('${provider.url}/chat/completions'),
@@ -60,15 +60,11 @@ class AiServiceImpl implements AiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final content = data['choices'][0]['message']['content'] as String;
-        logger.info(
-          '[AiService] AI response content length: ${content.length}',
-        );
-        logger.fine('[AiService] AI response content: $content');
+        logger.info('AI response content length: ${content.length}');
+        logger.fine('AI response content: $content');
         return Right(content);
       } else {
-        logger.severe(
-          '[AiService] AI API request failed: ${response.statusCode}',
-        );
+        logger.severe('AI API request failed: ${response.statusCode}');
         return Left(
           ServiceFailure(
             message:

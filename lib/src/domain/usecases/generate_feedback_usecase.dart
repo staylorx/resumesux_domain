@@ -51,7 +51,7 @@ class GenerateFeedbackUsecase {
     return result.map((content) => Feedback(content: content));
   }
 
-  String _getToneInstruction(double tone) {
+  String _getToneInstruction({required double tone}) {
     if (tone <= 0.2) {
       return 'Be brutally honest and critical, pointing out all flaws harshly without sugarcoating.';
     } else if (tone <= 0.4) {
@@ -65,7 +65,7 @@ class GenerateFeedbackUsecase {
     }
   }
 
-  String _getLengthInstruction(double length) {
+  String _getLengthInstruction({required double length}) {
     if (length <= 0.2) {
       return 'Provide a very brief summary, focusing only on the most critical points.';
     } else if (length <= 0.4) {
@@ -87,8 +87,8 @@ class GenerateFeedbackUsecase {
     required double tone,
     required double length,
   }) {
-    final toneInstruction = _getToneInstruction(tone);
-    final lengthInstruction = _getLengthInstruction(length);
+    final toneInstruction = _getToneInstruction(tone: tone);
+    final lengthInstruction = _getLengthInstruction(length: length);
 
     return '''
 $customPrompt

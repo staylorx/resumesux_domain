@@ -349,17 +349,13 @@ class ConfigRepositoryImpl implements ConfigRepository {
         final provider = config.providers.firstWhere((p) => p.isDefault);
         return Right(provider);
       } catch (e) {
-        return Left(
-          NotFoundFailure(message: 'No default provider found'),
-        );
+        return Left(NotFoundFailure(message: 'No default provider found'));
       }
     });
   }
 
   @override
-  Future<Either<Failure, AiModel>> getDefaultModel({
-    String? configPath,
-  }) async {
+  Future<Either<Failure, AiModel>> getDefaultModel({String? configPath}) async {
     final providerResult = await getDefaultProvider(configPath: configPath);
     return providerResult.fold((failure) => Left(failure), (provider) {
       return Right(provider.defaultModel!);

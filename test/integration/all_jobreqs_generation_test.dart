@@ -51,13 +51,11 @@ void main() {
       provider: TestAiHelper.defaultProvider,
     );
 
-    final gigRepository = GigRepositoryImpl(
-      digestPath: 'test/data/digest',
-      aiService: aiService,
-    );
+    // TODO: this isn't doing what we think it should do...
+    // digests are assumed to be one person, here we are mixing multiple people
     digestRepository = DigestRepositoryImpl(
       digestPath: 'test/data/digest',
-      gigRepository: gigRepository,
+      aiService: aiService,
     );
     jobReqRepository = JobReqRepositoryImpl(
       jobReqDatasource: JobReqSembastDatasource(
@@ -96,6 +94,7 @@ void main() {
       generateFeedbackUsecase: generateFeedbackUsecase,
       createJobReqUsecase: createJobReqUsecase,
       outputDirectoryService: outputDirectoryService,
+      digestRepository: digestRepository,
     );
 
     logger = Logger('AllJobReqsGenerationTest');

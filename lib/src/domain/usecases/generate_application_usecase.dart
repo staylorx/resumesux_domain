@@ -13,6 +13,7 @@ class GenerateApplicationUsecase {
   final GenerateFeedbackUsecase generateFeedbackUsecase;
   final CreateJobReqUsecase createJobReqUsecase;
   final OutputDirectoryService outputDirectoryService;
+  final DigestRepository digestRepository;
 
   /// Creates a new instance of [GenerateApplicationUsecase].
   GenerateApplicationUsecase({
@@ -23,6 +24,7 @@ class GenerateApplicationUsecase {
     required this.generateFeedbackUsecase,
     required this.createJobReqUsecase,
     required this.outputDirectoryService,
+    required this.digestRepository,
   });
 
   /// Generates an application for the given job requirement.
@@ -91,8 +93,8 @@ class GenerateApplicationUsecase {
 
     // Save AI response to application directory
     final aiResponseFilePath = outputDirectoryService.getAiResponseFilePath(
-      appDirPath,
-      'jobreq',
+      appDir: appDirPath,
+      type: 'jobreq',
     );
     final saveAiResult = await jobReqRepository.saveAiResponse(
       filePath: aiResponseFilePath,
@@ -101,6 +103,39 @@ class GenerateApplicationUsecase {
       final failure = saveAiResult.getLeft().toNullable()!;
       logger.warning('Failed to save AI response: ${failure.message}');
       // Continue anyway, as it's not critical
+    }
+
+    // Get digest to trigger AI calls for gigs and assets
+    progress('Retrieving applicant data');
+    logger.info('Retrieving applicant data');
+    final digestResult = await digestRepository.getAllDigests();
+    if (digestResult.isLeft()) {
+      return Left(digestResult.getLeft().toNullable()!);
+    }
+
+    // Save AI responses for gigs and assets
+    final gigAiResponseFilePath = outputDirectoryService.getAiResponseFilePath(
+      appDir: appDirPath,
+      type: 'gig',
+    );
+    final saveGigAiResult = await digestRepository.saveGigAiResponse(
+      filePath: gigAiResponseFilePath,
+    );
+    if (saveGigAiResult.isLeft()) {
+      final failure = saveGigAiResult.getLeft().toNullable()!;
+      logger.warning('Failed to save gig AI response: ${failure.message}');
+      // Continue anyway
+    }
+
+    final assetAiResponseFilePath = outputDirectoryService
+        .getAiResponseFilePath(appDir: appDirPath, type: 'asset');
+    final saveAssetAiResult = await digestRepository.saveAssetAiResponse(
+      filePath: assetAiResponseFilePath,
+    );
+    if (saveAssetAiResult.isLeft()) {
+      final failure = saveAssetAiResult.getLeft().toNullable()!;
+      logger.warning('Failed to save asset AI response: ${failure.message}');
+      // Continue anyway
     }
 
     progress('Generating resume');

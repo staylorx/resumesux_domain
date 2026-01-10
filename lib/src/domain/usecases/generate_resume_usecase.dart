@@ -80,7 +80,7 @@ class GenerateResumeUsecase {
     required String customPrompt,
     required Applicant applicant,
   }) {
-    final header = _buildApplicantHeader(applicant);
+    final header = _buildApplicantHeader(applicant: applicant);
     return '''
 $header
 
@@ -89,20 +89,19 @@ Generate an ATS-optimized resume. $customPrompt
 Job Requirements:
 $jobReq
 
-Work Experience (Gigs):
-${gigs.join('\n\n')}
+Work Experiences:
+${gigs.map((g) => '---\n$g').join('\n')}
 
-Assets (Education, Skills, etc.):
-${assets.join('\n\n')}
+Qualifications:
+${assets.map((a) => '---\n$a').join('\n')}
 
 Please generate a resume in markdown format optimized for ATS systems.
-Do not halucinate any information. Use only the provided data.
-Perform strict relevance checking before including any asset or gig. Only include items that are directly relevant to the job requirements. Omit any irrelevant or unrelated content entirely, such as non-tech certifications (e.g., pilot licenses) if the job is tech-focused.
-Do not include any work experience or assets that are not directly related to or explicitly mentioned in the job requirements. Prioritize recent work experience (last 10 years) and modern technologies. Exclude any experiences or skills from before 2010 or legacy technologies like SOA, Oracle WebLogic, BPEL unless they are directly relevant to the job requirements. Limit the resume to 1-2 pages, focusing on 4-5 most relevant recent roles. Quantify achievements where possible and ensure focus on modern backend/API skills.
+Do not hallucinate any information. Use only the provided data.
+Include all provided work experiences and qualifications, as they are pre-selected for relevance to the job requirements. Prioritize recent work experience (last 10 years) and modern technologies. Limit the resume to 1-2 pages. Quantify achievements where possible and ensure focus on modern backend/API skills.
 ''';
   }
 
-  String _buildApplicantHeader(Applicant applicant) {
+  String _buildApplicantHeader({required Applicant applicant}) {
     final address = applicant.address;
     return '''
 Applicant Information:

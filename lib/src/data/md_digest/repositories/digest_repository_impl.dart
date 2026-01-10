@@ -1,13 +1,25 @@
-import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of the DigestRepository.
 class DigestRepositoryImpl implements DigestRepository {
   final String digestPath;
-  final GigRepository gigRepository;
+  late final GigRepository gigRepository;
+  late final AssetRepository assetRepository;
 
-  DigestRepositoryImpl({required this.digestPath, required this.gigRepository});
+  DigestRepositoryImpl({
+    required this.digestPath,
+    required AiService aiService,
+  }) {
+    gigRepository = GigRepositoryImpl(
+      digestPath: digestPath,
+      aiService: aiService,
+    );
+    assetRepository = AssetRepositoryImpl(
+      digestPath: digestPath,
+      aiService: aiService,
+    );
+  }
 
   @override
   /// Retrieves all digests from the digest path.
@@ -18,7 +30,11 @@ class DigestRepositoryImpl implements DigestRepository {
         return Left(gigsResult.getLeft().toNullable()!);
       }
       final gigs = gigsResult.getOrElse((_) => []);
-      final assets = await _getAllAssets();
+      final assetsResult = await assetRepository.getAllAssets();
+      if (assetsResult.isLeft()) {
+        return Left(assetsResult.getLeft().toNullable()!);
+      }
+      final assets = assetsResult.getOrElse((_) => []);
       final digest = Digest(gigs: gigs, assets: assets);
       return Right([digest]);
     } catch (e) {
@@ -26,44 +42,17 @@ class DigestRepositoryImpl implements DigestRepository {
     }
   }
 
-  Future<List<Asset>> _getAllAssets() async {
-    final assetsDir = Directory('$digestPath/assets');
-    if (!assetsDir.existsSync()) {
-      return [];
-    }
-
-    final assets = <Asset>[];
-
-    final files = assetsDir
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.md'));
-
-    for (final file in files) {
-      final content = await file.readAsString();
-      final type = _getAssetType(path: file.path);
-      assets.add(
-        Asset(
-          tags: [Tag(name: type)],
-          content: content,
-        ),
-      );
-    }
-
-    return assets;
+  @override
+  Future<Either<Failure, Unit>> saveGigAiResponse({
+    required String filePath,
+  }) async {
+    return gigRepository.saveAiResponse(filePath: filePath);
   }
 
-  String _getAssetType({required String path}) {
-    final parts = path.split(Platform.pathSeparator);
-    final assetsIndex = parts.indexWhere((part) => part == 'assets');
-    if (assetsIndex != -1 && assetsIndex + 1 < parts.length) {
-      final nextPart = parts[assetsIndex + 1];
-      if (nextPart.contains('.')) {
-        return nextPart.split('.').first;
-      } else {
-        return nextPart;
-      }
-    }
-    return 'unknown';
+  @override
+  Future<Either<Failure, Unit>> saveAssetAiResponse({
+    required String filePath,
+  }) async {
+    return assetRepository.saveAiResponse(filePath: filePath);
   }
 }

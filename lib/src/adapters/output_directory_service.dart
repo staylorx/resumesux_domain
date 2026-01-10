@@ -19,8 +19,8 @@ class OutputDirectoryService {
     required JobReq jobReq,
   }) {
     try {
-      final concernDir = _sanitizeName(jobReq.concern?.name ?? 'unknown');
-      final dirName = _createDirName(jobReq.title);
+      final concernDir = _sanitizeName(name: jobReq.concern?.name ?? 'unknown');
+      final dirName = _createDirName(jobTitle: jobReq.title);
       final appDirPath = '$baseOutputDir/$concernDir/$dirName';
 
       final appDir = Directory(appDirPath);
@@ -38,30 +38,33 @@ class OutputDirectoryService {
   }
 
   /// Gets the path for the resume file in the application directory.
-  String getResumeFilePath(String appDir, String jobTitle) {
-    final sanitizedTitle = _sanitizeName(jobTitle);
+  String getResumeFilePath({required String appDir, required String jobTitle}) {
+    final sanitizedTitle = _sanitizeName(name: jobTitle);
     return '$appDir/resume_${sanitizedTitle.toLowerCase()}.md';
   }
 
   /// Gets the path for the cover letter file in the application directory.
-  String getCoverLetterFilePath(String appDir, String jobTitle) {
-    final sanitizedTitle = _sanitizeName(jobTitle);
+  String getCoverLetterFilePath({
+    required String appDir,
+    required String jobTitle,
+  }) {
+    final sanitizedTitle = _sanitizeName(name: jobTitle);
     return '$appDir/cover_letter_${sanitizedTitle.toLowerCase()}.md';
   }
 
   /// Gets the path for the feedback file in the application directory.
-  String getFeedbackFilePath(String appDir) {
+  String getFeedbackFilePath({required String appDir}) {
     return '$appDir/feedback.md';
   }
 
   /// Gets the path for the AI response file in the application directory.
   /// The file name includes the type to distinguish between different AI calls.
-  String getAiResponseFilePath(String appDir, String type) {
+  String getAiResponseFilePath({required String appDir, required String type}) {
     return '$appDir/${type}_ai_response.json';
   }
 
   /// Validates that the base output directory is accessible.
-  Either<Failure, Unit> validateBaseOutputDir(String baseOutputDir) {
+  Either<Failure, Unit> validateBaseOutputDir({required String baseOutputDir}) {
     try {
       final dir = Directory(baseOutputDir);
       if (!dir.existsSync()) {
@@ -81,17 +84,17 @@ class OutputDirectoryService {
     }
   }
 
-  String _sanitizeName(String name) {
+  String _sanitizeName({required String name}) {
     return name
         .replaceAll(RegExp(r'[^\w\s-]'), '')
         .replaceAll(' ', '_')
         .toLowerCase();
   }
 
-  String _createDirName(String jobTitle) {
+  String _createDirName({required String jobTitle}) {
     final now = DateTime.now();
     final dateStr = DateFormat('yyyyMMdd_HHmmss').format(now);
-    final sanitizedTitle = _sanitizeName(jobTitle);
+    final sanitizedTitle = _sanitizeName(name: jobTitle);
     return '$dateStr - $sanitizedTitle';
   }
 }

@@ -5,10 +5,16 @@ import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import '../test_utils.dart';
 
+// Import implementations for testing
+import 'package:resumesux_domain/src/data/md_digest/repositories/resume_repository_impl.dart';
+import 'package:resumesux_domain/src/data/md_digest/repositories/cover_letter_repository_impl.dart';
+
 void main() {
   late DigestRepository digestRepository;
   late JobReqRepository jobReqRepository;
   late ApplicationRepository applicationRepository;
+  late ResumeRepository resumeRepository;
+  late CoverLetterRepository coverLetterRepository;
   late AiServiceImpl aiService;
   late GenerateResumeUsecase generateResumeUsecase;
   late GenerateCoverLetterUsecase generateCoverLetterUsecase;
@@ -51,13 +57,9 @@ void main() {
       provider: TestAiHelper.defaultProvider,
     );
 
-    final gigRepository = GigRepositoryImpl(
-      digestPath: 'test/data/digest/software_engineer',
-      aiService: aiService,
-    );
     digestRepository = DigestRepositoryImpl(
       digestPath: 'test/data/digest/software_engineer',
-      gigRepository: gigRepository,
+      aiService: aiService,
     );
     jobReqRepository = JobReqRepositoryImpl(
       jobReqDatasource: JobReqSembastDatasource(
@@ -67,6 +69,12 @@ void main() {
     );
     final outputDirectoryService = OutputDirectoryService();
     applicationRepository = ApplicationRepositoryImpl(
+      outputDirectoryService: outputDirectoryService,
+    );
+    resumeRepository = ResumeRepositoryImpl(
+      outputDirectoryService: outputDirectoryService,
+    );
+    coverLetterRepository = CoverLetterRepositoryImpl(
       outputDirectoryService: outputDirectoryService,
     );
 
@@ -96,6 +104,7 @@ void main() {
       generateFeedbackUsecase: generateFeedbackUsecase,
       createJobReqUsecase: createJobReqUsecase,
       outputDirectoryService: outputDirectoryService,
+      digestRepository: digestRepository,
     );
 
     logger = Logger('ResumeGenerationTest');
@@ -140,6 +149,19 @@ void main() {
       (_) => throw Exception('Failed to generate resume'),
     );
     expect(resume.content, isNotEmpty);
+    logger.info(
+      'Resume generated successfully, content length: ${resume.content.length}',
+    );
+
+    // Save resume to output folder
+    final outputDir = TestDirFactory.instance.outputDir;
+    final saveResult = await resumeRepository.saveResume(
+      resume: resume,
+      outputDir: outputDir,
+      jobTitle: 'software_engineer',
+    );
+    expect(saveResult.isRight(), true);
+    logger.info('Resume saved to output folder');
   });
 
   test('generate cover letter for data scientist job', () async {
@@ -182,6 +204,19 @@ void main() {
       (_) => throw Exception('Failed to generate cover letter'),
     );
     expect(coverLetter.content, isNotEmpty);
+    logger.info(
+      'Cover letter generated successfully, content length: ${coverLetter.content.length}',
+    );
+
+    // Save cover letter to output folder
+    final outputDir = TestDirFactory.instance.outputDir;
+    final saveResult = await coverLetterRepository.saveCoverLetter(
+      coverLetter: coverLetter,
+      outputDir: outputDir,
+      jobTitle: 'data_scientist',
+    );
+    expect(saveResult.isRight(), true);
+    logger.info('Cover letter saved to output folder');
   });
 
   test(
