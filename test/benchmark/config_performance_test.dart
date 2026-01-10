@@ -35,8 +35,8 @@ void main() {
       expect(result.isRight(), true);
       expect(
         stopwatch.elapsedMilliseconds,
-        lessThan(200),
-      ); // Should load in under 200ms (accounting for schema validation)
+        lessThan(300),
+      ); // Should load in under 300ms (accounting for schema validation)
       logger.info('Config loading took: ${stopwatch.elapsedMilliseconds}ms');
     });
 

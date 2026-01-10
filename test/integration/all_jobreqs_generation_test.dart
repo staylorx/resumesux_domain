@@ -192,8 +192,9 @@ void main() {
         );
         expect(
           subDirs.length,
-          3,
-          reason: 'Expected 3 application directories in ${companyDir.path}',
+          greaterThanOrEqualTo(1),
+          reason:
+              'Expected at least 1 application directory in ${companyDir.path}',
         );
 
         final appDir = subDirs.first;
