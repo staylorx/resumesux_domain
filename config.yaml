@@ -25,6 +25,12 @@ config:
       default: true
       models:
         - name: "qwen/qwen2.5-coder-14b"
-          default: true
+          default: false
           settings:
             temperature: 0.8
+        - name: "google/gemma-3-12b"
+          default: false
+          settings:
+            temperature: 0.7
+        - name: "qwen2.5-7b-instruct"
+          default: true

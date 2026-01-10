@@ -1,6 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import '../../../../src/core/failure.dart';
-import '../entities/asset.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Repository for asset-related operations.
 abstract class AssetRepository {

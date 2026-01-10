@@ -9,7 +9,7 @@ void main() {
   late DigestRepository digestRepository;
   late JobReqRepository jobReqRepository;
   late ApplicationRepository applicationRepository;
-  late AiService aiService;
+  late AiServiceImpl aiService;
   late GenerateResumeUsecase generateResumeUsecase;
   late GenerateCoverLetterUsecase generateCoverLetterUsecase;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
@@ -46,23 +46,7 @@ void main() {
   });
 
   setUp(() {
-    final model = AiModel(
-      name: 'qwen/qwen2.5-coder-14b',
-      isDefault: true,
-      settings: {'temperature': 0.8},
-    );
-
-    final provider = AiProvider(
-      id: 'lmstudio',
-      url: 'http://127.0.0.1:1234/v1',
-      key: 'dummy-key',
-      models: [model],
-      defaultModel: model,
-      settings: {'max_tokens': 4000, 'temperature': 0.8},
-      isDefault: true,
-    );
-
-    aiService = AiService(httpClient: http.Client(), provider: provider);
+    aiService = AiServiceImpl(httpClient: http.Client(), provider: TestAiHelper.defaultProvider);
 
     digestRepository = DigestRepositoryImpl(digestPath: 'test/data/digest');
     jobReqRepository = JobReqRepositoryImpl(
@@ -71,7 +55,10 @@ void main() {
       ),
       aiService: aiService,
     );
-    applicationRepository = ApplicationRepositoryImpl();
+    final outputDirectoryService = OutputDirectoryService();
+    applicationRepository = ApplicationRepositoryImpl(
+      outputDirectoryService: outputDirectoryService,
+    );
 
     generateResumeUsecase = GenerateResumeUsecase(
       digestRepository: digestRepository,
@@ -88,6 +75,7 @@ void main() {
     createJobReqUsecase = CreateJobReqUsecase(
       jobReqRepository: jobReqRepository,
       aiService: aiService,
+      fileReader: FileReaderImpl(),
     );
 
     generateApplicationUsecase = GenerateApplicationUsecase(
@@ -97,6 +85,7 @@ void main() {
       generateCoverLetterUsecase: generateCoverLetterUsecase,
       generateFeedbackUsecase: generateFeedbackUsecase,
       createJobReqUsecase: createJobReqUsecase,
+      outputDirectoryService: outputDirectoryService,
     );
 
     logger = Logger('AllJobReqsGenerationTest');

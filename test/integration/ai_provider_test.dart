@@ -19,7 +19,7 @@ void main() {
   });
   late ConfigRepositoryImpl configRepository;
   late ConfigDatasource configDatasource;
-  late AiService aiService;
+  late AiServiceImpl aiService;
   late MockHttpClient mockHttpClient;
 
   setUp(() {
@@ -45,6 +45,7 @@ void main() {
       )!;
       expect(provider.id, 'lmstudio');
       expect(provider.isDefault, true);
+      // TODO: don't assume a default here... if there isn't one, then toss a Failure out
       expect(provider.defaultModel?.name, 'qwen/qwen2.5-coder-14b');
     });
 
@@ -129,7 +130,7 @@ void main() {
       final configPath = 'test/data/config/valid_config.yaml';
 
       // Act
-      aiService = await AiService.create(
+      aiService = await AiServiceImpl.create(
         configRepository: configRepository,
         providerName: 'lmstudio',
         configPath: configPath,
@@ -144,7 +145,7 @@ void main() {
     test('generate content with mocked successful response', () async {
       // Arrange
       final configPath = 'test/data/config/valid_config.yaml';
-      aiService = await AiService.create(
+      aiService = await AiServiceImpl.create(
         configRepository: configRepository,
         providerName: 'lmstudio',
         configPath: configPath,
@@ -196,7 +197,7 @@ void main() {
     test('handle API failure response', () async {
       // Arrange
       final configPath = 'test/data/config/valid_config.yaml';
-      aiService = await AiService.create(
+      aiService = await AiServiceImpl.create(
         configRepository: configRepository,
         providerName: 'lmstudio',
         configPath: configPath,
@@ -228,7 +229,7 @@ void main() {
     test('handle network failure', () async {
       // Arrange
       final configPath = 'test/data/config/valid_config.yaml';
-      aiService = await AiService.create(
+      aiService = await AiServiceImpl.create(
         configRepository: configRepository,
         providerName: 'lmstudio',
         configPath: configPath,
@@ -271,7 +272,10 @@ void main() {
         )!;
 
         // Create AI service
-        aiService = AiService(httpClient: mockHttpClient, provider: provider);
+        aiService = AiServiceImpl(
+          httpClient: mockHttpClient,
+          provider: provider,
+        );
 
         // Mock successful AI response
         final mockResponse = MockResponse();

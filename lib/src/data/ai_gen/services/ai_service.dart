@@ -4,16 +4,16 @@ import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-/// Service for generating content using AI providers.
-class AiService {
+/// Implementation of AiService for generating content using AI providers.
+class AiServiceImpl implements AiService {
   final Logger logger = LoggerFactory.create('AiService');
   final http.Client httpClient;
   final AiProvider provider;
 
-  AiService({required this.httpClient, required this.provider});
+  AiServiceImpl({required this.httpClient, required this.provider});
 
-  /// Creates an AiService instance for the given provider.
-  static Future<AiService> create({
+  /// Creates an AiServiceImpl instance for the given provider.
+  static Future<AiServiceImpl> create({
     required ConfigRepository configRepository,
     required String providerName,
     String? configPath,
@@ -31,10 +31,11 @@ class AiService {
     final provider = providerResult.getOrElse(
       (_) => throw Exception('Failed to get provider'),
     );
-    return AiService(httpClient: httpClient, provider: provider);
+    return AiServiceImpl(httpClient: httpClient, provider: provider);
   }
 
   /// Generates content using the AI provider.
+  @override
   Future<Either<Failure, String>> generateContent({
     required String prompt,
   }) async {

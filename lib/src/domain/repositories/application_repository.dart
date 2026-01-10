@@ -10,7 +10,6 @@ abstract class ApplicationRepository {
     required Resume resume,
     required CoverLetter coverLetter,
     required Feedback feedback,
-    required String outputDir,
-    required Concern concern,
+    required String appDirPath,
   });
 }

@@ -1,14 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 
-import '../../core/failure.dart';
-import '../../core/logger.dart';
-import '../entities/job_req.dart';
-import '../entities/resume.dart';
-import '../entities/cover_letter.dart';
-import '../entities/feedback.dart';
-import '../entities/applicant.dart';
-import '../../data/ai_gen/services/ai_service.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 // Parameters to control feedback generation:
 // - tone: Controls the tone of feedback (0.0 = brutal feedback, 1.0 = enthusiastic feedback)

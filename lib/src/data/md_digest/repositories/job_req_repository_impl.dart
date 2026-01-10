@@ -9,6 +9,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
   final Logger logger = LoggerFactory.create('JobReqRepositoryImpl');
   final JobReqDatasource jobReqDatasource;
   final AiService aiService;
+  String? _lastAiResponse;
 
   JobReqRepositoryImpl({
     required this.jobReqDatasource,
@@ -72,6 +73,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
       }
 
       final aiResponse = aiResult.getOrElse((_) => '');
+      _lastAiResponse = aiResponse;
 
       final extractedData = _parseAiResponse(aiResponse);
       if (extractedData == null) {
@@ -128,6 +130,22 @@ $content
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e) {
       return null;
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> saveAiResponse({required String outputDir}) async {
+    try {
+      if (_lastAiResponse == null) {
+        return Left(ServiceFailure(message: 'No AI response to save'));
+      }
+      // Directory should already exist from OutputDirectoryService
+      final file = File('$outputDir/ai_response.json');
+      await file.writeAsString(_lastAiResponse!);
+      logger.info('Saved AI response to ${file.path}');
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to save AI response: $e'));
     }
   }
 }

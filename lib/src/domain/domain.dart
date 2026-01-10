@@ -1,6 +1,9 @@
 /// Exports for the domain layer.
 library;
 
+export "failure.dart";
 export "usecases/usecases.dart";
 export "repositories/repositories.dart";
 export "entities/entities.dart";
+export "services/ai_service.dart";
+export "services/file_reader.dart";

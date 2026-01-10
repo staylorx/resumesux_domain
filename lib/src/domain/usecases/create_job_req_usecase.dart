@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
@@ -9,11 +8,13 @@ class CreateJobReqUsecase {
   final Logger logger = LoggerFactory.create('CreateJobReqUsecase');
   final JobReqRepository jobReqRepository;
   final AiService aiService;
+  final FileReader fileReader;
 
   /// Creates a new instance of [CreateJobReqUsecase].
   CreateJobReqUsecase({
     required this.jobReqRepository,
     required this.aiService,
+    required this.fileReader,
   });
 
   /// Creates a new job requirement.
@@ -99,34 +100,28 @@ class CreateJobReqUsecase {
   Future<Either<Failure, Map<String, dynamic>>> _extractJobReqData({
     required String path,
   }) async {
-    try {
-      final file = File(path);
-      if (!file.existsSync()) {
-        return Left(NotFoundFailure(message: 'Job req file not found: $path'));
-      }
-      final content = await file.readAsString();
-      final prompt = _buildExtractionPrompt(content: content, path: path);
+    final contentResult = fileReader.readFile(path);
+    if (contentResult.isLeft()) {
+      return Left(contentResult.getLeft().toNullable()!);
+    }
+    final content = contentResult.getOrElse((_) => '');
+    final prompt = _buildExtractionPrompt(content: content, path: path);
 
-      final aiResult = await aiService.generateContent(prompt: prompt);
-      if (aiResult.isLeft()) {
-        return Left(aiResult.getLeft().toNullable()!);
-      }
+    final aiResult = await aiService.generateContent(prompt: prompt);
+    if (aiResult.isLeft()) {
+      return Left(aiResult.getLeft().toNullable()!);
+    }
 
-      final aiResponse = aiResult.getOrElse((_) => '');
+    final aiResponse = aiResult.getOrElse((_) => '');
 
-      final extractedData = _parseAiResponse(aiResponse);
-      if (extractedData == null) {
-        return Left(
-          ParsingFailure(message: 'Failed to parse AI response as JSON'),
-        );
-      }
-
-      return Right(extractedData);
-    } catch (e) {
+    final extractedData = _parseAiResponse(aiResponse);
+    if (extractedData == null) {
       return Left(
-        ServiceFailure(message: 'Failed to extract job req data: $e'),
+        ParsingFailure(message: 'Failed to parse AI response as JSON'),
       );
     }
+
+    return Right(extractedData);
   }
 
   String _buildExtractionPrompt({

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path/path.dart' as path;
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Factory for creating temporary directories for tests.
 /// Uses build/test_temp/ as the base directory.
@@ -32,4 +33,27 @@ class TempDirFactory {
     Directory(path.dirname(setUpDbPath)).createSync(recursive: true);
     Directory(outputDir).createSync(recursive: true);
   }
+}
+
+/// Helper class for creating test AI models and providers.
+class TestAiHelper {
+  /// Default AI model for testing.
+  static AiModel get defaultModel => AiModel(
+    // name: 'qwen/qwen2.5-coder-14b',
+    // name: "google/gemma-3-12b",
+    name: "qwen2.5-7b-instruct",
+    isDefault: true,
+    settings: {'temperature': 0.8},
+  );
+
+  /// Default AI provider for testing.
+  static AiProvider get defaultProvider => AiProvider(
+    id: 'lmstudio',
+    url: 'http://127.0.0.1:1234/v1',
+    key: 'dummy-key',
+    models: [defaultModel],
+    defaultModel: defaultModel,
+    settings: {'max_tokens': 4000, 'temperature': 0.8},
+    isDefault: true,
+  );
 }

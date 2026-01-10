@@ -11,4 +11,7 @@ abstract class JobReqRepository {
 
   /// Updates an existing job requirement.
   Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq});
+
+  /// Saves the last AI response to the specified output directory.
+  Future<Either<Failure, Unit>> saveAiResponse({required String outputDir});
 }

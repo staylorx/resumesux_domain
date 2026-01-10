@@ -1,6 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import '../../../../src/core/failure.dart';
-import '../entities/applicant.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Repository for applicant-related operations.
 abstract class ApplicantRepository {

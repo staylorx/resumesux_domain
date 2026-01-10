@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
@@ -11,6 +12,7 @@ class GenerateApplicationUsecase {
   final GenerateCoverLetterUsecase generateCoverLetterUsecase;
   final GenerateFeedbackUsecase generateFeedbackUsecase;
   final CreateJobReqUsecase createJobReqUsecase;
+  final OutputDirectoryService outputDirectoryService;
 
   /// Creates a new instance of [GenerateApplicationUsecase].
   GenerateApplicationUsecase({
@@ -20,6 +22,7 @@ class GenerateApplicationUsecase {
     required this.generateCoverLetterUsecase,
     required this.generateFeedbackUsecase,
     required this.createJobReqUsecase,
+    required this.outputDirectoryService,
   });
 
   /// Generates an application for the given job requirement.
@@ -76,6 +79,26 @@ class GenerateApplicationUsecase {
 
     final jobReq = (jobReqResult as Right<Failure, JobReq>).value;
 
+    // Create application directory using the service
+    final appDirResult = outputDirectoryService.createApplicationDirectory(
+      baseOutputDir: outputDir,
+      jobReq: jobReq,
+    );
+    if (appDirResult.isLeft()) {
+      return appDirResult.map((_) => unit);
+    }
+    final appDirPath = appDirResult.getOrElse((_) => '');
+
+    // Save AI response to application directory
+    final saveAiResult = await jobReqRepository.saveAiResponse(
+      outputDir: appDirPath,
+    );
+    if (saveAiResult.isLeft()) {
+      final failure = saveAiResult.getLeft().toNullable()!;
+      logger.warning('Failed to save AI response: ${failure.message}');
+      // Continue anyway, as it's not critical
+    }
+
     progress('Generating resume');
     logger.info('Generating resume');
     // Generate resume
@@ -129,15 +152,13 @@ class GenerateApplicationUsecase {
     // Save application
     progress('Saving application');
     logger.info('Saving application to output directory: $outputDir');
-    final concern = jobReq.concern?.name ?? 'unknown';
     final saveResult = await applicationRepository.saveApplication(
       jobReqId: jobReq.id,
       jobTitle: jobReq.title,
       resume: resume,
       coverLetter: coverLetter ?? CoverLetter(content: ''),
       feedback: feedback,
-      outputDir: outputDir,
-      concern: Concern(name: concern),
+      appDirPath: appDirPath,
     );
 
     if (saveResult.isRight()) {

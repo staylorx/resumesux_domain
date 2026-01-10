@@ -31,11 +31,13 @@ class GenerateResumeUsecase {
 
     final digestResult = await digestRepository.getAllDigests();
     if (digestResult.isLeft()) {
+      logger.severe('[GenerateResumeUsecase] Failed to get digests: ${digestResult.getLeft().toNullable()!.message}');
       return Left(digestResult.getLeft().toNullable()!);
     }
 
     final digests = digestResult.getOrElse((failure) => []);
     if (digests.isEmpty) {
+      logger.severe('[GenerateResumeUsecase] No digests found');
       return Left(ValidationFailure(message: 'No digest found'));
     }
 
@@ -57,14 +59,18 @@ class GenerateResumeUsecase {
     );
     logger.fine('[GenerateResumeUsecase] Full prompt: $fullPrompt');
 
+    logger.info('[GenerateResumeUsecase] Calling AI service for resume generation');
     final result = await aiService.generateContent(prompt: fullPrompt);
-    return result.map((content) {
-      logger.info(
-        '[GenerateResumeUsecase] AI response length: ${content.length}',
-      );
-      logger.fine('[GenerateResumeUsecase] AI response: $content');
-      return Resume(content: content);
-    });
+    if (result.isLeft()) {
+      logger.severe('[GenerateResumeUsecase] AI service failed: ${result.getLeft().toNullable()!.message}');
+      return Left(result.getLeft().toNullable()!);
+    }
+    final content = result.getOrElse((_) => '');
+    logger.info(
+      '[GenerateResumeUsecase] AI response length: ${content.length}',
+    );
+    logger.fine('[GenerateResumeUsecase] AI response: $content');
+    return Right(Resume(content: content));
   }
 
   String _buildResumePrompt({
