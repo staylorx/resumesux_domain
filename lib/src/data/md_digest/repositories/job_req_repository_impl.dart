@@ -1,14 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:markdown/markdown.dart' as md;
-import 'package:yaml/yaml.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of the JobReqRepository.
 class JobReqRepositoryImpl implements JobReqRepository {
   final JobReqDatasource jobReqDatasource;
+  final AiService aiService;
 
-  JobReqRepositoryImpl({required this.jobReqDatasource});
+  JobReqRepositoryImpl({required this.jobReqDatasource, required this.aiService});
   @override
   /// Updates an existing job requirement.
   Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq}) async {
@@ -35,7 +36,46 @@ class JobReqRepositoryImpl implements JobReqRepository {
         return Left(ValidationFailure(message: 'Invalid Markdown syntax: $e'));
       }
 
-      return _parseJobReq(content: content);
+      // Build prompt
+      final prompt = _buildExtractionPrompt(content: content, path: path);
+
+      // Call AI
+      final aiResult = await aiService.generateContent(prompt: prompt);
+      if (aiResult.isLeft()) {
+        return Left(aiResult.getLeft().toNullable()!);
+      }
+
+      final aiResponse = aiResult.getOrElse((_) => '');
+
+      // Parse JSON
+      final extractedData = _parseAiResponse(aiResponse);
+      if (extractedData == null) {
+        return Left(
+          ParsingFailure(message: 'Failed to parse AI response as JSON'),
+        );
+      }
+
+      // Create JobReq
+      return Right(
+        JobReq(
+          id: extractedData['id'] as String? ?? '',
+          title: extractedData['title'] as String? ?? '',
+          content: content,
+          salary: extractedData['salary'] as String?,
+          location: extractedData['location'] as String?,
+          concern: extractedData['concern'] != null
+              ? Concern(
+                  name: extractedData['concern'] as String,
+                  location: extractedData['location'] as String?,
+                )
+              : null,
+          state: 'raw',
+          createdDate: extractedData['createdDate'] != null
+              ? DateTime.tryParse(extractedData['createdDate'].toString())
+              : null,
+          whereFound: extractedData['whereFound'] as String? ?? '',
+        ),
+      );
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to read job req: $e'));
     }
@@ -114,9 +154,16 @@ class JobReqRepositoryImpl implements JobReqRepository {
         content: bodyContent,
         salary: fields['salary']?.toString(),
         location: fields['location']?.toString(),
-        concern: fields['concern_name'] != null || fields['concern'] != null || fields['Concern'] != null
+        concern:
+            fields['concern_name'] != null ||
+                fields['concern'] != null ||
+                fields['Concern'] != null
             ? Concern(
-                name: (fields['concern_name'] ?? fields['concern'] ?? fields['Concern']).toString(),
+                name:
+                    (fields['concern_name'] ??
+                            fields['concern'] ??
+                            fields['Concern'])
+                        .toString(),
                 location: fields['location']?.toString(),
               )
             : null,

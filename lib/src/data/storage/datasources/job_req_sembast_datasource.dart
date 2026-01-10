@@ -62,7 +62,7 @@ class JobReqSembastDatasource implements JobReqDatasource {
   Future<Either<Failure, Unit>> clearDatabase() async {
     try {
       final db = await _database;
-      await _jobReqStore.delete(db);
+      await _jobReqStore.drop(db);
       return Right(unit);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to clear database: $e'));

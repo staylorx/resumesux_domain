@@ -1,11 +1,12 @@
 import 'dart:io';
-
+import 'package:path/path.dart' as p;
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 void main() {
+  late String tempDir;
   late DigestRepository digestRepository;
   late JobReqRepository jobReqRepository;
   late ApplicationRepository applicationRepository;
@@ -18,9 +19,17 @@ void main() {
   late Logger logger;
 
   setUpAll(() async {
+    tempDir = p.join('build', DateTime.now().toUtc().toIso8601String());
+
     // Clear the database before the test group
-    final datasource = JobReqSembastDatasource();
+    final datasource = JobReqSembastDatasource(
+      dbPath: p.join(tempDir, 'setUpAll', 'jobreqs.db'),
+    );
     final result = await datasource.clearDatabase();
+    result.fold(
+      (failure) => logger.severe('Failure: ${failure.message}'),
+      (_) => {},
+    );
     expect(
       result.isRight(),
       true,
@@ -40,7 +49,9 @@ void main() {
   setUp(() {
     digestRepository = DigestRepositoryImpl(digestPath: 'test/data/digest');
     jobReqRepository = JobReqRepositoryImpl(
-      jobReqDatasource: JobReqSembastDatasource(),
+      jobReqDatasource: JobReqSembastDatasource(
+        dbPath: p.join(tempDir, 'setUp', 'jobreqs.db'),
+      ),
     );
     applicationRepository = ApplicationRepositoryImpl();
 
@@ -175,13 +186,10 @@ void main() {
   });
 
   test(
-    'generate application for Photofax Field Investigator job with correct output path',
+    'generate application for TechInnovate Software Engineer job with correct output path',
     () async {
       // Arrange
-      final tempDir = Directory.systemTemp.createTempSync(
-        'resumesux_test_output',
-      );
-      final outputDir = tempDir.path;
+      final outputDir = p.join(tempDir, 'output');
 
       final applicant = Applicant(
         name: 'John Doe',
@@ -201,7 +209,8 @@ void main() {
 
       // Act
       final result = await generateApplicationUsecase.call(
-        jobReqPath: 'test/data/jobreqs/Photofax/Field Investigator.md',
+        jobReqPath:
+            'test/data/jobreqs/TechInnovate/Software Engineer/job_req.md',
         applicant: applicant,
         prompt: 'Generate a professional application.',
         outputDir: outputDir,
@@ -214,21 +223,17 @@ void main() {
       expect(result.isRight(), true);
 
       // Check that output directory structure is correct
-      final photofaxDir = Directory('$outputDir/photofax');
-      expect(photofaxDir.existsSync(), true);
+      final techInnovateDirectory = Directory('$outputDir/techinnovate');
+      expect(techInnovateDirectory.existsSync(), true);
 
-      final subDirs = photofaxDir.listSync().whereType<Directory>();
+      final subDirs = techInnovateDirectory.listSync().whereType<Directory>();
       expect(subDirs.length, 1);
 
       final appDir = subDirs.first;
-      expect(appDir.path, contains('field_investigator'));
-
+      expect(appDir.path, contains('software_engineer'));
       // Check files exist
-      final resumeFile = File('${appDir.path}/resume_field_investigator.md');
+      final resumeFile = File('${appDir.path}/resume_software_engineer.md');
       expect(resumeFile.existsSync(), true);
-
-      // Cleanup
-      tempDir.deleteSync(recursive: true);
     },
   );
 }
