@@ -25,37 +25,41 @@ void main() {
   late TestSuiteReadmeManager readmeManager;
   late SembastDatabaseService dbService;
 
-  setUpAll(() async {
-    suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
+  suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
-    // Set up logging
-    Logger.root.level = Level.ALL;
-    final logFile = File(path.join(suiteDir, 'log.txt'));
-    Logger.root.onRecord.listen((record) {
-      logFile.writeAsStringSync(
-        '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}\n',
-        mode: FileMode.append,
-      );
-    });
-
-    readmeManager = TestSuiteReadmeManager(
-      suiteDir: suiteDir,
-      suiteName: 'Software Engineer Generation Test',
+  // Set up logging
+  Logger.root.level = Level.ALL;
+  final logFile = File(path.join(suiteDir, 'log.txt'));
+  Logger.root.onRecord.listen((record) {
+    logFile.writeAsStringSync(
+      '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}\n',
+      mode: FileMode.append,
     );
-    readmeManager.initialize();
+  });
 
-    logger = Logger('ResumeSoftwareEngineerGenerationTest');
-    fileRepository = TestFileRepository();
+  logger = Logger('SoftwareEngineerGenerationTest');
+
+  readmeManager = TestSuiteReadmeManager(
+    suiteDir: suiteDir,
+    suiteName: 'Software Engineer Generation Test',
+  );
+  readmeManager.initialize();
+
+  setUpAll(() async {
+    readmeManager.startGroup('Software Engineer Tests');
 
     aiService = AiServiceImpl(
       httpClient: http.Client(),
       provider: TestAiHelper.defaultProvider,
     );
 
+    // Initialize the database before the test group
     dbService = SembastDatabaseService(
       dbPath: suiteDir,
       dbName: 'applications.db',
     );
+    await dbService.initialize();
+
     applicationDatasource = ApplicationDatasource(dbService: dbService);
   });
 
@@ -66,6 +70,8 @@ void main() {
   });
 
   setUp(() {
+    fileRepository = TestFileRepository();
+
     digestRepository = DigestRepositoryImpl(
       digestPath: 'test/data/digest/software_engineer',
       aiService: aiService,
@@ -123,8 +129,6 @@ void main() {
   });
 
   group('Software Engineer Tests', () {
-    readmeManager.startGroup('Software Engineer Tests');
-
     test('generate resume for software engineer job', () async {
       final testName = 'generate resume for software engineer job';
       readmeManager.startTest(testName);
@@ -340,9 +344,5 @@ void main() {
         }
       },
     );
-  });
-
-  tearDownAll(() {
-    readmeManager.finalize();
   });
 }

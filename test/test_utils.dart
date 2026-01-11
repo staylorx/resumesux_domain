@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:resumesux_domain/resumesux_domain.dart';
 
@@ -189,6 +190,7 @@ class TestAiHelper {
 /// Test implementation of FileRepository for testing purposes.
 /// Returns a fixed path for createApplicationDirectory and generates file paths with timestamps.
 class TestFileRepository implements FileRepository {
+  final Logger logger = LoggerFactory.create(name: 'TestFileRepository');
   @override
   Either<Failure, String> readFile({required String path}) {
     // Return dummy content for testing
@@ -243,9 +245,11 @@ class TestFileRepository implements FileRepository {
     final appDir = path.join(concernDir, dirName);
 
     try {
+      logger.fine('Creating app dir: $appDir');
       Directory(appDir).createSync(recursive: true);
       return Right(appDir);
     } catch (e) {
+      logger.warning('Failed to create app dir: $appDir, error: $e');
       return Left(ServiceFailure(message: 'Failed to create app dir: $e'));
     }
   }

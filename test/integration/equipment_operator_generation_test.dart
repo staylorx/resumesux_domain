@@ -25,26 +25,27 @@ void main() {
   late TestSuiteReadmeManager readmeManager;
   late SembastDatabaseService dbService;
 
-  setUpAll(() async {
-    suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
+  suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
-    // Set up logging
-    Logger.root.level = Level.ALL;
-    final logFile = File(path.join(suiteDir, 'log.txt'));
-    Logger.root.onRecord.listen((record) {
-      logFile.writeAsStringSync(
-        '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}\n',
-        mode: FileMode.append,
-      );
-    });
-
-    logger = Logger('ResumeHeavyEquipmentOperatorGenerationTest');
-
-    readmeManager = TestSuiteReadmeManager(
-      suiteDir: suiteDir,
-      suiteName: 'Heavy Equipment Operator Generation Test',
+  // Set up logging
+  Logger.root.level = Level.ALL;
+  final logFile = File(path.join(suiteDir, 'log.txt'));
+  Logger.root.onRecord.listen((record) {
+    logFile.writeAsStringSync(
+      '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}\n',
+      mode: FileMode.append,
     );
-    readmeManager.initialize();
+  });
+
+  logger = Logger('ResumeHeavyEquipmentOperatorGenerationTest');
+
+  readmeManager = TestSuiteReadmeManager(
+    suiteDir: suiteDir,
+    suiteName: 'Heavy Equipment Operator Generation Test',
+  );
+  readmeManager.initialize();
+
+  setUpAll(() async {
     readmeManager.startGroup('Heavy Equipment Operator Tests');
 
     aiService = AiServiceImpl(
@@ -124,9 +125,9 @@ void main() {
   });
 
   group('Heavy Equipment Operator Tests', () {
-    /// purposefully wierd application of operator to data science job req
-    test('generate resume for heavy equipment operator job', () async {
-      final testName = 'generate resume for heavy equipment operator job';
+    /// purposefully weird application of operator to data science job req
+    String testName = 'generate resume for heavy equipment operator job';
+    test(testName, () async {
       readmeManager.startTest(testName);
 
       try {
@@ -192,8 +193,8 @@ void main() {
       }
     });
 
-    test('generate cover letter for heavy equipment operator job', () async {
-      final testName = 'generate cover letter for heavy equipment operator job';
+    testName = 'generate cover letter for heavy equipment operator job';
+    test(testName, () async {
       readmeManager.startTest(testName);
 
       try {
@@ -271,141 +272,130 @@ void main() {
       }
     });
 
-    test(
-      'generate application for DataDriven Analytics Senior Data Scientist job with heavy equipment operator data',
-      () async {
-        final testName =
-            'generate application for DataDriven Analytics Senior Data Scientist job with heavy equipment operator data';
-        readmeManager.startTest(testName);
+    testName =
+        'generate application for DataDriven Analytics Senior Data Scientist job with heavy equipment operator data';
+    test(testName, () async {
+      readmeManager.startTest(testName);
 
-        try {
-          final applicant = Applicant(
-            name: 'John Doe',
-            preferredName: 'John',
-            email: 'john.doe@example.com',
-            address: Address(
-              street1: '123 Main St',
-              city: 'Anytown',
-              state: 'CA',
-              zip: '12345',
-            ),
-            phone: '(555) 123-4567',
-            linkedin: 'https://linkedin.com/in/johndoe',
-            github: 'https://github.com/johndoe',
-            portfolio: 'https://johndoe.dev',
-          );
+      try {
+        final applicant = Applicant(
+          name: 'John Doe',
+          preferredName: 'John',
+          email: 'john.doe@example.com',
+          address: Address(
+            street1: '123 Main St',
+            city: 'Anytown',
+            state: 'CA',
+            zip: '12345',
+          ),
+          phone: '(555) 123-4567',
+          linkedin: 'https://linkedin.com/in/johndoe',
+          github: 'https://github.com/johndoe',
+          portfolio: 'https://johndoe.dev',
+        );
 
-          final jobReqResult = await jobReqRepository.getJobReq(
-            path:
-                'test/data/jobreqs/DataDriven Analytics/Senior Data Scientist/job_req.md',
-          );
-          final jobReq = jobReqResult.getOrElse(
-            (_) => throw Exception('Failed to load job req'),
-          );
+        final jobReqResult = await jobReqRepository.getJobReq(
+          path:
+              'test/data/jobreqs/DataDriven Analytics/Senior Data Scientist/job_req.md',
+        );
+        final jobReq = jobReqResult.getOrElse(
+          (_) => throw Exception('Failed to load job req'),
+        );
 
-          // Act
-          logger.info('Starting generateApplicationUsecase.call');
-          final stopwatch = Stopwatch()..start();
-          final result = await generateApplicationUsecase.call(
-            jobReq: jobReq,
-            applicant: applicant,
-            prompt: 'Generate a professional application.',
-            includeCover: true,
-            includeFeedback: true,
-            progress: (message) => logger.info(message),
-          );
-          stopwatch.stop();
-          logger.info(
-            'generateApplicationUsecase.call completed in ${stopwatch.elapsedMilliseconds} ms',
-          );
+        // Act
+        logger.info('Starting generateApplicationUsecase.call');
+        final stopwatch = Stopwatch()..start();
+        final result = await generateApplicationUsecase.call(
+          jobReq: jobReq,
+          applicant: applicant,
+          prompt: 'Generate a professional application.',
+          includeCover: true,
+          includeFeedback: true,
+          progress: (message) => logger.info(message),
+        );
+        stopwatch.stop();
+        logger.info(
+          'generateApplicationUsecase.call completed in ${stopwatch.elapsedMilliseconds} ms',
+        );
 
-          // Assert
-          expect(result.isRight(), true);
-          final application = result.getOrElse(
-            (_) => throw Exception('Failed to generate application'),
-          );
+        // Assert
+        expect(result.isRight(), true);
+        final application = result.getOrElse(
+          (_) => throw Exception('Failed to generate application'),
+        );
 
-          // Save the application artifacts
-          logger.info('Starting saveApplicationArtifacts');
-          final saveStopwatch = Stopwatch()..start();
-          final saveResult = await applicationRepository
-              .saveApplicationArtifacts(
-                application: application,
-                outputDir: suiteDir,
-              );
-          saveStopwatch.stop();
-          logger.info(
-            'saveApplicationArtifacts completed in ${saveStopwatch.elapsedMilliseconds} ms',
-          );
-          expect(saveResult.isRight(), true);
+        // Save the application artifacts
+        logger.info('Starting saveApplicationArtifacts');
+        final saveStopwatch = Stopwatch()..start();
+        final saveResult = await applicationRepository.saveApplicationArtifacts(
+          application: application,
+          outputDir: suiteDir,
+        );
+        saveStopwatch.stop();
+        logger.info(
+          'saveApplicationArtifacts completed in ${saveStopwatch.elapsedMilliseconds} ms',
+        );
+        expect(saveResult.isRight(), true);
 
-          // Check that output directory structure is correct
-          logger.info('Starting directory structure checks');
-          final dirCheckStopwatch = Stopwatch()..start();
-          final dataDrivenDirectory = Directory(
-            '$suiteDir/datadriven_analytics',
-          );
-          expect(dataDrivenDirectory.existsSync(), true);
+        // Check that output directory structure is correct
+        logger.info('Starting directory structure checks');
+        final dirCheckStopwatch = Stopwatch()..start();
+        final dataDrivenDirectory = Directory('$suiteDir/datadriven_analytics');
+        expect(dataDrivenDirectory.existsSync(), true);
 
-          final subDirs = dataDrivenDirectory.listSync().whereType<Directory>();
-          expect(subDirs.length, greaterThan(0));
+        final subDirs = dataDrivenDirectory.listSync().whereType<Directory>();
+        expect(subDirs.length, greaterThan(0));
 
-          // Find the most recent app dir (should contain senior_data_scientist)
-          final appDir = subDirs.firstWhere(
-            (dir) => dir.path.contains('senior_data_scientist'),
-            orElse: () =>
-                throw Exception('No app dir found for senior_data_scientist'),
-          );
-          // Check files exist
-          final files = appDir.listSync().whereType<File>();
-          dirCheckStopwatch.stop();
-          logger.info(
-            'Directory structure checks completed in ${dirCheckStopwatch.elapsedMilliseconds} ms',
-          );
-          logger.info('Starting file content checks');
-          final fileCheckStopwatch = Stopwatch()..start();
-          final resumeFiles = files.where((f) => f.path.contains('resume_'));
-          expect(resumeFiles.length, 1);
-          expect(resumeFiles.first.existsSync(), true);
-          final resumeContent = File(resumeFiles.first.path).readAsStringSync();
-          expect(resumeContent, contains('excavator'));
-          expect(resumeContent, contains('bulldozer'));
-          expect(resumeContent, isNot(contains('Python')));
-          expect(resumeContent, isNot(contains('machine learning')));
+        // Find the most recent app dir (should contain senior_data_scientist)
+        final appDir = subDirs.firstWhere(
+          (dir) => dir.path.contains('senior_data_scientist'),
+          orElse: () =>
+              throw Exception('No app dir found for senior_data_scientist'),
+        );
+        // Check files exist
+        final files = appDir.listSync().whereType<File>();
+        dirCheckStopwatch.stop();
+        logger.info(
+          'Directory structure checks completed in ${dirCheckStopwatch.elapsedMilliseconds} ms',
+        );
+        logger.info('Starting file content checks');
+        final fileCheckStopwatch = Stopwatch()..start();
+        final resumeFiles = files.where((f) => f.path.contains('resume_'));
+        expect(resumeFiles.length, 1);
+        expect(resumeFiles.first.existsSync(), true);
+        final resumeContent = File(resumeFiles.first.path).readAsStringSync();
+        expect(resumeContent, contains('excavator'));
+        expect(resumeContent, contains('bulldozer'));
+        expect(resumeContent, isNot(contains('Python')));
+        expect(resumeContent, isNot(contains('machine learning')));
 
-          final coverFiles = files.where(
-            (f) => f.path.contains('cover_letter_'),
-          );
-          expect(coverFiles.length, 1);
-          expect(coverFiles.first.existsSync(), true);
-          final coverContent = File(coverFiles.first.path).readAsStringSync();
-          expect(coverContent, contains('excavator'));
-          expect(coverContent, contains('bulldozer'));
-          expect(coverContent, isNot(contains('Python')));
-          expect(coverContent, isNot(contains('machine learning')));
+        final coverFiles = files.where((f) => f.path.contains('cover_letter_'));
+        expect(coverFiles.length, 1);
+        expect(coverFiles.first.existsSync(), true);
+        final coverContent = File(coverFiles.first.path).readAsStringSync();
+        expect(coverContent, contains('excavator'));
+        expect(coverContent, contains('bulldozer'));
+        expect(coverContent, isNot(contains('Python')));
+        expect(coverContent, isNot(contains('machine learning')));
 
-          final feedbackFiles = files.where(
-            (f) => f.path.contains('feedback_'),
-          );
-          expect(feedbackFiles.length, 1);
-          expect(feedbackFiles.first.existsSync(), true);
-          final feedbackContent = File(
-            feedbackFiles.first.path,
-          ).readAsStringSync();
-          expect(feedbackContent, contains('Strengths'));
-          expect(feedbackContent, contains('Areas for Improvement'));
-          fileCheckStopwatch.stop();
-          logger.info(
-            'File content checks completed in ${fileCheckStopwatch.elapsedMilliseconds} ms',
-          );
+        final feedbackFiles = files.where((f) => f.path.contains('feedback_'));
+        expect(feedbackFiles.length, 1);
+        expect(feedbackFiles.first.existsSync(), true);
+        final feedbackContent = File(
+          feedbackFiles.first.path,
+        ).readAsStringSync();
+        expect(feedbackContent, contains('Strengths'));
+        expect(feedbackContent, contains('Areas for Improvement'));
+        fileCheckStopwatch.stop();
+        logger.info(
+          'File content checks completed in ${fileCheckStopwatch.elapsedMilliseconds} ms',
+        );
 
-          readmeManager.endTest(testName, true);
-        } catch (e) {
-          readmeManager.endTest(testName, false, error: e.toString());
-          rethrow;
-        }
-      },
-      timeout: Timeout(Duration(seconds: 120)),
-    );
+        readmeManager.endTest(testName, true);
+      } catch (e) {
+        readmeManager.endTest(testName, false, error: e.toString());
+        rethrow;
+      }
+    }, timeout: Timeout(Duration(seconds: 120)));
   });
 }

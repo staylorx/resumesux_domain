@@ -16,27 +16,27 @@ void main() {
   late ApplicationRepository applicationRepository;
   late TestSuiteReadmeManager readmeManager;
 
-  setUpAll(() async {
-    suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
+  suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
-    // Set up logging
-    Logger.root.level = Level.ALL;
-    final logFile = File(path.join(suiteDir, 'log.txt'));
-    Logger.root.onRecord.listen((record) {
-      logFile.writeAsStringSync(
-        '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}\n',
-        mode: FileMode.append,
-      );
-    });
-
-    logger = Logger('AllJobReqsGenerationTest');
-
-    readmeManager = TestSuiteReadmeManager(
-      suiteDir: suiteDir,
-      suiteName: 'All Applications Generation Test',
+  // Set up logging
+  Logger.root.level = Level.ALL;
+  final logFile = File(path.join(suiteDir, 'log.txt'));
+  Logger.root.onRecord.listen((record) {
+    logFile.writeAsStringSync(
+      '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}\n',
+      mode: FileMode.append,
     );
-    readmeManager.initialize();
+  });
 
+  logger = Logger('AllJobReqsGenerationTest');
+
+  readmeManager = TestSuiteReadmeManager(
+    suiteDir: suiteDir,
+    suiteName: 'All Applications Generation Test',
+  );
+  readmeManager.initialize();
+
+  setUpAll(() async {
     aiService = AiServiceImpl(
       httpClient: http.Client(),
       provider: TestAiHelper.defaultProvider,
@@ -145,8 +145,9 @@ void main() {
     final digestPath = scenario['digestPath'] as String;
     final jobReqPaths = scenario['jobReqPaths'] as List<String>;
 
-    group('Scenario: $scenarioName', () {
-      readmeManager.startGroup('Scenario: $scenarioName');
+    String groupName = 'Scenario: $scenarioName';
+    group(groupName, () {
+      readmeManager.startGroup(groupName);
 
       late DigestRepository digestRepository;
       late GetDigestUsecase getDigestUsecase;
@@ -185,8 +186,8 @@ void main() {
       });
 
       for (final jobReqPath in jobReqPaths) {
-        test('Generate application for $jobReqPath', () async {
-          final testName = 'Generate application for $jobReqPath';
+        String testName = 'Generate application for $jobReqPath';
+        test(testName, () async {
           readmeManager.startTest(testName);
 
           try {
@@ -252,8 +253,8 @@ void main() {
     });
   }
 
-  test('Verify all applications saved correctly', () async {
-    final testName = 'Verify all applications saved correctly';
+  String testName = 'Verify all applications saved correctly';
+  test(testName, () async {
     readmeManager.startTest(testName);
 
     try {
