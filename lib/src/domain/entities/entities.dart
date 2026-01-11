@@ -1,7 +1,7 @@
 /// Exports for domain entities.
 library;
 
-export 'address.dart';
+export '../value_objects/address.dart';
 export 'applicant.dart';
 export 'asset.dart';
 export 'concern.dart';

@@ -5,23 +5,22 @@ import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import '../test_utils.dart';
 
-// Import implementations for testing
-import 'package:resumesux_domain/src/data/md_digest/repositories/resume_repository_impl.dart';
-import 'package:resumesux_domain/src/data/md_digest/repositories/cover_letter_repository_impl.dart';
-
 void main() {
   late DigestRepository digestRepository;
   late JobReqRepository jobReqRepository;
-  late ApplicationRepository applicationRepository;
   late ResumeRepository resumeRepository;
   late CoverLetterRepository coverLetterRepository;
   late AiServiceImpl aiService;
   late GenerateResumeUsecase generateResumeUsecase;
   late GenerateCoverLetterUsecase generateCoverLetterUsecase;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
+  late SaveResumeUsecase saveResumeUsecase;
+  late SaveCoverLetterUsecase saveCoverLetterUsecase;
+  late SaveFeedbackUsecase saveFeedbackUsecase;
   late CreateJobReqUsecase createJobReqUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
-  late OutputDirectoryService outputDirectoryService;
+  late FileRepository fileRepository;
+
   late Logger logger;
 
   setUpAll(() async {
@@ -34,16 +33,13 @@ void main() {
       );
     });
 
-    logger = Logger('ResumeHeavyEquipmentOperatorGenerationTest');
-    outputDirectoryService = OutputDirectoryService();
-
     // Clear the database before the test group
     final datasource = JobReqSembastDatasource(
       dbPath: TestDirFactory.instance.setUpAllDbPath,
     );
     final result = await datasource.clearDatabase();
     result.fold(
-      (failure) => logger.severe('Failure: ${failure.message}'),
+      (failure) => logger.warning('Failure: ${failure.message}'),
       (_) => {},
     );
     expect(
@@ -59,6 +55,8 @@ void main() {
       provider: TestAiHelper.defaultProvider,
     );
 
+    fileRepository = TestFileRepository();
+
     digestRepository = DigestRepositoryImpl(
       digestPath: 'test/data/digest/heavy_equipment_operator',
       aiService: aiService,
@@ -69,14 +67,10 @@ void main() {
       ),
       aiService: aiService,
     );
-    applicationRepository = ApplicationRepositoryImpl(
-      outputDirectoryService: outputDirectoryService,
-    );
-    resumeRepository = ResumeRepositoryImpl(
-      outputDirectoryService: outputDirectoryService,
-    );
+
+    resumeRepository = ResumeRepositoryImpl(fileRepository: fileRepository);
     coverLetterRepository = CoverLetterRepositoryImpl(
-      outputDirectoryService: outputDirectoryService,
+      fileRepository: fileRepository,
     );
 
     generateResumeUsecase = GenerateResumeUsecase(
@@ -91,20 +85,28 @@ void main() {
 
     generateFeedbackUsecase = GenerateFeedbackUsecase(aiService: aiService);
 
+    saveResumeUsecase = SaveResumeUsecase(fileRepository: fileRepository);
+    saveCoverLetterUsecase = SaveCoverLetterUsecase(
+      fileRepository: fileRepository,
+    );
+    saveFeedbackUsecase = SaveFeedbackUsecase(fileRepository: fileRepository);
+
     createJobReqUsecase = CreateJobReqUsecase(
       jobReqRepository: jobReqRepository,
       aiService: aiService,
-      fileReader: FileReaderImpl(),
+      fileRepository: fileRepository,
     );
 
     generateApplicationUsecase = GenerateApplicationUsecase(
       jobReqRepository: jobReqRepository,
-      applicationRepository: applicationRepository,
       generateResumeUsecase: generateResumeUsecase,
       generateCoverLetterUsecase: generateCoverLetterUsecase,
       generateFeedbackUsecase: generateFeedbackUsecase,
+      saveResumeUsecase: saveResumeUsecase,
+      saveCoverLetterUsecase: saveCoverLetterUsecase,
+      saveFeedbackUsecase: saveFeedbackUsecase,
       createJobReqUsecase: createJobReqUsecase,
-      outputDirectoryService: outputDirectoryService,
+      fileRepository: fileRepository,
       digestRepository: digestRepository,
     );
 
@@ -164,7 +166,7 @@ void main() {
     final outputDir = TestDirFactory.instance.outputDir;
 
     // Create application directory for consistency
-    final appDirResult = outputDirectoryService.createApplicationDirectory(
+    final appDirResult = fileRepository.createApplicationDirectory(
       baseOutputDir: outputDir,
       jobReq: jobReq,
     );
@@ -232,7 +234,7 @@ void main() {
     final outputDir = TestDirFactory.instance.outputDir;
 
     // Create application directory for consistency
-    final appDirResult = outputDirectoryService.createApplicationDirectory(
+    final appDirResult = fileRepository.createApplicationDirectory(
       baseOutputDir: outputDir,
       jobReq: jobReq,
     );
@@ -325,5 +327,6 @@ void main() {
       expect(feedbackContent, contains('not qualified'));
       expect(feedbackContent, contains('lacks'));
     },
+    timeout: Timeout(Duration(seconds: 120)),
   );
 }

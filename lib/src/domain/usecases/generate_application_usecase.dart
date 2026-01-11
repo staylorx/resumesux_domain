@@ -7,23 +7,27 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 class GenerateApplicationUsecase {
   final Logger logger = LoggerFactory.create('GenerateApplicationUsecase');
   final JobReqRepository jobReqRepository;
-  final ApplicationRepository applicationRepository;
   final GenerateResumeUsecase generateResumeUsecase;
   final GenerateCoverLetterUsecase generateCoverLetterUsecase;
   final GenerateFeedbackUsecase generateFeedbackUsecase;
+  final SaveResumeUsecase saveResumeUsecase;
+  final SaveCoverLetterUsecase saveCoverLetterUsecase;
+  final SaveFeedbackUsecase saveFeedbackUsecase;
   final CreateJobReqUsecase createJobReqUsecase;
-  final OutputDirectoryService outputDirectoryService;
+  final FileRepository fileRepository;
   final DigestRepository digestRepository;
 
   /// Creates a new instance of [GenerateApplicationUsecase].
   GenerateApplicationUsecase({
     required this.jobReqRepository,
-    required this.applicationRepository,
     required this.generateResumeUsecase,
     required this.generateCoverLetterUsecase,
     required this.generateFeedbackUsecase,
+    required this.saveResumeUsecase,
+    required this.saveCoverLetterUsecase,
+    required this.saveFeedbackUsecase,
     required this.createJobReqUsecase,
-    required this.outputDirectoryService,
+    required this.fileRepository,
     required this.digestRepository,
   });
 
@@ -81,8 +85,8 @@ class GenerateApplicationUsecase {
 
     final jobReq = (jobReqResult as Right<Failure, JobReq>).value;
 
-    // Create application directory using the service
-    final appDirResult = outputDirectoryService.createApplicationDirectory(
+    // Create application directory using the repository
+    final appDirResult = fileRepository.createApplicationDirectory(
       baseOutputDir: outputDir,
       jobReq: jobReq,
     );
@@ -92,7 +96,7 @@ class GenerateApplicationUsecase {
     final appDirPath = appDirResult.getOrElse((_) => '');
 
     // Save AI response to application directory
-    final aiResponseFilePath = outputDirectoryService.getAiResponseFilePath(
+    final aiResponseFilePath = fileRepository.getAiResponseFilePath(
       appDir: appDirPath,
       type: 'jobreq',
     );
@@ -114,7 +118,7 @@ class GenerateApplicationUsecase {
     }
 
     // Save AI responses for gigs and assets
-    final gigAiResponseFilePath = outputDirectoryService.getAiResponseFilePath(
+    final gigAiResponseFilePath = fileRepository.getAiResponseFilePath(
       appDir: appDirPath,
       type: 'gig',
     );
@@ -127,8 +131,10 @@ class GenerateApplicationUsecase {
       // Continue anyway
     }
 
-    final assetAiResponseFilePath = outputDirectoryService
-        .getAiResponseFilePath(appDir: appDirPath, type: 'asset');
+    final assetAiResponseFilePath = fileRepository.getAiResponseFilePath(
+      appDir: appDirPath,
+      type: 'asset',
+    );
     final saveAssetAiResult = await digestRepository.saveAssetAiResponse(
       filePath: assetAiResponseFilePath,
     );
@@ -191,24 +197,60 @@ class GenerateApplicationUsecase {
     // Save application
     progress('Saving application');
     logger.info('Saving application to output directory: $outputDir');
-    final saveResult = await applicationRepository.saveApplication(
-      jobReqId: jobReq.id,
-      jobTitle: jobReq.title,
-      resume: resume,
-      coverLetter: coverLetter ?? CoverLetter(content: ''),
-      feedback: feedback,
-      appDirPath: appDirPath,
-    );
 
-    if (saveResult.isRight()) {
-      progress('Application saved successfully');
-      logger.info('Application saved successfully');
-    } else {
-      final failure = saveResult.getLeft().toNullable()!;
-      progress('Failed to save application: ${failure.message}');
-      logger.severe('Failed to save application: ${failure.message}');
+    // Save resume
+    final resumeFilePath = fileRepository.getResumeFilePath(
+      appDir: appDirPath,
+      jobTitle: jobReq.title,
+    );
+    final saveResumeResult = await saveResumeUsecase(
+      resume: resume,
+      filePath: resumeFilePath,
+    );
+    if (saveResumeResult.isLeft()) {
+      final failure = saveResumeResult.getLeft().toNullable()!;
+      progress('Failed to save resume: ${failure.message}');
+      logger.severe('Failed to save resume: ${failure.message}');
+      return saveResumeResult.map((_) => unit);
     }
 
-    return saveResult;
+    // Save cover letter if provided
+    if (coverLetter != null && coverLetter.content.isNotEmpty) {
+      final coverFilePath = fileRepository.getCoverLetterFilePath(
+        appDir: appDirPath,
+        jobTitle: jobReq.title,
+      );
+      final saveCoverResult = await saveCoverLetterUsecase(
+        coverLetter: coverLetter,
+        filePath: coverFilePath,
+      );
+      if (saveCoverResult.isLeft()) {
+        final failure = saveCoverResult.getLeft().toNullable()!;
+        progress('Failed to save cover letter: ${failure.message}');
+        logger.severe('Failed to save cover letter: ${failure.message}');
+        return saveCoverResult.map((_) => unit);
+      }
+    }
+
+    // Save feedback if provided
+    if (feedback.content.isNotEmpty) {
+      final feedbackFilePath = fileRepository.getFeedbackFilePath(
+        appDir: appDirPath,
+      );
+      final saveFeedbackResult = await saveFeedbackUsecase(
+        feedback: feedback,
+        filePath: feedbackFilePath,
+      );
+      if (saveFeedbackResult.isLeft()) {
+        final failure = saveFeedbackResult.getLeft().toNullable()!;
+        progress('Failed to save feedback: ${failure.message}');
+        logger.severe('Failed to save feedback: ${failure.message}');
+        return saveFeedbackResult.map((_) => unit);
+      }
+    }
+
+    progress('Application saved successfully');
+    logger.info('Application saved successfully');
+    return Right(unit);
   }
 }

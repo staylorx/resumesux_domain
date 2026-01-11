@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:fpdart/fpdart.dart';
 import 'package:path/path.dart' as path;
 import 'package:resumesux_domain/resumesux_domain.dart';
 
@@ -68,4 +69,73 @@ class TestAiHelper {
     settings: {'max_tokens': 4000, 'temperature': 0.8},
     isDefault: true,
   );
+}
+
+/// Test implementation of FileRepository for testing purposes.
+/// Returns a fixed path for createApplicationDirectory and generates file paths with timestamps.
+class TestFileRepository implements FileRepository {
+  @override
+  Either<Failure, String> readFile(String path) {
+    // Return dummy content for testing
+    return const Right('test file content');
+  }
+
+  @override
+  Future<Either<Failure, Unit>> writeFile(String path, String content) async {
+    // Do nothing for testing
+    return const Right(unit);
+  }
+
+  @override
+  Either<Failure, Unit> createDirectory(String path) {
+    // Do nothing for testing
+    return const Right(unit);
+  }
+
+  @override
+  Either<Failure, Unit> validateDirectory(String path) {
+    // Always valid for testing
+    return const Right(unit);
+  }
+
+  @override
+  Either<Failure, String> createApplicationDirectory({
+    required String baseOutputDir,
+    required JobReq jobReq,
+  }) {
+    final appDir = path.join(baseOutputDir, 'test_app_dir');
+    try {
+      Directory(appDir).createSync(recursive: true);
+      return Right(appDir);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to create app dir: $e'));
+    }
+  }
+
+  @override
+  String getResumeFilePath({required String appDir, required String jobTitle}) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    return path.join(appDir, 'resume_$timestamp.md');
+  }
+
+  @override
+  String getCoverLetterFilePath({
+    required String appDir,
+    required String jobTitle,
+  }) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    return path.join(appDir, 'cover_letter_$timestamp.md');
+  }
+
+  @override
+  String getFeedbackFilePath({required String appDir}) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    return path.join(appDir, 'feedback_$timestamp.md');
+  }
+
+  @override
+  String getAiResponseFilePath({required String appDir, required String type}) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    return path.join(appDir, 'ai_response_${type}_$timestamp.md');
+  }
 }

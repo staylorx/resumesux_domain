@@ -5,14 +5,10 @@ import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import '../test_utils.dart';
 
-// Import implementations for testing
-import 'package:resumesux_domain/src/data/md_digest/repositories/resume_repository_impl.dart';
-import 'package:resumesux_domain/src/data/md_digest/repositories/cover_letter_repository_impl.dart';
-
 void main() {
   late DigestRepository digestRepository;
   late JobReqRepository jobReqRepository;
-  late ApplicationRepository applicationRepository;
+
   late ResumeRepository resumeRepository;
   late CoverLetterRepository coverLetterRepository;
   late AiServiceImpl aiService;
@@ -21,7 +17,10 @@ void main() {
   late GenerateFeedbackUsecase generateFeedbackUsecase;
   late CreateJobReqUsecase createJobReqUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
-  late OutputDirectoryService outputDirectoryService;
+  late FileRepository fileRepository;
+  late SaveResumeUsecase saveResumeUsecase;
+  late SaveFeedbackUsecase saveFeedbackUsecase;
+  late SaveCoverLetterUsecase saveCoverLetterUsecase;
   late Logger logger;
 
   setUpAll(() async {
@@ -35,7 +34,7 @@ void main() {
     });
 
     logger = Logger('ResumeSoftwareEngineerGenerationTest');
-    outputDirectoryService = OutputDirectoryService();
+    fileRepository = TestFileRepository();
 
     // Clear the database before the test group
     final datasource = JobReqSembastDatasource(
@@ -69,14 +68,10 @@ void main() {
       ),
       aiService: aiService,
     );
-    applicationRepository = ApplicationRepositoryImpl(
-      outputDirectoryService: outputDirectoryService,
-    );
-    resumeRepository = ResumeRepositoryImpl(
-      outputDirectoryService: outputDirectoryService,
-    );
+
+    resumeRepository = ResumeRepositoryImpl(fileRepository: fileRepository);
     coverLetterRepository = CoverLetterRepositoryImpl(
-      outputDirectoryService: outputDirectoryService,
+      fileRepository: fileRepository,
     );
 
     generateResumeUsecase = GenerateResumeUsecase(
@@ -94,18 +89,25 @@ void main() {
     createJobReqUsecase = CreateJobReqUsecase(
       jobReqRepository: jobReqRepository,
       aiService: aiService,
-      fileReader: FileReaderImpl(),
+      fileRepository: fileRepository,
     );
+    saveResumeUsecase = SaveResumeUsecase(fileRepository: fileRepository);
+    saveCoverLetterUsecase = SaveCoverLetterUsecase(
+      fileRepository: fileRepository,
+    );
+    saveFeedbackUsecase = SaveFeedbackUsecase(fileRepository: fileRepository);
 
     generateApplicationUsecase = GenerateApplicationUsecase(
       jobReqRepository: jobReqRepository,
-      applicationRepository: applicationRepository,
+      saveCoverLetterUsecase: saveCoverLetterUsecase,
       generateResumeUsecase: generateResumeUsecase,
       generateCoverLetterUsecase: generateCoverLetterUsecase,
       generateFeedbackUsecase: generateFeedbackUsecase,
       createJobReqUsecase: createJobReqUsecase,
-      outputDirectoryService: outputDirectoryService,
+      fileRepository: fileRepository,
       digestRepository: digestRepository,
+      saveResumeUsecase: saveResumeUsecase,
+      saveFeedbackUsecase: saveFeedbackUsecase,
     );
 
     logger = Logger('ResumeGenerationTest');
@@ -158,7 +160,7 @@ void main() {
     final outputDir = TestDirFactory.instance.outputDir;
 
     // Create application directory for consistency
-    final appDirResult = outputDirectoryService.createApplicationDirectory(
+    final appDirResult = fileRepository.createApplicationDirectory(
       baseOutputDir: outputDir,
       jobReq: jobReq,
     );
@@ -222,7 +224,7 @@ void main() {
     final outputDir = TestDirFactory.instance.outputDir;
 
     // Create application directory for consistency
-    final appDirResult = outputDirectoryService.createApplicationDirectory(
+    final appDirResult = fileRepository.createApplicationDirectory(
       baseOutputDir: outputDir,
       jobReq: jobReq,
     );

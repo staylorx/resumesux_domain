@@ -2,6 +2,9 @@ import 'dart:io';
 import 'package:markdown/markdown.dart';
 import 'package:resumesux_domain/src/domain/failure.dart';
 
+// TODO: this has too much "io" in it for domain layer, consider moving to data layer
+// should use some kind of file adapter
+
 /// Validates that all Markdown files in the directory are valid Markdown.
 Future<void> validateMarkdownFiles({
   required String directory,

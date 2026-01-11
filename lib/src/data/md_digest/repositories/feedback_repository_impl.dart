@@ -10,16 +10,14 @@ class FeedbackRepositoryImpl extends DocumentRepositoryImpl
   @override
   Logger get logger => LoggerFactory.create('FeedbackRepositoryImpl');
 
-  FeedbackRepositoryImpl({required super.outputDirectoryService});
+  FeedbackRepositoryImpl({required super.fileRepository});
 
   @override
   Future<Either<Failure, Unit>> saveFeedback({
     required Feedback feedback,
     required String outputDir,
   }) async {
-    final filePath = outputDirectoryService.getFeedbackFilePath(
-      appDir: outputDir,
-    );
+    final filePath = fileRepository.getFeedbackFilePath(appDir: outputDir);
     return saveToFile(
       filePath: filePath,
       content: feedback.content,

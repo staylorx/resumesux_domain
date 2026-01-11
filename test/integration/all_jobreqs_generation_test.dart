@@ -7,11 +7,10 @@ import '../test_utils.dart';
 
 void main() {
   late JobReqRepository jobReqRepository;
-  late ApplicationRepository applicationRepository;
   late AiServiceImpl aiService;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
   late CreateJobReqUsecase createJobReqUsecase;
-  late OutputDirectoryService outputDirectoryService;
+  late FileRepository fileRepository;
   late Logger logger;
 
   setUpAll(() async {
@@ -25,7 +24,7 @@ void main() {
     });
 
     logger = Logger('AllJobReqsGenerationTest');
-    outputDirectoryService = OutputDirectoryService();
+    fileRepository = TestFileRepository();
 
     // Clear the database before the test group
     final datasource = JobReqSembastDatasource(
@@ -55,16 +54,13 @@ void main() {
       ),
       aiService: aiService,
     );
-    applicationRepository = ApplicationRepositoryImpl(
-      outputDirectoryService: outputDirectoryService,
-    );
 
     generateFeedbackUsecase = GenerateFeedbackUsecase(aiService: aiService);
 
     createJobReqUsecase = CreateJobReqUsecase(
       jobReqRepository: jobReqRepository,
       aiService: aiService,
-      fileReader: FileReaderImpl(),
+      fileRepository: fileRepository,
     );
 
     logger = Logger('AllJobReqsGenerationTest');
@@ -142,15 +138,28 @@ void main() {
             aiService: aiService,
           );
 
+          final SaveCoverLetterUsecase saveCoverLetterUsecase =
+              SaveCoverLetterUsecase(fileRepository: fileRepository);
+
+          final SaveResumeUsecase saveResumeUsecase = SaveResumeUsecase(
+            fileRepository: fileRepository,
+          );
+
+          final SaveFeedbackUsecase saveFeedbackUsecase = SaveFeedbackUsecase(
+            fileRepository: fileRepository,
+          );
+
           final generateApplicationUsecase = GenerateApplicationUsecase(
             jobReqRepository: jobReqRepository,
-            applicationRepository: applicationRepository,
             generateResumeUsecase: generateResumeUsecase,
             generateCoverLetterUsecase: generateCoverLetterUsecase,
             generateFeedbackUsecase: generateFeedbackUsecase,
             createJobReqUsecase: createJobReqUsecase,
-            outputDirectoryService: outputDirectoryService,
+            fileRepository: fileRepository,
             digestRepository: digestRepository,
+            saveResumeUsecase: saveResumeUsecase,
+            saveCoverLetterUsecase: saveCoverLetterUsecase,
+            saveFeedbackUsecase: saveFeedbackUsecase,
           );
 
           final result = await generateApplicationUsecase.call(

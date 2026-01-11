@@ -1,0 +1,141 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:crypto/crypto.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
+
+/// Implementation of FileRepository using dart:io.
+/// This belongs in the adapters layer as it deals with framework concerns.
+class FileRepositoryImpl implements FileRepository {
+  final Logger logger = LoggerFactory.create('FileRepositoryImpl');
+
+  @override
+  Either<Failure, String> readFile(String path) {
+    try {
+      final file = File(path);
+      if (!file.existsSync()) {
+        return Left(NotFoundFailure(message: 'File not found: $path'));
+      }
+      final content = file.readAsStringSync();
+      return Right(content);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to read file: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> writeFile(String path, String content) async {
+    try {
+      final file = File(path);
+      await file.writeAsString(content);
+      logger.info('Wrote file: $path (${content.length} chars)');
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to write file: $e'));
+    }
+  }
+
+  @override
+  Either<Failure, Unit> createDirectory(String path) {
+    try {
+      final dir = Directory(path);
+      if (!dir.existsSync()) {
+        dir.createSync(recursive: true);
+        logger.info('Created directory: $path');
+      }
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to create directory: $e'));
+    }
+  }
+
+  @override
+  Either<Failure, Unit> validateDirectory(String baseOutputDir) {
+    try {
+      final dir = Directory(baseOutputDir);
+      if (!dir.existsSync()) {
+        dir.createSync(recursive: true);
+      }
+
+      // Try to create a test file to check write permissions
+      final testFile = File('$baseOutputDir/.test_write');
+      testFile.writeAsStringSync('test');
+      testFile.deleteSync();
+
+      return Right(unit);
+    } catch (e) {
+      return Left(
+        ServiceFailure(message: 'Output directory not accessible: $e'),
+      );
+    }
+  }
+
+  @override
+  Either<Failure, String> createApplicationDirectory({
+    required String baseOutputDir,
+    required JobReq jobReq,
+  }) {
+    try {
+      final concern = jobReq.concern?.name ?? 'unknown';
+      final title = jobReq.title;
+      final hashInput = '$concern$title';
+      final hash = sha256.convert(utf8.encode(hashInput)).toString();
+      final concernDir = _sanitizeName(name: concern);
+      final appDirPath = '$baseOutputDir/$concernDir/$hash';
+
+      final appDir = Directory(appDirPath);
+      if (!appDir.existsSync()) {
+        appDir.createSync(recursive: true);
+        logger.info('Created application directory: $appDirPath');
+      } else {
+        logger.info('Reusing existing application directory: $appDirPath');
+      }
+
+      return Right(appDirPath);
+    } catch (e) {
+      return Left(
+        ServiceFailure(message: 'Failed to create application directory: $e'),
+      );
+    }
+  }
+
+  @override
+  String getResumeFilePath({required String appDir, required String jobTitle}) {
+    final sanitizedTitle = _sanitizeName(name: jobTitle);
+    return '$appDir/resume_${sanitizedTitle.toLowerCase()}${_getTimestamp()}.md';
+  }
+
+  @override
+  String getCoverLetterFilePath({
+    required String appDir,
+    required String jobTitle,
+  }) {
+    final sanitizedTitle = _sanitizeName(name: jobTitle);
+    return '$appDir/cover_letter_${sanitizedTitle.toLowerCase()}${_getTimestamp()}.md';
+  }
+
+  @override
+  String getFeedbackFilePath({required String appDir}) {
+    return '$appDir/feedback${_getTimestamp()}.md';
+  }
+
+  @override
+  String getAiResponseFilePath({required String appDir, required String type}) {
+    return '$appDir/${type}_ai_response${_getTimestamp()}.json';
+  }
+
+  String _getTimestamp() {
+    final now = DateTime.now().toUtc();
+    final formatter = DateFormat('yyyyMMdd_HHmmss');
+    return '_${formatter.format(now)}';
+  }
+
+  String _sanitizeName({required String name}) {
+    return name
+        .replaceAll(RegExp(r'[^\w\s-]'), '')
+        .replaceAll(' ', '_')
+        .toLowerCase();
+  }
+}

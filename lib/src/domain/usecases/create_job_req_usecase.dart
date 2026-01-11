@@ -8,13 +8,13 @@ class CreateJobReqUsecase {
   final Logger logger = LoggerFactory.create('CreateJobReqUsecase');
   final JobReqRepository jobReqRepository;
   final AiService aiService;
-  final FileReader fileReader;
+  final FileRepository fileRepository;
 
   /// Creates a new instance of [CreateJobReqUsecase].
   CreateJobReqUsecase({
     required this.jobReqRepository,
     required this.aiService,
-    required this.fileReader,
+    required this.fileRepository,
   });
 
   /// Creates a new job requirement.
@@ -100,7 +100,7 @@ class CreateJobReqUsecase {
   Future<Either<Failure, Map<String, dynamic>>> _extractJobReqData({
     required String path,
   }) async {
-    final contentResult = fileReader.readFile(path);
+    final contentResult = fileRepository.readFile(path);
     if (contentResult.isLeft()) {
       return Left(contentResult.getLeft().toNullable()!);
     }

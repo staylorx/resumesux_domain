@@ -9,7 +9,7 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
   @override
   Logger get logger => LoggerFactory.create('CoverLetterRepositoryImpl');
 
-  CoverLetterRepositoryImpl({required super.outputDirectoryService});
+  CoverLetterRepositoryImpl({required super.fileRepository});
 
   @override
   Future<Either<Failure, Unit>> saveCoverLetter({
@@ -17,7 +17,7 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
     required String outputDir,
     required String jobTitle,
   }) async {
-    final filePath = outputDirectoryService.getCoverLetterFilePath(
+    final filePath = fileRepository.getCoverLetterFilePath(
       appDir: outputDir,
       jobTitle: jobTitle,
     );

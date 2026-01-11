@@ -6,9 +6,9 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 /// Base implementation for document repositories with common file saving logic.
 class DocumentRepositoryImpl {
   Logger get logger => LoggerFactory.create('DocumentRepositoryImpl');
-  final OutputDirectoryService outputDirectoryService;
+  final FileRepository fileRepository;
 
-  DocumentRepositoryImpl({required this.outputDirectoryService});
+  DocumentRepositoryImpl({required this.fileRepository});
 
   /// Protected method to save content to a file.
   /// Subclasses should provide the appropriate file path.

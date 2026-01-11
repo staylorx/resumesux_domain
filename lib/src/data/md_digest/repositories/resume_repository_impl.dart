@@ -10,7 +10,7 @@ class ResumeRepositoryImpl extends DocumentRepositoryImpl
   @override
   Logger get logger => LoggerFactory.create('ResumeRepositoryImpl');
 
-  ResumeRepositoryImpl({required super.outputDirectoryService});
+  ResumeRepositoryImpl({required super.fileRepository});
 
   @override
   Future<Either<Failure, Unit>> saveResume({
@@ -18,7 +18,7 @@ class ResumeRepositoryImpl extends DocumentRepositoryImpl
     required String outputDir,
     required String jobTitle,
   }) async {
-    final filePath = outputDirectoryService.getResumeFilePath(
+    final filePath = fileRepository.getResumeFilePath(
       appDir: outputDir,
       jobTitle: jobTitle,
     );
