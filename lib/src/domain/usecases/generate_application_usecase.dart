@@ -4,7 +4,9 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for generating a complete job application including resume, cover letter, and feedback.
 class GenerateApplicationUsecase {
-  final Logger logger = LoggerFactory.create('GenerateApplicationUsecase');
+  final Logger logger = LoggerFactory.create(
+    name: 'GenerateApplicationUsecase',
+  );
   final GenerateResumeUsecase generateResumeUsecase;
   final GenerateCoverLetterUsecase generateCoverLetterUsecase;
   final GenerateFeedbackUsecase generateFeedbackUsecase;
@@ -78,6 +80,7 @@ class GenerateApplicationUsecase {
       logger.info('Generating cover letter');
       final coverResult = await generateCoverLetterUsecase(
         jobReq: jobReq,
+        resume: resume,
         applicant: applicant,
         prompt: prompt,
       );

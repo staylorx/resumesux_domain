@@ -29,7 +29,7 @@ class ConfigDatasource {
       }
 
       // Convert YamlMap to regular Map for easier handling
-      final configMap = _convertYamlMapToMap(yamlMap);
+      final configMap = _convertYamlMapToMap(yamlMap: yamlMap);
       return Right(configMap);
     } on YamlException catch (e) {
       return Left(ParsingFailure(message: 'Invalid YAML syntax: ${e.message}'));
@@ -38,17 +38,17 @@ class ConfigDatasource {
     }
   }
 
-  Map<String, dynamic> _convertYamlMapToMap(dynamic yamlMap) {
+  Map<String, dynamic> _convertYamlMapToMap({required dynamic yamlMap}) {
     if (yamlMap is Map) {
       final result = <String, dynamic>{};
       for (final entry in yamlMap.entries) {
         final key = entry.key.toString();
         final value = entry.value;
         if (value is Map) {
-          result[key] = _convertYamlMapToMap(value);
+          result[key] = _convertYamlMapToMap(yamlMap: value);
         } else if (value is List) {
           result[key] = value.map((item) {
-            return item is Map ? _convertYamlMapToMap(item) : item;
+            return item is Map ? _convertYamlMapToMap(yamlMap: item) : item;
           }).toList();
         } else {
           result[key] = value;

@@ -4,7 +4,7 @@ import 'tag.dart';
 // TODO, what to do with skills, which could be considered "smart" tags? But we want to connect a skill
 // to a particular gig.
 
-/// Represents an asset containing content and optional associated tags.
+/// Represents an asset (license, certification, education, etc.) containing content and optional associated tags.
 class Asset with EquatableMixin, Taggable {
   final String content;
 

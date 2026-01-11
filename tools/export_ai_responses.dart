@@ -48,8 +48,11 @@ void main(List<String> arguments) async {
   final exportAll = results['all'] as bool;
 
   // Initialize datasource
-  final dbService = SembastDatabaseService(dbPath, 'applications.db');
-  final applicationDatasource = ApplicationSembastDatasource(dbService: dbService, dbPath: dbPath);
+  final dbService = SembastDatabaseService(
+    dbPath: dbPath,
+    dbName: 'applications.db',
+  );
+  final applicationDatasource = ApplicationDatasource(dbService: dbService);
 
   // Get all AI response documents
   final documentsResult = await applicationDatasource

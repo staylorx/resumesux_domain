@@ -3,11 +3,9 @@ import 'package:crypto/crypto.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-// TODO: I don't think anything uses or tests this.
-
 /// Implementation of ApplicationRepository.
 class ApplicationRepositoryImpl implements ApplicationRepository {
-  final ApplicationSembastDatasource applicationSembastDatasource;
+  final ApplicationDatasource applicationDatasource;
   final FileRepository fileRepository;
   final ResumeRepository resumeRepository;
   final CoverLetterRepository coverLetterRepository;
@@ -15,7 +13,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
 
   /// Creates a new instance of [ApplicationRepositoryImpl].
   ApplicationRepositoryImpl({
-    required this.applicationSembastDatasource,
+    required this.applicationDatasource,
     required this.fileRepository,
     required this.resumeRepository,
     required this.coverLetterRepository,
@@ -39,7 +37,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
       createdAt: application.createdAt,
       updatedAt: application.updatedAt,
     );
-    return applicationSembastDatasource.saveApplication(dto);
+    return applicationDatasource.saveApplication(dto);
   }
 
   @override
@@ -58,13 +56,9 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     final appDirPath = appDirResult.getOrElse((_) => '');
 
     // Save resume
-    final resumeFilePath = fileRepository.getResumeFilePath(
-      appDir: appDirPath,
-      jobTitle: application.jobReq.title,
-    );
     final saveResumeResult = await resumeRepository.saveResume(
       resume: application.resume,
-      outputDir: resumeFilePath,
+      outputDir: appDirPath,
       jobTitle: application.jobReq.title,
     );
     if (saveResumeResult.isLeft()) {
@@ -73,13 +67,9 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
 
     // Save cover letter if not empty
     if (application.coverLetter.content.isNotEmpty) {
-      final coverFilePath = fileRepository.getCoverLetterFilePath(
-        appDir: appDirPath,
-        jobTitle: application.jobReq.title,
-      );
       final saveCoverResult = await coverLetterRepository.saveCoverLetter(
         coverLetter: application.coverLetter,
-        outputDir: coverFilePath,
+        outputDir: appDirPath,
         jobTitle: application.jobReq.title,
       );
       if (saveCoverResult.isLeft()) {
@@ -89,12 +79,9 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
 
     // Save feedback if not empty
     if (application.feedback.content.isNotEmpty) {
-      final feedbackFilePath = fileRepository.getFeedbackFilePath(
-        appDir: appDirPath,
-      );
       final saveFeedbackResult = await feedbackRepository.saveFeedback(
         feedback: application.feedback,
-        outputDir: feedbackFilePath,
+        outputDir: appDirPath,
       );
       if (saveFeedbackResult.isLeft()) {
         return saveFeedbackResult;

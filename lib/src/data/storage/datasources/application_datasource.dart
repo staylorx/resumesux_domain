@@ -1,24 +1,18 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-import '../../../domain/services/database_service.dart';
-import '../sembast_database_service.dart';
-
-/// Sembast datasource for persisting application data and AI responses.
-class ApplicationSembastDatasource {
+/// Datasource for persisting application data and AI responses.
+class ApplicationDatasource {
   final DatabaseService _dbService;
   bool _initialized = false;
-  final String? dbPath;
 
-  /// Creates a datasource with required DatabaseService and optional dbPath.
-  ApplicationSembastDatasource({
-    required DatabaseService dbService,
-    this.dbPath,
-  }) : _dbService = dbService;
+  /// Creates a datasource with required DatabaseService.
+  ApplicationDatasource({required DatabaseService dbService})
+    : _dbService = dbService;
 
   Future<void> _ensureInitialized() async {
     if (!_initialized) {
-      await _dbService.initialize(dbPath, 'applications.db');
+      await _dbService.initialize();
       _initialized = true;
     }
   }
@@ -27,7 +21,11 @@ class ApplicationSembastDatasource {
   Future<Either<Failure, Unit>> saveApplication(ApplicationDto dto) async {
     try {
       await _ensureInitialized();
-      await _dbService.put('applications', dto.id, dto.toMap());
+      await _dbService.put(
+        storeName: 'applications',
+        key: dto.id,
+        value: dto.toMap(),
+      );
       return Right(unit);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to save application: $e'));
@@ -38,7 +36,7 @@ class ApplicationSembastDatasource {
   Future<Either<Failure, ApplicationDto>> getApplication(String id) async {
     try {
       await _ensureInitialized();
-      final data = await _dbService.get('applications', id);
+      final data = await _dbService.get(storeName: 'applications', key: id);
       if (data == null) {
         return Left(NotFoundFailure(message: 'Application not found: $id'));
       }
@@ -52,7 +50,7 @@ class ApplicationSembastDatasource {
   Future<Either<Failure, List<ApplicationDto>>> getAllApplications() async {
     try {
       await _ensureInitialized();
-      final records = await _dbService.find('applications');
+      final records = await _dbService.find(storeName: 'applications');
       final applications = records
           .map((record) => ApplicationDto.fromMap(record))
           .toList();
@@ -69,7 +67,11 @@ class ApplicationSembastDatasource {
     try {
       await _ensureInitialized();
       final storeName = _getAiResponseStoreName(dto.documentType);
-      await _dbService.put(storeName, dto.id, dto.toMap());
+      await _dbService.put(
+        storeName: storeName,
+        key: dto.id,
+        value: dto.toMap(),
+      );
       return Right(unit);
     } catch (e) {
       return Left(
@@ -91,7 +93,7 @@ class ApplicationSembastDatasource {
       ];
 
       for (final storeName in storeNames) {
-        final records = await _dbService.find(storeName);
+        final records = await _dbService.find(storeName: storeName);
         for (final record in records) {
           allAiResponses.add(DocumentDto.fromMap(record));
         }
@@ -110,7 +112,11 @@ class ApplicationSembastDatasource {
     try {
       await _ensureInitialized();
       final storeName = _getDocumentStoreName(dto.documentType);
-      await _dbService.put(storeName, dto.id, dto.toMap());
+      await _dbService.put(
+        storeName: storeName,
+        key: dto.id,
+        value: dto.toMap(),
+      );
       return Right(unit);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to save document: $e'));
@@ -125,7 +131,7 @@ class ApplicationSembastDatasource {
     try {
       await _ensureInitialized();
       final storeName = _getDocumentStoreName(documentType);
-      final data = await _dbService.get(storeName, id);
+      final data = await _dbService.get(storeName: storeName, key: id);
       if (data == null) {
         return Left(NotFoundFailure(message: 'Document not found: $id'));
       }
@@ -144,7 +150,7 @@ class ApplicationSembastDatasource {
       final storeNames = ['resumes', 'cover_letters', 'feedbacks', 'jobreqs'];
 
       for (final storeName in storeNames) {
-        final records = await _dbService.find(storeName);
+        final records = await _dbService.find(storeName: storeName);
         for (final record in records) {
           allDocuments.add(DocumentDto.fromMap(record));
         }
@@ -160,7 +166,7 @@ class ApplicationSembastDatasource {
   Future<Either<Failure, Unit>> clearJobReqs() async {
     try {
       await _ensureInitialized();
-      await _dbService.drop('jobreqs');
+      await _dbService.drop(storeName: 'jobreqs');
       return Right(unit);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to clear job reqs: $e'));
@@ -171,9 +177,9 @@ class ApplicationSembastDatasource {
     switch (documentType) {
       case 'jobreq_response':
         return 'jobreq_responses';
-      case 'gig_responses':
+      case 'gig_response':
         return 'gig_responses';
-      case 'asset_responses':
+      case 'asset_response':
         return 'asset_responses';
       default:
         throw ArgumentError('Unknown AI response document type: $documentType');

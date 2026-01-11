@@ -10,7 +10,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 /// Implementation of FileRepository using dart:io.
 /// This belongs in the adapters layer as it deals with framework concerns.
 class FileRepositoryImpl implements FileRepository {
-  final Logger logger = LoggerFactory.create('FileRepositoryImpl');
+  final Logger logger = LoggerFactory.create(name: 'FileRepositoryImpl');
 
   @override
   Either<Failure, String> readFile({required String path}) {

@@ -6,13 +6,13 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 class FeedbackRepositoryImpl extends DocumentRepositoryImpl
     implements FeedbackRepository {
   @override
-  Logger get logger => LoggerFactory.create('FeedbackRepositoryImpl');
+  Logger get logger => LoggerFactory.create(name: 'FeedbackRepositoryImpl');
 
-  final ApplicationSembastDatasource applicationSembastDatasource;
+  final ApplicationDatasource applicationDatasource;
 
   FeedbackRepositoryImpl({
     required super.fileRepository,
-    required this.applicationSembastDatasource,
+    required this.applicationDatasource,
   });
 
   @override
@@ -41,6 +41,6 @@ class FeedbackRepositoryImpl extends DocumentRepositoryImpl
       documentType: 'feedback',
       jobReqId: jobReqId,
     );
-    return applicationSembastDatasource.saveDocument(dto);
+    return applicationDatasource.saveDocument(dto);
   }
 }

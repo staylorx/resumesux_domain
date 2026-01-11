@@ -6,16 +6,16 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of the AssetRepository.
 class AssetRepositoryImpl implements AssetRepository {
-  final Logger logger = LoggerFactory.create('AssetRepositoryImpl');
+  final Logger logger = LoggerFactory.create(name: 'AssetRepositoryImpl');
   final String digestPath;
   final AiService aiService;
-  final ApplicationSembastDatasource applicationSembastDatasource;
+  final ApplicationDatasource applicationDatasource;
   final List<Map<String, dynamic>> _allAiResponses = [];
 
   AssetRepositoryImpl({
     required this.digestPath,
     required this.aiService,
-    required this.applicationSembastDatasource,
+    required this.applicationDatasource,
   });
 
   @override
@@ -37,7 +37,7 @@ class AssetRepositoryImpl implements AssetRepository {
 
       final aiResponse = aiResult.getOrElse((_) => '');
 
-      final extractedData = _parseAiResponse(aiResponse);
+      final extractedData = _parseAiResponse(response: aiResponse);
       if (extractedData == null) {
         return Left(
           ParsingFailure(message: 'Failed to parse AI response as JSON'),
@@ -76,7 +76,7 @@ $content
 ''';
   }
 
-  Map<String, dynamic>? _parseAiResponse(String response) {
+  Map<String, dynamic>? _parseAiResponse({required String response}) {
     try {
       // Try to extract JSON from response
       final jsonStart = response.indexOf('{');
@@ -174,6 +174,6 @@ $content
       documentType: 'asset_responses',
       jobReqId: jobReqId,
     );
-    return applicationSembastDatasource.saveAiResponseDocument(dto);
+    return applicationDatasource.saveAiResponseDocument(dto);
   }
 }

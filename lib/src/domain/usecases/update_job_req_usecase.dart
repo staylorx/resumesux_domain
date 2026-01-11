@@ -4,7 +4,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for updating an existing job requirement.
 class UpdateJobReqUsecase {
-  final Logger logger = LoggerFactory.create('UpdateJobReqUsecase');
+  final Logger logger = LoggerFactory.create(name: 'UpdateJobReqUsecase');
   final JobReqRepository jobReqRepository;
 
   /// Creates a new instance of [UpdateJobReqUsecase].

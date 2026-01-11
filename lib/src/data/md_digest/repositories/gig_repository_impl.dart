@@ -6,16 +6,16 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of the GigRepository.
 class GigRepositoryImpl implements GigRepository {
-  final Logger logger = LoggerFactory.create('GigRepositoryImpl');
+  final Logger logger = LoggerFactory.create(name: 'GigRepositoryImpl');
   final String digestPath;
   final AiService aiService;
-  final ApplicationSembastDatasource applicationSembastDatasource;
+  final ApplicationDatasource applicationDatasource;
   final List<Map<String, dynamic>> _allAiResponses = [];
 
   GigRepositoryImpl({
     required this.digestPath,
     required this.aiService,
-    required this.applicationSembastDatasource,
+    required this.applicationDatasource,
   });
 
   @override
@@ -37,7 +37,7 @@ class GigRepositoryImpl implements GigRepository {
 
       final aiResponse = aiResult.getOrElse((_) => '');
 
-      final extractedData = _parseAiResponse(aiResponse);
+      final extractedData = _parseAiResponse(response: aiResponse);
       if (extractedData == null) {
         return Left(
           ParsingFailure(message: 'Failed to parse AI response as JSON'),
@@ -84,7 +84,7 @@ $content
 ''';
   }
 
-  Map<String, dynamic>? _parseAiResponse(String response) {
+  Map<String, dynamic>? _parseAiResponse({required String response}) {
     try {
       // Try to extract JSON from response
       final jsonStart = response.indexOf('{');
@@ -160,6 +160,6 @@ $content
       documentType: 'gig_responses',
       jobReqId: jobReqId,
     );
-    return applicationSembastDatasource.saveAiResponseDocument(dto);
+    return applicationDatasource.saveAiResponseDocument(dto);
   }
 }

@@ -4,7 +4,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for retrieving digest data including gigs and assets.
 class GetDigestUsecase {
-  final Logger logger = LoggerFactory.create('GetDigestUsecase');
+  final Logger logger = LoggerFactory.create(name: 'GetDigestUsecase');
   final GigRepository gigRepository;
   final AssetRepository assetRepository;
 

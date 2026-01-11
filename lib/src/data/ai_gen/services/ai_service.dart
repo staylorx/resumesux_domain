@@ -6,7 +6,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of AiService for generating content using AI providers.
 class AiServiceImpl implements AiService {
-  final Logger logger = LoggerFactory.create('AiService');
+  final Logger logger = LoggerFactory.create(name: 'AiService');
   final http.Client httpClient;
   final AiProvider provider;
 

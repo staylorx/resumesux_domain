@@ -4,7 +4,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for saving a resume to a file.
 class SaveResumeUsecase {
-  final Logger logger = LoggerFactory.create('SaveResumeUsecase');
+  final Logger logger = LoggerFactory.create(name: 'SaveResumeUsecase');
   final FileRepository fileRepository;
 
   /// Creates a new instance of [SaveResumeUsecase].

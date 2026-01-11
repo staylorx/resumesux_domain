@@ -9,13 +9,13 @@ class SembastDatabaseService implements DatabaseService {
   final String? dbPath;
   final String dbName;
 
-  SembastDatabaseService(this.dbPath, this.dbName);
+  SembastDatabaseService({required this.dbPath, required this.dbName});
 
   @override
-  Future<void> initialize(String? dbPath, String dbName) async {
+  Future<void> initialize() async {
     if (_db != null) return;
     if (dbPath != null) {
-      final dbPathFull = path.join(Directory.current.path, dbPath);
+      final dbPathFull = path.join(Directory.current.path, dbPath!, dbName);
       await Directory(path.dirname(dbPathFull)).create(recursive: true);
       _db = await databaseFactoryIo.openDatabase(dbPathFull);
     } else {
@@ -24,10 +24,10 @@ class SembastDatabaseService implements DatabaseService {
   }
 
   @override
-  Future<void> put(
-    String storeName,
-    String key,
-    Map<String, dynamic> value, {
+  Future<void> put({
+    required String storeName,
+    required String key,
+    required Map<String, dynamic> value,
     Transaction? transaction,
   }) async {
     final db = _db!;
@@ -37,9 +37,9 @@ class SembastDatabaseService implements DatabaseService {
   }
 
   @override
-  Future<Map<String, dynamic>?> get(
-    String storeName,
-    String key, {
+  Future<Map<String, dynamic>?> get({
+    required String storeName,
+    required String key,
     Transaction? transaction,
   }) async {
     final db = _db!;
@@ -49,8 +49,8 @@ class SembastDatabaseService implements DatabaseService {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> find(
-    String storeName, {
+  Future<List<Map<String, dynamic>>> find({
+    required String storeName,
     Transaction? transaction,
   }) async {
     final db = _db!;
@@ -60,7 +60,10 @@ class SembastDatabaseService implements DatabaseService {
   }
 
   @override
-  Future<void> drop(String storeName, {Transaction? transaction}) async {
+  Future<void> drop({
+    required String storeName,
+    Transaction? transaction,
+  }) async {
     final db = _db!;
     final store = stringMapStoreFactory.store(storeName);
     await store.drop(transaction ?? db);

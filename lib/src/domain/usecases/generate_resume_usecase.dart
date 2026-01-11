@@ -4,7 +4,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for generating a resume.
 class GenerateResumeUsecase {
-  final Logger logger = LoggerFactory.create('GenerateResumeUsecase');
+  final Logger logger = LoggerFactory.create(name: 'GenerateResumeUsecase');
   final DigestRepository digestRepository;
   final AiService aiService;
 
@@ -98,6 +98,7 @@ ${assets.map((a) => '---\n$a').join('\n')}
 Please generate a resume in markdown format optimized for ATS systems.
 Do not hallucinate any information. Use only the provided data.
 Include all provided work experiences and qualifications. Do not add any skills, experiences, or qualifications not explicitly provided in the Work Experiences and Qualifications sections. If the provided data does not match the job requirements, still use only the provided data without modification or addition. Limit the resume to 1-2 pages. Quantify achievements where possible.
+Output only the plain markdown content without any code blocks, backticks, or additional explanatory text.
 ''';
   }
 

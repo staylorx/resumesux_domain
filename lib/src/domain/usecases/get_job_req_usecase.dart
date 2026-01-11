@@ -4,7 +4,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for retrieving a job requirement, with preprocessing if needed.
 class GetJobReqUsecase {
-  final Logger logger = LoggerFactory.create('GetJobReqUsecase');
+  final Logger logger = LoggerFactory.create(name: 'GetJobReqUsecase');
   final JobReqRepository jobReqRepository;
   final CreateJobReqUsecase createJobReqUsecase;
 

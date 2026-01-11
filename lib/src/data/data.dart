@@ -18,7 +18,7 @@ export 'md_digest/repositories/feedback_repository_impl.dart';
 export 'md_digest/repositories/application_repository_impl.dart';
 
 export 'storage/sembast_database_service.dart';
-export 'storage/datasources/application_sembast_datasource.dart';
+export 'storage/datasources/application_datasource.dart';
 
 export 'models/document_dto.dart';
 export 'models/job_req_dto.dart';

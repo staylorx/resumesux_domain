@@ -4,7 +4,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for saving AI responses to the database.
 class SaveAiResponsesUsecase {
-  final Logger logger = LoggerFactory.create('SaveAiResponsesUsecase');
+  final Logger logger = LoggerFactory.create(name: 'SaveAiResponsesUsecase');
   final JobReqRepository jobReqRepository;
   final GigRepository gigRepository;
   final AssetRepository assetRepository;

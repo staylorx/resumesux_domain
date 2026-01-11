@@ -4,7 +4,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for retrieving and enriching applicant information.
 class GetApplicantUsecase {
-  final Logger logger = LoggerFactory.create('GetApplicantUsecase');
+  final Logger logger = LoggerFactory.create(name: 'GetApplicantUsecase');
   final ApplicantRepository applicantRepository;
 
   /// Creates a new instance of [GetApplicantUsecase].

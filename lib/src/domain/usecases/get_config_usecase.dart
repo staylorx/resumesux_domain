@@ -4,7 +4,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for loading application configuration.
 class GetConfigUsecase {
-  final Logger logger = LoggerFactory.create('GetConfigUsecase');
+  final Logger logger = LoggerFactory.create(name: 'GetConfigUsecase');
   final ConfigRepository configRepository;
 
   /// Creates a new instance of [GetConfigUsecase].

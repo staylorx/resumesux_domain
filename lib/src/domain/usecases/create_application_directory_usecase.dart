@@ -5,7 +5,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 /// Use case for creating an application directory.
 class CreateApplicationDirectoryUsecase {
   final Logger logger = LoggerFactory.create(
-    'CreateApplicationDirectoryUsecase',
+    name: 'CreateApplicationDirectoryUsecase',
   );
   final FileRepository fileRepository;
 

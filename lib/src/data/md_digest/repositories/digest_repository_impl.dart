@@ -12,17 +12,17 @@ class DigestRepositoryImpl implements DigestRepository {
   DigestRepositoryImpl({
     required this.digestPath,
     required AiService aiService,
-    required ApplicationSembastDatasource applicationSembastDatasource,
+    required ApplicationDatasource applicationDatasource,
   }) {
     gigRepository = GigRepositoryImpl(
       digestPath: digestPath,
       aiService: aiService,
-      applicationSembastDatasource: applicationSembastDatasource,
+      applicationDatasource: applicationDatasource,
     );
     assetRepository = AssetRepositoryImpl(
       digestPath: digestPath,
       aiService: aiService,
-      applicationSembastDatasource: applicationSembastDatasource,
+      applicationDatasource: applicationDatasource,
     );
   }
 

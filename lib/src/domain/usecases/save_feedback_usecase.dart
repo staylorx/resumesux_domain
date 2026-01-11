@@ -4,7 +4,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for saving feedback to a file.
 class SaveFeedbackUsecase {
-  final Logger logger = LoggerFactory.create('SaveFeedbackUsecase');
+  final Logger logger = LoggerFactory.create(name: 'SaveFeedbackUsecase');
   final FileRepository fileRepository;
 
   /// Creates a new instance of [SaveFeedbackUsecase].

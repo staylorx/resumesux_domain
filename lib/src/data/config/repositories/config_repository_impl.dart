@@ -10,12 +10,12 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 const String kAppName = 'resumesux';
 
 class ConfigRepositoryImpl implements ConfigRepository {
-  final Logger logger = LoggerFactory.create('ConfigRepositoryImpl');
+  final Logger logger = LoggerFactory.create(name: 'ConfigRepositoryImpl');
   final ConfigDatasource configDatasource;
 
   ConfigRepositoryImpl({required this.configDatasource});
 
-  Either<Failure, String> _getConfigDir(String appName) {
+  Either<Failure, String> _getConfigDir({required String appName}) {
     final homeEnv = Platform.isWindows ? 'USERPROFILE' : 'HOME';
     final home = Platform.environment[homeEnv];
     if (home == null) {
@@ -85,7 +85,9 @@ class ConfigRepositoryImpl implements ConfigRepository {
   @override
   Future<Either<Failure, Config>> loadConfig({String? configPath}) async {
     // Determine config file path
-    final configFilePathResult = await _resolveConfigPath(configPath);
+    final configFilePathResult = await _resolveConfigPath(
+      configPath: configPath,
+    );
     if (configFilePathResult.isLeft()) {
       return Left(configFilePathResult.getLeft().toNullable()!);
     }
@@ -105,13 +107,15 @@ class ConfigRepositoryImpl implements ConfigRepository {
     return validationResult;
   }
 
-  Future<Either<Failure, String>> _resolveConfigPath(String? configPath) async {
+  Future<Either<Failure, String>> _resolveConfigPath({
+    String? configPath,
+  }) async {
     if (configPath != null && configPath.isNotEmpty) {
       // Use provided config path
       return Right(configPath);
     } else {
       // Use default config directory
-      final configDirResult = _getConfigDir(kAppName);
+      final configDirResult = _getConfigDir(appName: kAppName);
       return configDirResult.fold((failure) => Left(failure), (configDir) {
         final configFilePath = p.join(configDir, 'config.yaml');
         return Right(configFilePath);

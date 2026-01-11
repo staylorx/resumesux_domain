@@ -9,7 +9,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for generating feedback on an application.
 class GenerateFeedbackUsecase {
-  final Logger logger = LoggerFactory.create('GenerateFeedbackUsecase');
+  final Logger logger = LoggerFactory.create(name: 'GenerateFeedbackUsecase');
   final AiService aiService;
 
   /// Creates a new instance of [GenerateFeedbackUsecase].
@@ -20,7 +20,7 @@ class GenerateFeedbackUsecase {
   /// Parameters:
   /// - [jobReq]: The job requirement.
   /// - [resume]: The generated resume.
-  /// - [coverLetter]: The generated cover letter.
+  /// - [coverLetter]: The generated cover letter (optional).
   /// - [prompt]: The prompt for AI generation.
   /// - [applicant]: The applicant information.
   /// - [tone]: Controls the tone of feedback (0.0 = brutal feedback, 1.0 = enthusiastic feedback). Default is 0.5.
@@ -30,7 +30,7 @@ class GenerateFeedbackUsecase {
   Future<Either<Failure, Feedback>> call({
     required JobReq jobReq,
     required Resume resume,
-    required CoverLetter coverLetter,
+    CoverLetter? coverLetter,
     required String prompt,
     required Applicant applicant,
     double tone = 0.5,
@@ -41,7 +41,7 @@ class GenerateFeedbackUsecase {
     final fullPrompt = _buildFeedbackPrompt(
       jobReq: jobReq.content,
       resume: resume.content,
-      coverLetter: coverLetter.content,
+      coverLetter: coverLetter?.content ?? '',
       customPrompt: prompt,
       tone: tone,
       length: length,
@@ -105,6 +105,11 @@ $coverLetter
 $toneInstruction $lengthInstruction Include suggestions for improvement on how well this application matches the job requirements.
 
 Do not include the job requirements, resume, or cover letter content in your response. Provide only the feedback analysis in markdown format.
+Output only the plain markdown content without any code blocks, backticks, or additional explanatory text.
+Add a section at the end that summarizes an opinion of a hiring manager reviewing this application: qualified, not qualified, maybe, yes, no, or needs more information. Add this as "tl;dr" for a quick view.
+If there are hidden ideas or biases that a hiring manager might pick up on, put them down here also. 
+Do not be afraid to be direct and honest in this section. If you think you're being polite in the main feedback, this is the place to be candid including avoiding overly "politically correct" language.
+Respect the tone and length instructions provided.
 ''';
   }
 }

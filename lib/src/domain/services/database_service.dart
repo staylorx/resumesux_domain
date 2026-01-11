@@ -2,30 +2,30 @@ import 'package:sembast/sembast.dart';
 
 /// Abstract interface for database operations to allow swapping implementations (e.g., Sembast, Hive, SQLite).
 abstract class DatabaseService {
-  /// Initializes the database with optional path and name.
-  Future<void> initialize(String? dbPath, String dbName);
+  /// Initializes the database.
+  Future<void> initialize();
 
   /// Stores a value in the specified store with the given key.
-  Future<void> put(
-    String storeName,
-    String key,
-    Map<String, dynamic> value, {
+  Future<void> put({
+    required String storeName,
+    required String key,
+    required Map<String, dynamic> value,
     Transaction? transaction,
   });
 
   /// Retrieves a value from the specified store by key.
-  Future<Map<String, dynamic>?> get(
-    String storeName,
-    String key, {
+  Future<Map<String, dynamic>?> get({
+    required String storeName,
+    required String key,
     Transaction? transaction,
   });
 
   /// Finds all records in the specified store.
-  Future<List<Map<String, dynamic>>> find(
-    String storeName, {
+  Future<List<Map<String, dynamic>>> find({
+    required String storeName,
     Transaction? transaction,
   });
 
   /// Drops the specified store.
-  Future<void> drop(String storeName, {Transaction? transaction});
+  Future<void> drop({required String storeName, Transaction? transaction});
 }

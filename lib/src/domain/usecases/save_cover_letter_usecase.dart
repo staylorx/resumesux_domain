@@ -4,7 +4,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for saving a cover letter to a file.
 class SaveCoverLetterUsecase {
-  final Logger logger = LoggerFactory.create('SaveCoverLetterUsecase');
+  final Logger logger = LoggerFactory.create(name: 'SaveCoverLetterUsecase');
   final FileRepository fileRepository;
 
   /// Creates a new instance of [SaveCoverLetterUsecase].

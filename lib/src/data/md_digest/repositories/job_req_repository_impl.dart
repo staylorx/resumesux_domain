@@ -6,10 +6,10 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of the JobReqRepository.
 class JobReqRepositoryImpl implements JobReqRepository {
-  final Logger logger = LoggerFactory.create('JobReqRepositoryImpl');
+  final Logger logger = LoggerFactory.create(name: 'JobReqRepositoryImpl');
 
   final AiService aiService;
-  final ApplicationSembastDatasource applicationSembastDatasource;
+  final ApplicationDatasource applicationDatasource;
   Map<String, dynamic>? _lastAiResponse;
 
   @override
@@ -19,7 +19,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
 
   JobReqRepositoryImpl({
     required this.aiService,
-    required this.applicationSembastDatasource,
+    required this.applicationDatasource,
   });
 
   @override
@@ -69,7 +69,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
       documentType: 'jobreq',
     );
-    await applicationSembastDatasource.saveDocument(dto);
+    await applicationDatasource.saveDocument(dto);
     return Right(jobReq);
   }
 
@@ -90,9 +90,9 @@ class JobReqRepositoryImpl implements JobReqRepository {
       }
 
       final aiResponse = aiResult.getOrElse((_) => '');
-      _lastAiResponse = _parseAiResponse(aiResponse);
+      _lastAiResponse = _parseAiResponse(response: aiResponse);
 
-      final extractedData = _parseAiResponse(aiResponse);
+      final extractedData = _parseAiResponse(response: aiResponse);
       if (extractedData == null) {
         return Left(
           ParsingFailure(message: 'Failed to parse AI response as JSON'),
@@ -137,7 +137,7 @@ $content
 ''';
   }
 
-  Map<String, dynamic>? _parseAiResponse(String response) {
+  Map<String, dynamic>? _parseAiResponse({required String response}) {
     try {
       // Try to extract JSON from response
       final jsonStart = response.indexOf('{');
@@ -163,7 +163,7 @@ $content
       documentType: 'jobreq_response',
       jobReqId: jobReqId,
     );
-    return applicationSembastDatasource.saveAiResponseDocument(dto);
+    return applicationDatasource.saveAiResponseDocument(dto);
   }
 
   @override
@@ -190,7 +190,7 @@ $content
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
       documentType: 'jobreq',
     );
-    final result = await applicationSembastDatasource.saveDocument(dto);
+    final result = await applicationDatasource.saveDocument(dto);
     return result.map((_) => jobReq);
   }
 
@@ -218,6 +218,6 @@ $content
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
       documentType: 'jobreq',
     );
-    return await applicationSembastDatasource.saveDocument(dto);
+    return await applicationDatasource.saveDocument(dto);
   }
 }

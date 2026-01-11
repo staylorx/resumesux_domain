@@ -6,13 +6,13 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 class ResumeRepositoryImpl extends DocumentRepositoryImpl
     implements ResumeRepository {
   @override
-  Logger get logger => LoggerFactory.create('ResumeRepositoryImpl');
+  Logger get logger => LoggerFactory.create(name: 'ResumeRepositoryImpl');
 
-  final ApplicationSembastDatasource applicationSembastDatasource;
+  final ApplicationDatasource applicationDatasource;
 
   ResumeRepositoryImpl({
     required super.fileRepository,
-    required this.applicationSembastDatasource,
+    required this.applicationDatasource,
   });
 
   @override
@@ -45,6 +45,6 @@ class ResumeRepositoryImpl extends DocumentRepositoryImpl
       documentType: 'resume',
       jobReqId: jobReqId,
     );
-    return applicationSembastDatasource.saveDocument(dto);
+    return applicationDatasource.saveDocument(dto);
   }
 }

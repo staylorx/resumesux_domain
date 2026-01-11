@@ -3,6 +3,133 @@ import 'package:fpdart/fpdart.dart';
 import 'package:path/path.dart' as path;
 import 'package:resumesux_domain/resumesux_domain.dart';
 
+/// Manages README.md file for test suites, tracking progress and status.
+class TestSuiteReadmeManager {
+  final String suiteDir;
+  final String suiteName;
+  final DateTime startTime;
+  final List<String> groups = [];
+  final Map<String, TestEntry> testEntries = {};
+
+  TestSuiteReadmeManager({required this.suiteDir, required this.suiteName})
+    : startTime = DateTime.now();
+
+  /// Initializes the README.md with suite information.
+  void initialize() {
+    _writeReadme();
+  }
+
+  /// Records the start of a test group.
+  void startGroup(String groupName) {
+    groups.add(groupName);
+    _writeReadme();
+  }
+
+  /// Records the start of a test.
+  void startTest(String testName) {
+    testEntries[testName] = TestEntry(
+      name: testName,
+      startTime: DateTime.now(),
+      status: TestStatus.running,
+    );
+    _writeReadme();
+  }
+
+  /// Records the end of a test with its status.
+  void endTest(String testName, bool passed, {String? error}) {
+    final entry = testEntries[testName];
+    if (entry != null) {
+      entry.endTime = DateTime.now();
+      entry.status = passed ? TestStatus.passed : TestStatus.failed;
+      entry.error = error;
+      _writeReadme();
+    }
+  }
+
+  /// Finalizes the README with summary.
+  void finalize() {
+    _writeReadme();
+  }
+
+  void _writeReadme() {
+    final buffer = StringBuffer();
+
+    buffer.writeln('# Test Suite: $suiteName');
+    buffer.writeln('');
+    buffer.writeln('Started: ${startTime.toIso8601String()}');
+    buffer.writeln('Suite Directory: $suiteDir');
+    buffer.writeln('');
+
+    if (groups.isNotEmpty) {
+      buffer.writeln('## Test Groups');
+      for (final group in groups) {
+        buffer.writeln('- $group');
+      }
+      buffer.writeln('');
+    }
+
+    if (testEntries.isNotEmpty) {
+      buffer.writeln('## Test Results');
+      buffer.writeln('');
+      buffer.writeln('| Test | Status | Duration | Error |');
+      buffer.writeln('|------|--------|----------|-------|');
+
+      for (final entry in testEntries.values) {
+        final duration = entry.endTime != null
+            ? '${entry.endTime!.difference(entry.startTime).inSeconds}s'
+            : 'Running';
+        final statusEmoji = entry.status == TestStatus.passed
+            ? '✅'
+            : entry.status == TestStatus.failed
+            ? '❌'
+            : '⏳';
+        final error = entry.error ?? '';
+        buffer.writeln(
+          '| ${entry.name} | $statusEmoji ${entry.status.name} | $duration | $error |',
+        );
+      }
+      buffer.writeln('');
+
+      final passed = testEntries.values
+          .where((e) => e.status == TestStatus.passed)
+          .length;
+      final failed = testEntries.values
+          .where((e) => e.status == TestStatus.failed)
+          .length;
+      final running = testEntries.values
+          .where((e) => e.status == TestStatus.running)
+          .length;
+
+      buffer.writeln('## Summary');
+      buffer.writeln('- Total Tests: ${testEntries.length}');
+      buffer.writeln('- Passed: $passed');
+      buffer.writeln('- Failed: $failed');
+      buffer.writeln('- Running: $running');
+    }
+
+    final readmePath = path.join(suiteDir, 'README.md');
+    File(readmePath).writeAsStringSync(buffer.toString());
+  }
+}
+
+/// Represents a test entry in the README.
+class TestEntry {
+  final String name;
+  final DateTime startTime;
+  DateTime? endTime;
+  TestStatus status;
+  String? error;
+
+  TestEntry({
+    required this.name,
+    required this.startTime,
+    required this.status,
+  });
+}
+
+/// Enum for test status.
+enum TestStatus { running, passed, failed }
+
 /// Factory for creating temporary directories for tests.
 class TestDirFactory {
   static TestDirFactory? _instance;
@@ -17,20 +144,11 @@ class TestDirFactory {
   /// Base temp directory for tests
   String get _baseTempDir => "build";
 
-  /// Database path for setUpAll (shared across tests)
-  String get setUpAllDbPath =>
-      path.join(_baseTempDir, 'setUpAll', 'jobreqs.db');
-
-  /// Database path for setUp (per-test setup)
-  String get setUpDbPath => path.join(_baseTempDir, 'setUp', 'jobreqs.db');
-
   /// Output directory for test outputs
   String get outputDir => path.join(_baseTempDir, 'output');
 
   /// Ensures the temp directories exist
   void ensureTempDirs() {
-    Directory(path.dirname(setUpAllDbPath)).createSync(recursive: true);
-    Directory(path.dirname(setUpDbPath)).createSync(recursive: true);
     Directory(outputDir).createSync(recursive: true);
   }
 

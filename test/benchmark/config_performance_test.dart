@@ -10,7 +10,7 @@ void main() {
       '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}',
     );
   });
-  final logger = LoggerFactory.create('ConfigPerformanceTest');
+  final logger = LoggerFactory.create(name: 'ConfigPerformanceTest');
 
   late ConfigRepositoryImpl configRepository;
   late ConfigDatasource configDatasource;

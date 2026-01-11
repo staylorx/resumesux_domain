@@ -6,13 +6,13 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
     implements CoverLetterRepository {
   @override
-  Logger get logger => LoggerFactory.create('CoverLetterRepositoryImpl');
+  Logger get logger => LoggerFactory.create(name: 'CoverLetterRepositoryImpl');
 
-  final ApplicationSembastDatasource applicationSembastDatasource;
+  final ApplicationDatasource applicationDatasource;
 
   CoverLetterRepositoryImpl({
     required super.fileRepository,
-    required this.applicationSembastDatasource,
+    required this.applicationDatasource,
   });
 
   @override
@@ -45,6 +45,6 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
       documentType: 'cover_letter',
       jobReqId: jobReqId,
     );
-    return applicationSembastDatasource.saveDocument(dto);
+    return applicationDatasource.saveDocument(dto);
   }
 }
