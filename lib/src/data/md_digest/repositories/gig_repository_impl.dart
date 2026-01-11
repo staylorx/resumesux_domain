@@ -9,14 +9,12 @@ class GigRepositoryImpl implements GigRepository {
   final Logger logger = LoggerFactory.create('GigRepositoryImpl');
   final String digestPath;
   final AiService aiService;
-  final DocumentSembastDatasource documentSembastDatasource;
   final ApplicationSembastDatasource applicationSembastDatasource;
   final List<Map<String, dynamic>> _allAiResponses = [];
 
   GigRepositoryImpl({
     required this.digestPath,
     required this.aiService,
-    required this.documentSembastDatasource,
     required this.applicationSembastDatasource,
   });
 

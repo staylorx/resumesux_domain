@@ -8,11 +8,11 @@ class ResumeRepositoryImpl extends DocumentRepositoryImpl
   @override
   Logger get logger => LoggerFactory.create('ResumeRepositoryImpl');
 
-  final DocumentSembastDatasource documentSembastDatasource;
+  final ApplicationSembastDatasource applicationSembastDatasource;
 
   ResumeRepositoryImpl({
     required super.fileRepository,
-    required this.documentSembastDatasource,
+    required this.applicationSembastDatasource,
   });
 
   @override
@@ -45,6 +45,6 @@ class ResumeRepositoryImpl extends DocumentRepositoryImpl
       documentType: 'resume',
       jobReqId: jobReqId,
     );
-    return documentSembastDatasource.saveDocument(dto);
+    return applicationSembastDatasource.saveDocument(dto);
   }
 }

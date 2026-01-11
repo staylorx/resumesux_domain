@@ -36,7 +36,7 @@ void main() {
     fileRepository = TestFileRepository();
 
     // Clear the database before the test group
-    final datasource = DocumentSembastDatasource(
+    final datasource = ApplicationSembastDatasource(
       dbPath: TestDirFactory.instance.setUpAllDbPath,
     );
     final result = await datasource.clearJobReqs();
@@ -64,28 +64,20 @@ void main() {
     digestRepository = DigestRepositoryImpl(
       digestPath: 'test/data/digest/software_engineer',
       aiService: aiService,
-      documentSembastDatasource: DocumentSembastDatasource(
-        dbPath: TestDirFactory.instance.setUpDbPath,
-      ),
       applicationSembastDatasource: applicationSembastDatasource,
     );
     jobReqRepository = JobReqRepositoryImpl(
-      documentSembastDatasource: DocumentSembastDatasource(
-        dbPath: TestDirFactory.instance.setUpDbPath,
-      ),
       aiService: aiService,
       applicationSembastDatasource: applicationSembastDatasource,
     );
 
-    final documentSembastDatasource = DocumentSembastDatasource();
-
     resumeRepository = ResumeRepositoryImpl(
       fileRepository: fileRepository,
-      documentSembastDatasource: documentSembastDatasource,
+      applicationSembastDatasource: applicationSembastDatasource,
     );
     coverLetterRepository = CoverLetterRepositoryImpl(
       fileRepository: fileRepository,
-      documentSembastDatasource: documentSembastDatasource,
+      applicationSembastDatasource: applicationSembastDatasource,
     );
 
     generateResumeUsecase = GenerateResumeUsecase(

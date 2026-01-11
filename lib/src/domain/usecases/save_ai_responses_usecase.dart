@@ -6,12 +6,14 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 class SaveAiResponsesUsecase {
   final Logger logger = LoggerFactory.create('SaveAiResponsesUsecase');
   final JobReqRepository jobReqRepository;
-  final DigestRepository digestRepository;
+  final GigRepository gigRepository;
+  final AssetRepository assetRepository;
 
   /// Creates a new instance of [SaveAiResponsesUsecase].
   SaveAiResponsesUsecase({
     required this.jobReqRepository,
-    required this.digestRepository,
+    required this.gigRepository,
+    required this.assetRepository,
   });
 
   /// Saves AI responses for the job requirement, gigs, and assets.
@@ -38,10 +40,9 @@ class SaveAiResponsesUsecase {
     }
 
     // Save AI responses for gigs
-    final gigAiResponseJson = digestRepository.gigRepository
-        .getLastAiResponsesJson();
+    final gigAiResponseJson = gigRepository.getLastAiResponsesJson();
     if (gigAiResponseJson != null) {
-      final saveGigAiResult = await digestRepository.saveGigAiResponse(
+      final saveGigAiResult = await gigRepository.saveAiResponse(
         aiResponseJson: gigAiResponseJson,
         jobReqId: jobReqId,
       );
@@ -53,10 +54,9 @@ class SaveAiResponsesUsecase {
     }
 
     // Save AI responses for assets
-    final assetAiResponseJson = digestRepository.assetRepository
-        .getLastAiResponsesJson();
+    final assetAiResponseJson = assetRepository.getLastAiResponsesJson();
     if (assetAiResponseJson != null) {
-      final saveAssetAiResult = await digestRepository.saveAssetAiResponse(
+      final saveAssetAiResult = await assetRepository.saveAiResponse(
         aiResponseJson: assetAiResponseJson,
         jobReqId: jobReqId,
       );

@@ -8,11 +8,11 @@ class FeedbackRepositoryImpl extends DocumentRepositoryImpl
   @override
   Logger get logger => LoggerFactory.create('FeedbackRepositoryImpl');
 
-  final DocumentSembastDatasource documentSembastDatasource;
+  final ApplicationSembastDatasource applicationSembastDatasource;
 
   FeedbackRepositoryImpl({
     required super.fileRepository,
-    required this.documentSembastDatasource,
+    required this.applicationSembastDatasource,
   });
 
   @override
@@ -41,6 +41,6 @@ class FeedbackRepositoryImpl extends DocumentRepositoryImpl
       documentType: 'feedback',
       jobReqId: jobReqId,
     );
-    return documentSembastDatasource.saveDocument(dto);
+    return applicationSembastDatasource.saveDocument(dto);
   }
 }

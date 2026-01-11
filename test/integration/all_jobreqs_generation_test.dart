@@ -27,7 +27,7 @@ void main() {
     suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
     // Clear the database before the test group
-    final datasource = DocumentSembastDatasource(
+    final datasource = ApplicationSembastDatasource(
       dbPath: TestDirFactory.instance.setUpDbPath,
     );
     final result = await datasource.clearJobReqs();
@@ -49,9 +49,6 @@ void main() {
     );
 
     jobReqRepository = JobReqRepositoryImpl(
-      documentSembastDatasource: DocumentSembastDatasource(
-        dbPath: TestDirFactory.instance.setUpDbPath,
-      ),
       aiService: aiService,
       applicationSembastDatasource: ApplicationSembastDatasource(
         dbPath: TestDirFactory.instance.setUpDbPath,
@@ -110,19 +107,13 @@ void main() {
         },
       ];
 
-      // TODO: create  collection of Applications
-
       // Generate application for each jobreq
-      // TODO: replace this with loop of application in applications
       for (final scenario in scenarios) {
         final scenarioName = scenario['name'] as String;
         final digestPath = scenario['digestPath'] as String;
         final digestRepository = DigestRepositoryImpl(
           digestPath: digestPath,
           aiService: aiService,
-          documentSembastDatasource: DocumentSembastDatasource(
-            dbPath: TestDirFactory.instance.setUpDbPath,
-          ),
           applicationSembastDatasource: ApplicationSembastDatasource(
             dbPath: TestDirFactory.instance.setUpDbPath,
           ),

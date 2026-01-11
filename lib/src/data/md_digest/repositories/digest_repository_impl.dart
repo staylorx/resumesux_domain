@@ -12,19 +12,16 @@ class DigestRepositoryImpl implements DigestRepository {
   DigestRepositoryImpl({
     required this.digestPath,
     required AiService aiService,
-    required DocumentSembastDatasource documentSembastDatasource,
     required ApplicationSembastDatasource applicationSembastDatasource,
   }) {
     gigRepository = GigRepositoryImpl(
       digestPath: digestPath,
       aiService: aiService,
-      documentSembastDatasource: documentSembastDatasource,
       applicationSembastDatasource: applicationSembastDatasource,
     );
     assetRepository = AssetRepositoryImpl(
       digestPath: digestPath,
       aiService: aiService,
-      documentSembastDatasource: documentSembastDatasource,
       applicationSembastDatasource: applicationSembastDatasource,
     );
   }
@@ -48,27 +45,5 @@ class DigestRepositoryImpl implements DigestRepository {
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to get digest: $e'));
     }
-  }
-
-  @override
-  Future<Either<Failure, Unit>> saveGigAiResponse({
-    required String aiResponseJson,
-    required String jobReqId,
-  }) async {
-    return gigRepository.saveAiResponse(
-      aiResponseJson: aiResponseJson,
-      jobReqId: jobReqId,
-    );
-  }
-
-  @override
-  Future<Either<Failure, Unit>> saveAssetAiResponse({
-    required String aiResponseJson,
-    required String jobReqId,
-  }) async {
-    return assetRepository.saveAiResponse(
-      aiResponseJson: aiResponseJson,
-      jobReqId: jobReqId,
-    );
   }
 }

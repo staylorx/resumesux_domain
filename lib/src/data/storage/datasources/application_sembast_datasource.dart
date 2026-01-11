@@ -104,6 +104,68 @@ class ApplicationSembastDatasource {
     }
   }
 
+  /// Saves a document DTO to the appropriate store based on documentType.
+  Future<Either<Failure, Unit>> saveDocument(DocumentDto dto) async {
+    try {
+      await _ensureInitialized();
+      final storeName = _getDocumentStoreName(dto.documentType);
+      await _dbService.put(storeName, dto.id, dto.toMap());
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to save document: $e'));
+    }
+  }
+
+  /// Retrieves a document by ID and type.
+  Future<Either<Failure, DocumentDto>> getDocument(
+    String id,
+    String documentType,
+  ) async {
+    try {
+      await _ensureInitialized();
+      final storeName = _getDocumentStoreName(documentType);
+      final data = await _dbService.get(storeName, id);
+      if (data == null) {
+        return Left(NotFoundFailure(message: 'Document not found: $id'));
+      }
+      return Right(DocumentDto.fromMap(data));
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get document: $e'));
+    }
+  }
+
+  /// Retrieves all documents from document stores.
+  Future<Either<Failure, List<DocumentDto>>> getAllDocuments() async {
+    try {
+      await _ensureInitialized();
+      final allDocuments = <DocumentDto>[];
+
+      final storeNames = ['resumes', 'cover_letters', 'feedbacks', 'jobreqs'];
+
+      for (final storeName in storeNames) {
+        final records = await _dbService.find(storeName);
+        for (final record in records) {
+          allDocuments.add(DocumentDto.fromMap(record));
+        }
+      }
+
+      return Right(allDocuments);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get all documents: $e'));
+    }
+  }
+
+  /// Clears all job req records from the database.
+  Future<Either<Failure, Unit>> clearJobReqs() async {
+    try {
+      await _ensureInitialized();
+      await _dbService.drop('jobreqs');
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to clear job reqs: $e'));
+    }
+  }
+
   String _getAiResponseStoreName(String documentType) {
     switch (documentType) {
       case 'jobreq_response':
@@ -114,6 +176,21 @@ class ApplicationSembastDatasource {
         return 'asset_responses';
       default:
         throw ArgumentError('Unknown AI response document type: $documentType');
+    }
+  }
+
+  String _getDocumentStoreName(String documentType) {
+    switch (documentType) {
+      case 'resume':
+        return 'resumes';
+      case 'cover_letter':
+        return 'cover_letters';
+      case 'feedback':
+        return 'feedbacks';
+      case 'jobreq':
+        return 'jobreqs';
+      default:
+        throw ArgumentError('Unknown document type: $documentType');
     }
   }
 }

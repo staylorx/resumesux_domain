@@ -9,14 +9,12 @@ class AssetRepositoryImpl implements AssetRepository {
   final Logger logger = LoggerFactory.create('AssetRepositoryImpl');
   final String digestPath;
   final AiService aiService;
-  final DocumentSembastDatasource documentSembastDatasource;
   final ApplicationSembastDatasource applicationSembastDatasource;
   final List<Map<String, dynamic>> _allAiResponses = [];
 
   AssetRepositoryImpl({
     required this.digestPath,
     required this.aiService,
-    required this.documentSembastDatasource,
     required this.applicationSembastDatasource,
   });
 

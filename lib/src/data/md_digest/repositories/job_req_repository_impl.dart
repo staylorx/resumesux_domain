@@ -9,7 +9,6 @@ class JobReqRepositoryImpl implements JobReqRepository {
   final Logger logger = LoggerFactory.create('JobReqRepositoryImpl');
 
   final AiService aiService;
-  final DocumentSembastDatasource documentSembastDatasource;
   final ApplicationSembastDatasource applicationSembastDatasource;
   Map<String, dynamic>? _lastAiResponse;
 
@@ -20,7 +19,6 @@ class JobReqRepositoryImpl implements JobReqRepository {
 
   JobReqRepositoryImpl({
     required this.aiService,
-    required this.documentSembastDatasource,
     required this.applicationSembastDatasource,
   });
 
@@ -71,7 +69,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
       documentType: 'jobreq',
     );
-    await documentSembastDatasource.saveDocument(dto);
+    await applicationSembastDatasource.saveDocument(dto);
     return Right(jobReq);
   }
 
@@ -192,7 +190,7 @@ $content
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
       documentType: 'jobreq',
     );
-    final result = await documentSembastDatasource.saveDocument(dto);
+    final result = await applicationSembastDatasource.saveDocument(dto);
     return result.map((_) => jobReq);
   }
 
@@ -220,6 +218,6 @@ $content
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
       documentType: 'jobreq',
     );
-    return await documentSembastDatasource.saveDocument(dto);
+    return await applicationSembastDatasource.saveDocument(dto);
   }
 }

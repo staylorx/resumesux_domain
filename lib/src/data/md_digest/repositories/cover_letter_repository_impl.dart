@@ -8,11 +8,11 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
   @override
   Logger get logger => LoggerFactory.create('CoverLetterRepositoryImpl');
 
-  final DocumentSembastDatasource documentSembastDatasource;
+  final ApplicationSembastDatasource applicationSembastDatasource;
 
   CoverLetterRepositoryImpl({
     required super.fileRepository,
-    required this.documentSembastDatasource,
+    required this.applicationSembastDatasource,
   });
 
   @override
@@ -45,6 +45,6 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
       documentType: 'cover_letter',
       jobReqId: jobReqId,
     );
-    return documentSembastDatasource.saveDocument(dto);
+    return applicationSembastDatasource.saveDocument(dto);
   }
 }

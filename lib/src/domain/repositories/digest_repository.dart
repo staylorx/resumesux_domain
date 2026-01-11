@@ -11,16 +11,4 @@ abstract class DigestRepository {
 
   /// Gets the asset repository.
   AssetRepository get assetRepository;
-
-  /// Saves the AI responses JSON for gigs to the database.
-  Future<Either<Failure, Unit>> saveGigAiResponse({
-    required String aiResponseJson,
-    required String jobReqId,
-  });
-
-  /// Saves the AI responses JSON for assets to the database.
-  Future<Either<Failure, Unit>> saveAssetAiResponse({
-    required String aiResponseJson,
-    required String jobReqId,
-  });
 }
