@@ -120,13 +120,13 @@ void main() {
       for (final scenario in scenarios) {
         final scenarioName = scenario['name'] as String;
         final digestPath = scenario['digestPath'] as String;
+        final digestRepository = DigestRepositoryImpl(
+          digestPath: digestPath,
+          aiService: aiService,
+        );
         for (final jobReqPath in scenario['jobReqPaths'] as List<String>) {
           logger.info(
             "Applying for jobreq at $jobReqPath using digest at $digestPath for scenario $scenarioName",
-          );
-          final digestRepository = DigestRepositoryImpl(
-            digestPath: digestPath,
-            aiService: aiService,
           );
 
           final generateResumeUsecase = GenerateResumeUsecase(
