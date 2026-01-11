@@ -103,6 +103,8 @@ Generated Cover Letter:
 $coverLetter
 
 $toneInstruction $lengthInstruction Include suggestions for improvement on how well this application matches the job requirements.
+
+Do not include the job requirements, resume, or cover letter content in your response. Provide only the feedback analysis in markdown format.
 ''';
   }
 }
