@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
+
+// TODO: I don't think anything uses or tests this.
 
 /// Implementation of ApplicationRepository.
 class ApplicationRepositoryImpl implements ApplicationRepository {
@@ -23,10 +27,15 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     required Application application,
   }) async {
     final dto = ApplicationDto(
-      // TODO: these hashcodes are placeholders; replace with proper IDs? Are hashcodes stable enough?
-      id: application.hashCode.toString(),
-      applicantId: application.applicant.hashCode.toString(),
-      jobReqId: application.jobReq.hashCode.toString(),
+      id: sha256
+          .convert(utf8.encode(DateTime.now().toIso8601String()))
+          .toString(),
+      applicantId: sha256
+          .convert(utf8.encode(application.applicant.email))
+          .toString(),
+      jobReqId: sha256
+          .convert(utf8.encode(application.jobReq.content))
+          .toString(),
       createdAt: application.createdAt,
       updatedAt: application.updatedAt,
     );

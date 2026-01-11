@@ -27,7 +27,12 @@ void main() {
     suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
     // Clear the database before the test group
+    final dbService = SembastDatabaseService(
+      TestDirFactory.instance.setUpDbPath,
+      'applications.db',
+    );
     final datasource = ApplicationSembastDatasource(
+      dbService: dbService,
       dbPath: TestDirFactory.instance.setUpDbPath,
     );
     final result = await datasource.clearJobReqs();
@@ -48,9 +53,14 @@ void main() {
       provider: TestAiHelper.defaultProvider,
     );
 
+    final dbService2 = SembastDatabaseService(
+      TestDirFactory.instance.setUpDbPath,
+      'applications.db',
+    );
     jobReqRepository = JobReqRepositoryImpl(
       aiService: aiService,
       applicationSembastDatasource: ApplicationSembastDatasource(
+        dbService: dbService2,
         dbPath: TestDirFactory.instance.setUpDbPath,
       ),
     );
@@ -111,10 +121,15 @@ void main() {
       for (final scenario in scenarios) {
         final scenarioName = scenario['name'] as String;
         final digestPath = scenario['digestPath'] as String;
+        final dbService3 = SembastDatabaseService(
+          TestDirFactory.instance.setUpDbPath,
+          'applications.db',
+        );
         final digestRepository = DigestRepositoryImpl(
           digestPath: digestPath,
           aiService: aiService,
           applicationSembastDatasource: ApplicationSembastDatasource(
+            dbService: dbService3,
             dbPath: TestDirFactory.instance.setUpDbPath,
           ),
         );

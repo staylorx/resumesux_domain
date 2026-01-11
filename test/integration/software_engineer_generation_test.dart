@@ -36,7 +36,9 @@ void main() {
     fileRepository = TestFileRepository();
 
     // Clear the database before the test group
+    final dbService = SembastDatabaseService(TestDirFactory.instance.setUpAllDbPath, 'applications.db');
     final datasource = ApplicationSembastDatasource(
+      dbService: dbService,
       dbPath: TestDirFactory.instance.setUpAllDbPath,
     );
     final result = await datasource.clearJobReqs();
@@ -57,7 +59,9 @@ void main() {
       provider: TestAiHelper.defaultProvider,
     );
 
+    final dbService2 = SembastDatabaseService(TestDirFactory.instance.setUpDbPath, 'applications.db');
     final applicationSembastDatasource = ApplicationSembastDatasource(
+      dbService: dbService2,
       dbPath: TestDirFactory.instance.setUpDbPath,
     );
 

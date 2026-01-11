@@ -6,14 +6,15 @@ import '../sembast_database_service.dart';
 
 /// Sembast datasource for persisting application data and AI responses.
 class ApplicationSembastDatasource {
-  late final DatabaseService _dbService;
+  final DatabaseService _dbService;
   bool _initialized = false;
   final String? dbPath;
 
-  /// Creates a datasource with optional dbPath. If null, uses memory database.
-  ApplicationSembastDatasource({this.dbPath}) {
-    _dbService = SembastDatabaseService(dbPath, 'applications.db');
-  }
+  /// Creates a datasource with required DatabaseService and optional dbPath.
+  ApplicationSembastDatasource({
+    required DatabaseService dbService,
+    this.dbPath,
+  }) : _dbService = dbService;
 
   Future<void> _ensureInitialized() async {
     if (!_initialized) {
