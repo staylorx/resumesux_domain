@@ -46,7 +46,7 @@ void main() {
       expect(config.providers.length, 2);
 
       final lmstudioProvider = config.providers.firstWhere(
-        (p) => p.id == 'lmstudio',
+        (p) => p.name == 'lmstudio',
       );
       expect(lmstudioProvider.url, 'http://127.0.0.1:1234');
       expect(lmstudioProvider.key, 'dummy-key');
@@ -55,7 +55,7 @@ void main() {
       expect(lmstudioProvider.defaultModel?.name, 'qwen/qwen2.5-coder-14b');
 
       final openaiProvider = config.providers.firstWhere(
-        (p) => p.id == 'openai',
+        (p) => p.name == 'openai',
       );
       expect(openaiProvider.url, 'https://api.openai.com/v1');
       expect(openaiProvider.key, 'sk-test-key');
@@ -94,7 +94,7 @@ void main() {
       // Check providers
       expect(config.providers.length, 1);
       final provider = config.providers.first;
-      expect(provider.id, 'testprovider');
+      expect(provider.name, 'testprovider');
       expect(provider.models.length, 1);
       expect(provider.defaultModel?.name, 'test-model');
       expect(provider.isDefault, true); // default specified

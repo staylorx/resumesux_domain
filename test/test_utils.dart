@@ -58,7 +58,7 @@ class TestAiHelper {
 
   /// Default AI provider for testing.
   static AiProvider get defaultProvider => AiProvider(
-    id: 'lmstudio',
+    name: 'lmstudio',
     url: 'http://127.0.0.1:1234/v1',
     key: 'dummy-key',
     models: [defaultModel],

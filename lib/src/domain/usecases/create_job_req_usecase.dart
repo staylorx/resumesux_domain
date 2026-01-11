@@ -76,11 +76,9 @@ class CreateJobReqUsecase {
       '[CreateJobReqUsecase] Creating job req with title $finalTitle',
     );
 
-    final id = DateTime.now().toIso8601String();
     final createdDate = DateTime.now();
 
     final jobReq = JobReq(
-      id: id,
       title: finalTitle,
       content: finalContent,
       salary: finalSalary,

@@ -43,7 +43,7 @@ void main() {
       final provider = result.getOrElse(
         (_) => throw Exception('Failed to get provider'),
       );
-      expect(provider.id, 'lmstudio');
+      expect(provider.name, 'lmstudio');
       expect(provider.isDefault, true);
       expect(provider.defaultModel!.name, 'qwen/qwen2.5-coder-14b');
     });
@@ -81,7 +81,7 @@ void main() {
       final provider = result.getOrElse(
         (_) => throw Exception('Failed to get provider'),
       );
-      expect(provider.id, 'openai');
+      expect(provider.name, 'openai');
       expect(provider.isDefault, false);
       expect(provider.defaultModel?.name, 'gpt-4');
     });
@@ -113,7 +113,7 @@ void main() {
       final config = configResult.getOrElse(
         (_) => throw Exception('Failed to load config'),
       );
-      final provider = config.providers.firstWhere((p) => p.id == 'lmstudio');
+      final provider = config.providers.firstWhere((p) => p.name == 'lmstudio');
 
       // Act
       final hasDefault = configRepository.hasDefaultModel(provider: provider);
@@ -137,7 +137,7 @@ void main() {
       );
 
       // Assert
-      expect(aiService.provider.id, 'lmstudio');
+      expect(aiService.provider.name, 'lmstudio');
       expect(aiService.provider.defaultModel?.name, 'qwen/qwen2.5-coder-14b');
     });
 

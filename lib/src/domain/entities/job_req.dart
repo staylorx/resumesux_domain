@@ -3,7 +3,6 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Represents a job requirement or job posting.
 class JobReq extends Doc with EquatableMixin {
-  final String id;
   final String title;
   final String? salary;
   final String? location;
@@ -12,7 +11,6 @@ class JobReq extends Doc with EquatableMixin {
   final String? whereFound;
 
   JobReq({
-    required this.id,
     required this.title,
     required super.content,
     this.salary,
@@ -25,7 +23,6 @@ class JobReq extends Doc with EquatableMixin {
   @override
   JobReq copyWith({String? content}) {
     return JobReq(
-      id: id,
       title: title,
       content: content ?? this.content,
       salary: salary,
@@ -38,7 +35,6 @@ class JobReq extends Doc with EquatableMixin {
 
   @override
   List<Object?> get props => [
-    id,
     title,
     content,
     salary,

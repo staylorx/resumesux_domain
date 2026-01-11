@@ -16,9 +16,11 @@ export 'md_digest/repositories/resume_repository_impl.dart';
 export 'md_digest/repositories/cover_letter_repository_impl.dart';
 export 'md_digest/repositories/feedback_repository_impl.dart';
 
-export 'storage/datasources/job_req_sembast_datasource.dart';
 export 'storage/datasources/document_sembast_datasource.dart';
+export 'storage/datasources/application_sembast_datasource.dart';
 
 export 'models/document_dto.dart';
+export 'models/job_req_dto.dart';
+export 'models/application_dto.dart';
 
 export 'adapters/file_repository_impl.dart';

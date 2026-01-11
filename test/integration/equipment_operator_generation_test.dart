@@ -14,14 +14,10 @@ void main() {
   late GenerateResumeUsecase generateResumeUsecase;
   late GenerateCoverLetterUsecase generateCoverLetterUsecase;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
-  late SaveResumeUsecase saveResumeUsecase;
-  late SaveCoverLetterUsecase saveCoverLetterUsecase;
-  late SaveFeedbackUsecase saveFeedbackUsecase;
-  late CreateJobReqUsecase createJobReqUsecase;
+  late GetDigestUsecase getDigestUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
   late FileRepository fileRepository;
   late String suiteDir;
-
   late Logger logger;
 
   setUpAll(() async {
@@ -34,15 +30,17 @@ void main() {
       );
     });
 
+    logger = Logger('ResumeHeavyEquipmentOperatorGenerationTest');
+
     suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
     // Clear the database before the test group
-    final datasource = JobReqSembastDatasource(
+    final datasource = DocumentSembastDatasource(
       dbPath: TestDirFactory.instance.setUpAllDbPath,
     );
-    final result = await datasource.clearDatabase();
+    final result = await datasource.clearJobReqs();
     result.fold(
-      (failure) => logger.warning('Failure: ${failure.message}'),
+      (failure) => logger.severe('Failure: ${failure.message}'),
       (_) => {},
     );
     expect(
@@ -60,34 +58,37 @@ void main() {
 
     fileRepository = TestFileRepository();
 
+    final applicationSembastDatasource = ApplicationSembastDatasource(
+      dbPath: TestDirFactory.instance.setUpDbPath,
+    );
+
     digestRepository = DigestRepositoryImpl(
       digestPath: 'test/data/digest/heavy_equipment_operator',
       aiService: aiService,
       documentSembastDatasource: DocumentSembastDatasource(
         dbPath: TestDirFactory.instance.setUpDbPath,
       ),
+      applicationSembastDatasource: applicationSembastDatasource,
     );
     jobReqRepository = JobReqRepositoryImpl(
-      jobReqDatasource: JobReqSembastDatasource(
-        dbPath: TestDirFactory.instance.setUpDbPath,
-      ),
       documentSembastDatasource: DocumentSembastDatasource(
         dbPath: TestDirFactory.instance.setUpDbPath,
       ),
       aiService: aiService,
+      applicationSembastDatasource: applicationSembastDatasource,
     );
-
-    final documentSembastDatasource = DocumentSembastDatasource();
-
     resumeRepository = ResumeRepositoryImpl(
       fileRepository: fileRepository,
-      documentSembastDatasource: documentSembastDatasource,
+      documentSembastDatasource: DocumentSembastDatasource(
+        dbPath: TestDirFactory.instance.setUpDbPath,
+      ),
     );
     coverLetterRepository = CoverLetterRepositoryImpl(
       fileRepository: fileRepository,
-      documentSembastDatasource: documentSembastDatasource,
+      documentSembastDatasource: DocumentSembastDatasource(
+        dbPath: TestDirFactory.instance.setUpDbPath,
+      ),
     );
-
     generateResumeUsecase = GenerateResumeUsecase(
       digestRepository: digestRepository,
       aiService: aiService,
@@ -100,32 +101,17 @@ void main() {
 
     generateFeedbackUsecase = GenerateFeedbackUsecase(aiService: aiService);
 
-    saveResumeUsecase = SaveResumeUsecase(fileRepository: fileRepository);
-    saveCoverLetterUsecase = SaveCoverLetterUsecase(
-      fileRepository: fileRepository,
-    );
-    saveFeedbackUsecase = SaveFeedbackUsecase(fileRepository: fileRepository);
-
-    createJobReqUsecase = CreateJobReqUsecase(
-      jobReqRepository: jobReqRepository,
-      aiService: aiService,
-      fileRepository: fileRepository,
+    getDigestUsecase = GetDigestUsecase(
+      gigRepository: digestRepository.gigRepository,
+      assetRepository: digestRepository.assetRepository,
     );
 
     generateApplicationUsecase = GenerateApplicationUsecase(
-      jobReqRepository: jobReqRepository,
       generateResumeUsecase: generateResumeUsecase,
       generateCoverLetterUsecase: generateCoverLetterUsecase,
       generateFeedbackUsecase: generateFeedbackUsecase,
-      saveResumeUsecase: saveResumeUsecase,
-      saveCoverLetterUsecase: saveCoverLetterUsecase,
-      saveFeedbackUsecase: saveFeedbackUsecase,
-      createJobReqUsecase: createJobReqUsecase,
-      fileRepository: fileRepository,
-      digestRepository: digestRepository,
+      getDigestUsecase: getDigestUsecase,
     );
-
-    logger = Logger('ResumeHeavyEquipmentOperatorGenerationTest');
   });
 
   /// purposefully wierd application of operator to data science job req
@@ -262,13 +248,19 @@ void main() {
         portfolio: 'https://johndoe.dev',
       );
 
+      final jobReqResult = await jobReqRepository.getJobReq(
+        path:
+            'test/data/jobreqs/DataDriven Analytics/Senior Data Scientist/job_req.md',
+      );
+      final jobReq = jobReqResult.getOrElse(
+        (_) => throw Exception('Failed to load job req'),
+      );
+
       // Act
       final result = await generateApplicationUsecase.call(
-        jobReqPath:
-            'test/data/jobreqs/DataDriven Analytics/Senior Data Scientist/job_req.md',
+        jobReq: jobReq,
         applicant: applicant,
         prompt: 'Generate a professional application.',
-        outputDir: suiteDir,
         includeCover: true,
         includeFeedback: true,
         progress: (message) => logger.info(message),

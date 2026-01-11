@@ -7,6 +7,7 @@ export 'job_req_repository.dart';
 export 'digest_repository.dart';
 export 'config_repository.dart';
 export 'applicant_repository.dart';
+export 'application_repository.dart';
 export 'resume_repository.dart';
 export 'cover_letter_repository.dart';
 export 'feedback_repository.dart';

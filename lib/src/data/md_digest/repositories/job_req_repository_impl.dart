@@ -4,15 +4,13 @@ import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-import '../../models/job_req_dto.dart';
-
 /// Implementation of the JobReqRepository.
 class JobReqRepositoryImpl implements JobReqRepository {
   final Logger logger = LoggerFactory.create('JobReqRepositoryImpl');
 
   final AiService aiService;
-  final JobReqSembastDatasource jobReqDatasource;
   final DocumentSembastDatasource documentSembastDatasource;
+  final ApplicationSembastDatasource applicationSembastDatasource;
   Map<String, dynamic>? _lastAiResponse;
 
   @override
@@ -22,8 +20,8 @@ class JobReqRepositoryImpl implements JobReqRepository {
 
   JobReqRepositoryImpl({
     required this.aiService,
-    required this.jobReqDatasource,
     required this.documentSembastDatasource,
+    required this.applicationSembastDatasource,
   });
 
   @override
@@ -39,7 +37,6 @@ class JobReqRepositoryImpl implements JobReqRepository {
     }
 
     final jobReq = JobReq(
-      id: DateTime.now().toIso8601String(),
       title: data['title'] as String? ?? 'Unknown',
       content: data['content'] as String? ?? '',
       salary: data['salary'] as String?,
@@ -53,7 +50,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
 
     // Save to database for persistence
     final jobReqDto = JobReqDto(
-      id: jobReq.id,
+      id: jobReq.hashCode.toString(),
       title: jobReq.title,
       content: jobReq.content,
       salary: jobReq.salary,
@@ -68,7 +65,13 @@ class JobReqRepositoryImpl implements JobReqRepository {
       createdDate: jobReq.createdDate?.toIso8601String(),
       whereFound: jobReq.whereFound,
     );
-    await jobReqDatasource.updateJobReq(jobReqDto: jobReqDto);
+    final dto = DocumentDto(
+      id: jobReqDto.id,
+      content: jobReqDto.content,
+      aiResponseJson: jsonEncode(jobReqDto.toMap()),
+      documentType: 'jobreq',
+    );
+    await documentSembastDatasource.saveDocument(dto);
     return Right(jobReq);
   }
 
@@ -162,13 +165,13 @@ $content
       documentType: 'jobreq_response',
       jobReqId: jobReqId,
     );
-    return documentSembastDatasource.saveDocument(dto);
+    return applicationSembastDatasource.saveAiResponseDocument(dto);
   }
 
   @override
   Future<Either<Failure, JobReq>> createJobReq({required JobReq jobReq}) async {
     final jobReqDto = JobReqDto(
-      id: jobReq.id,
+      id: jobReq.hashCode.toString(),
       title: jobReq.title,
       content: jobReq.content,
       salary: jobReq.salary,
@@ -183,14 +186,20 @@ $content
       createdDate: jobReq.createdDate?.toIso8601String(),
       whereFound: jobReq.whereFound,
     );
-    final result = await jobReqDatasource.createJobReq(jobReqDto: jobReqDto);
+    final dto = DocumentDto(
+      id: jobReqDto.id,
+      content: jobReqDto.content,
+      aiResponseJson: jsonEncode(jobReqDto.toMap()),
+      documentType: 'jobreq',
+    );
+    final result = await documentSembastDatasource.saveDocument(dto);
     return result.map((_) => jobReq);
   }
 
   @override
   Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq}) async {
     final jobReqDto = JobReqDto(
-      id: jobReq.id,
+      id: jobReq.hashCode.toString(),
       title: jobReq.title,
       content: jobReq.content,
       salary: jobReq.salary,
@@ -205,6 +214,12 @@ $content
       createdDate: jobReq.createdDate?.toIso8601String(),
       whereFound: jobReq.whereFound,
     );
-    return await jobReqDatasource.updateJobReq(jobReqDto: jobReqDto);
+    final dto = DocumentDto(
+      id: jobReqDto.id,
+      content: jobReqDto.content,
+      aiResponseJson: jsonEncode(jobReqDto.toMap()),
+      documentType: 'jobreq',
+    );
+    return await documentSembastDatasource.saveDocument(dto);
   }
 }

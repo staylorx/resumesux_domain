@@ -8,19 +8,15 @@ import '../test_utils.dart';
 void main() {
   late DigestRepository digestRepository;
   late JobReqRepository jobReqRepository;
-
   late ResumeRepository resumeRepository;
   late CoverLetterRepository coverLetterRepository;
   late AiServiceImpl aiService;
   late GenerateResumeUsecase generateResumeUsecase;
   late GenerateCoverLetterUsecase generateCoverLetterUsecase;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
-  late CreateJobReqUsecase createJobReqUsecase;
+  late GetDigestUsecase getDigestUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
   late FileRepository fileRepository;
-  late SaveResumeUsecase saveResumeUsecase;
-  late SaveFeedbackUsecase saveFeedbackUsecase;
-  late SaveCoverLetterUsecase saveCoverLetterUsecase;
   late String suiteDir;
   late Logger logger;
 
@@ -40,10 +36,10 @@ void main() {
     fileRepository = TestFileRepository();
 
     // Clear the database before the test group
-    final datasource = JobReqSembastDatasource(
+    final datasource = DocumentSembastDatasource(
       dbPath: TestDirFactory.instance.setUpAllDbPath,
     );
-    final result = await datasource.clearDatabase();
+    final result = await datasource.clearJobReqs();
     result.fold(
       (failure) => logger.severe('Failure: ${failure.message}'),
       (_) => {},
@@ -61,21 +57,24 @@ void main() {
       provider: TestAiHelper.defaultProvider,
     );
 
+    final applicationSembastDatasource = ApplicationSembastDatasource(
+      dbPath: TestDirFactory.instance.setUpDbPath,
+    );
+
     digestRepository = DigestRepositoryImpl(
       digestPath: 'test/data/digest/software_engineer',
       aiService: aiService,
       documentSembastDatasource: DocumentSembastDatasource(
         dbPath: TestDirFactory.instance.setUpDbPath,
       ),
+      applicationSembastDatasource: applicationSembastDatasource,
     );
     jobReqRepository = JobReqRepositoryImpl(
-      jobReqDatasource: JobReqSembastDatasource(
-        dbPath: TestDirFactory.instance.setUpDbPath,
-      ),
       documentSembastDatasource: DocumentSembastDatasource(
         dbPath: TestDirFactory.instance.setUpDbPath,
       ),
       aiService: aiService,
+      applicationSembastDatasource: applicationSembastDatasource,
     );
 
     final documentSembastDatasource = DocumentSembastDatasource();
@@ -101,28 +100,16 @@ void main() {
 
     generateFeedbackUsecase = GenerateFeedbackUsecase(aiService: aiService);
 
-    createJobReqUsecase = CreateJobReqUsecase(
-      jobReqRepository: jobReqRepository,
-      aiService: aiService,
-      fileRepository: fileRepository,
+    getDigestUsecase = GetDigestUsecase(
+      gigRepository: digestRepository.gigRepository,
+      assetRepository: digestRepository.assetRepository,
     );
-    saveResumeUsecase = SaveResumeUsecase(fileRepository: fileRepository);
-    saveCoverLetterUsecase = SaveCoverLetterUsecase(
-      fileRepository: fileRepository,
-    );
-    saveFeedbackUsecase = SaveFeedbackUsecase(fileRepository: fileRepository);
 
     generateApplicationUsecase = GenerateApplicationUsecase(
-      jobReqRepository: jobReqRepository,
-      saveCoverLetterUsecase: saveCoverLetterUsecase,
       generateResumeUsecase: generateResumeUsecase,
       generateCoverLetterUsecase: generateCoverLetterUsecase,
       generateFeedbackUsecase: generateFeedbackUsecase,
-      createJobReqUsecase: createJobReqUsecase,
-      fileRepository: fileRepository,
-      digestRepository: digestRepository,
-      saveResumeUsecase: saveResumeUsecase,
-      saveFeedbackUsecase: saveFeedbackUsecase,
+      getDigestUsecase: getDigestUsecase,
     );
 
     logger = Logger('ResumeGenerationTest');
@@ -247,9 +234,6 @@ void main() {
   test(
     'generate application for TechInnovate Software Engineer job with correct output path',
     () async {
-      // Arrange
-      final outputDir = suiteDir;
-
       final applicant = Applicant(
         name: 'John Doe',
         preferredName: 'John',
@@ -266,13 +250,19 @@ void main() {
         portfolio: 'https://johndoe.dev',
       );
 
+      final jobReqResult = await jobReqRepository.getJobReq(
+        path: 'test/data/jobreqs/TechInnovate/Software Engineer/job_req.md',
+      );
+      expect(jobReqResult.isRight(), true);
+      final jobReq = jobReqResult.getOrElse(
+        (_) => throw Exception('Failed to load job req'),
+      );
+
       // Act
       final result = await generateApplicationUsecase.call(
-        jobReqPath:
-            'test/data/jobreqs/TechInnovate/Software Engineer/job_req.md',
+        jobReq: jobReq,
         applicant: applicant,
         prompt: 'Generate a professional application.',
-        outputDir: outputDir,
         includeCover: false,
         includeFeedback: false,
         progress: (message) => logger.info(message),

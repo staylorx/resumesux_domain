@@ -48,10 +48,11 @@ void main(List<String> arguments) async {
   final exportAll = results['all'] as bool;
 
   // Initialize datasource
-  final documentDatasource = DocumentSembastDatasource(dbPath: dbPath);
+  final applicationDatasource = ApplicationSembastDatasource(dbPath: dbPath);
 
-  // Get all documents
-  final documentsResult = await documentDatasource.getAllDocuments();
+  // Get all AI response documents
+  final documentsResult = await applicationDatasource
+      .getAllAiResponseDocuments();
   if (documentsResult.isLeft()) {
     print(
       'Error: Failed to get documents: ${documentsResult.getLeft().toNullable()?.message}',

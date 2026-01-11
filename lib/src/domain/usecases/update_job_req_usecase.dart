@@ -17,7 +17,7 @@ class UpdateJobReqUsecase {
   ///
   /// Returns: [Either<Failure, Unit>] success or a failure.
   Future<Either<Failure, Unit>> call({required JobReq jobReq}) async {
-    logger.info('[UpdateJobReqUsecase] Updating job req with id ${jobReq.id}');
+    logger.info('[UpdateJobReqUsecase] Updating job req with ${jobReq.title}');
 
     try {
       return await jobReqRepository.updateJobReq(jobReq: jobReq);

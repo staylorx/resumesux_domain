@@ -4,7 +4,7 @@ import '../value_objects/ai_model.dart';
 
 /// Represents an AI provider configuration.
 class AiProvider with EquatableMixin {
-  final String id;
+  final String name;
   final String url;
   final String key;
   final List<AiModel> models;
@@ -13,7 +13,7 @@ class AiProvider with EquatableMixin {
   final bool isDefault;
 
   const AiProvider({
-    required this.id,
+    required this.name,
     required this.url,
     required this.key,
     required this.models,
@@ -23,7 +23,7 @@ class AiProvider with EquatableMixin {
   });
 
   AiProvider copyWith({
-    String? id,
+    String? name,
     String? url,
     String? key,
     List<AiModel>? models,
@@ -32,7 +32,7 @@ class AiProvider with EquatableMixin {
     bool? isDefault,
   }) {
     return AiProvider(
-      id: id ?? this.id,
+      name: name ?? this.name,
       url: url ?? this.url,
       key: key ?? this.key,
       models: models ?? this.models,
@@ -44,7 +44,7 @@ class AiProvider with EquatableMixin {
 
   @override
   List<Object> get props => [
-    id,
+    name,
     url,
     key,
     models,

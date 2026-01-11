@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
-
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of the AssetRepository.
@@ -11,12 +10,14 @@ class AssetRepositoryImpl implements AssetRepository {
   final String digestPath;
   final AiService aiService;
   final DocumentSembastDatasource documentSembastDatasource;
+  final ApplicationSembastDatasource applicationSembastDatasource;
   final List<Map<String, dynamic>> _allAiResponses = [];
 
   AssetRepositoryImpl({
     required this.digestPath,
     required this.aiService,
     required this.documentSembastDatasource,
+    required this.applicationSembastDatasource,
   });
 
   @override
@@ -175,6 +176,6 @@ $content
       documentType: 'asset_responses',
       jobReqId: jobReqId,
     );
-    return documentSembastDatasource.saveDocument(dto);
+    return applicationSembastDatasource.saveAiResponseDocument(dto);
   }
 }

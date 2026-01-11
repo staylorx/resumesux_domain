@@ -3,6 +3,7 @@ library;
 
 export '../value_objects/address.dart';
 export 'applicant.dart';
+export 'application.dart';
 export 'asset.dart';
 export 'concern.dart';
 export 'config.dart';

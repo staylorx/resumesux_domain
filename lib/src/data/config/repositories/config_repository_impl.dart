@@ -230,7 +230,7 @@ class ConfigRepositoryImpl implements ConfigRepository {
       final settings = providerMap['settings'] as Map<String, dynamic>? ?? {};
 
       final tempProvider = AiProvider(
-        id: providerId,
+        name: providerId,
         url: url,
         key: key,
         models: [],
@@ -289,7 +289,7 @@ class ConfigRepositoryImpl implements ConfigRepository {
     // Validate that exactly one provider is marked as default
     final defaultProviders = providers.where((p) => p.isDefault).toList();
     logger.info(
-      'Found ${defaultProviders.length} default providers: ${defaultProviders.map((p) => p.id).join(', ')}',
+      'Found ${defaultProviders.length} default providers: ${defaultProviders.map((p) => p.name).join(', ')}',
     );
     if (defaultProviders.length != 1) {
       logger.severe(
@@ -328,7 +328,7 @@ class ConfigRepositoryImpl implements ConfigRepository {
         if (providerName == 'default') {
           provider = config.providers.firstWhere((p) => p.isDefault);
         } else {
-          provider = config.providers.firstWhere((p) => p.id == providerName);
+          provider = config.providers.firstWhere((p) => p.name == providerName);
         }
         return Right(provider);
       } catch (e) {

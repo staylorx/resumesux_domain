@@ -9,8 +9,6 @@ void main() {
   late JobReqRepository jobReqRepository;
   late AiServiceImpl aiService;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
-  late CreateJobReqUsecase createJobReqUsecase;
-  late FileRepository fileRepository;
   late String suiteDir;
   late Logger logger;
 
@@ -27,13 +25,12 @@ void main() {
     logger = Logger('AllJobReqsGenerationTest');
 
     suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
-    fileRepository = TestFileRepository();
 
     // Clear the database before the test group
-    final datasource = JobReqSembastDatasource(
+    final datasource = DocumentSembastDatasource(
       dbPath: TestDirFactory.instance.setUpDbPath,
     );
-    final result = await datasource.clearDatabase();
+    final result = await datasource.clearJobReqs();
     result.fold(
       (failure) => logger.severe('Failure: ${failure.message}'),
       (_) => {},
@@ -52,22 +49,16 @@ void main() {
     );
 
     jobReqRepository = JobReqRepositoryImpl(
-      jobReqDatasource: JobReqSembastDatasource(
-        dbPath: TestDirFactory.instance.setUpDbPath,
-      ),
       documentSembastDatasource: DocumentSembastDatasource(
         dbPath: TestDirFactory.instance.setUpDbPath,
       ),
       aiService: aiService,
+      applicationSembastDatasource: ApplicationSembastDatasource(
+        dbPath: TestDirFactory.instance.setUpDbPath,
+      ),
     );
 
     generateFeedbackUsecase = GenerateFeedbackUsecase(aiService: aiService);
-
-    createJobReqUsecase = CreateJobReqUsecase(
-      jobReqRepository: jobReqRepository,
-      aiService: aiService,
-      fileRepository: fileRepository,
-    );
 
     logger = Logger('AllJobReqsGenerationTest');
   });
@@ -119,7 +110,10 @@ void main() {
         },
       ];
 
+      // TODO: create  collection of Applications
+
       // Generate application for each jobreq
+      // TODO: replace this with loop of application in applications
       for (final scenario in scenarios) {
         final scenarioName = scenario['name'] as String;
         final digestPath = scenario['digestPath'] as String;
@@ -129,7 +123,16 @@ void main() {
           documentSembastDatasource: DocumentSembastDatasource(
             dbPath: TestDirFactory.instance.setUpDbPath,
           ),
+          applicationSembastDatasource: ApplicationSembastDatasource(
+            dbPath: TestDirFactory.instance.setUpDbPath,
+          ),
         );
+
+        final getDigestUsecase = GetDigestUsecase(
+          gigRepository: digestRepository.gigRepository,
+          assetRepository: digestRepository.assetRepository,
+        );
+
         for (final jobReqPath in scenario['jobReqPaths'] as List<String>) {
           logger.info(
             "Applying for jobreq at $jobReqPath using digest at $digestPath for scenario $scenarioName",
@@ -145,35 +148,26 @@ void main() {
             aiService: aiService,
           );
 
-          final SaveCoverLetterUsecase saveCoverLetterUsecase =
-              SaveCoverLetterUsecase(fileRepository: fileRepository);
-
-          final SaveResumeUsecase saveResumeUsecase = SaveResumeUsecase(
-            fileRepository: fileRepository,
-          );
-
-          final SaveFeedbackUsecase saveFeedbackUsecase = SaveFeedbackUsecase(
-            fileRepository: fileRepository,
-          );
-
           final generateApplicationUsecase = GenerateApplicationUsecase(
-            jobReqRepository: jobReqRepository,
             generateResumeUsecase: generateResumeUsecase,
             generateCoverLetterUsecase: generateCoverLetterUsecase,
             generateFeedbackUsecase: generateFeedbackUsecase,
-            createJobReqUsecase: createJobReqUsecase,
-            fileRepository: fileRepository,
-            digestRepository: digestRepository,
-            saveResumeUsecase: saveResumeUsecase,
-            saveCoverLetterUsecase: saveCoverLetterUsecase,
-            saveFeedbackUsecase: saveFeedbackUsecase,
+            getDigestUsecase: getDigestUsecase,
+          );
+
+          final jobReqResult = await jobReqRepository.getJobReq(
+            path: jobReqPath,
+          );
+          final jobReq = jobReqResult.getOrElse(
+            (failure) => throw Exception(
+              'Failed to get jobreq at $jobReqPath: ${failure.message}',
+            ),
           );
 
           final result = await generateApplicationUsecase.call(
-            jobReqPath: jobReqPath,
+            jobReq: jobReq,
             applicant: applicant,
             prompt: 'Generate a professional application.',
-            outputDir: suiteDir,
             includeCover: true,
             includeFeedback: true,
             progress: (message) => logger.info(message),
