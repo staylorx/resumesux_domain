@@ -23,8 +23,8 @@ class SaveCoverLetterUsecase {
   }) async {
     logger.info('Saving cover letter to: $filePath');
     final result = await fileRepository.writeFile(
-      filePath,
-      coverLetter.content,
+      path: filePath,
+      content: coverLetter.content,
     );
     if (result.isRight()) {
       logger.info('Cover letter saved successfully');

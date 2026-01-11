@@ -100,7 +100,7 @@ class CreateJobReqUsecase {
   Future<Either<Failure, Map<String, dynamic>>> _extractJobReqData({
     required String path,
   }) async {
-    final contentResult = fileRepository.readFile(path);
+    final contentResult = fileRepository.readFile(path: path);
     if (contentResult.isLeft()) {
       return Left(contentResult.getLeft().toNullable()!);
     }

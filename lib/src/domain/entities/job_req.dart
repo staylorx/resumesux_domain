@@ -2,20 +2,19 @@ import 'package:equatable/equatable.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Represents a job requirement or job posting.
-class JobReq with EquatableMixin {
+class JobReq extends Doc with EquatableMixin {
   final String id;
   final String title;
-  final String content;
   final String? salary;
   final String? location;
   final Concern? concern;
   final DateTime? createdDate;
   final String? whereFound;
 
-  const JobReq({
+  JobReq({
     required this.id,
     required this.title,
-    required this.content,
+    required super.content,
     this.salary,
     this.location,
     this.concern,
@@ -23,25 +22,17 @@ class JobReq with EquatableMixin {
     this.whereFound,
   });
 
-  JobReq copyWith({
-    String? id,
-    String? title,
-    String? content,
-    String? salary,
-    String? location,
-    Concern? concern,
-    DateTime? createdDate,
-    String? whereFound,
-  }) {
+  @override
+  JobReq copyWith({String? content}) {
     return JobReq(
-      id: id ?? this.id,
-      title: title ?? this.title,
+      id: id,
+      title: title,
       content: content ?? this.content,
-      salary: salary ?? this.salary,
-      location: location ?? this.location,
-      concern: concern ?? this.concern,
-      createdDate: createdDate ?? this.createdDate,
-      whereFound: whereFound ?? this.whereFound,
+      salary: salary,
+      location: location,
+      concern: concern,
+      createdDate: createdDate,
+      whereFound: whereFound,
     );
   }
 

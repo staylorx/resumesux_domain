@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Repository for job requirement-related operations.
-abstract class JobReqRepository {
+abstract class JobReqRepository implements DocRepository {
   /// Creates a new job requirement.
   Future<Either<Failure, JobReq>> createJobReq({required JobReq jobReq});
 
@@ -12,6 +12,14 @@ abstract class JobReqRepository {
   /// Updates an existing job requirement.
   Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq});
 
-  /// Saves the last AI response to the specified file path.
-  Future<Either<Failure, Unit>> saveAiResponse({required String filePath});
+  /// Retrieves the last AI response as JSON string.
+  String? getLastAiResponseJson();
+
+  /// Saves the AI response JSON for a job requirement to the database.
+  @override
+  Future<Either<Failure, Unit>> saveAiResponse({
+    required String aiResponseJson,
+    required String jobReqId,
+    String? content,
+  });
 }

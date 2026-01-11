@@ -6,6 +6,12 @@ abstract class AssetRepository {
   /// Retrieves all assets.
   Future<Either<Failure, List<Asset>>> getAllAssets();
 
-  /// Saves the last AI response to the specified file path.
-  Future<Either<Failure, Unit>> saveAiResponse({required String filePath});
+  /// Retrieves the last AI responses as JSON string.
+  String? getLastAiResponsesJson();
+
+  /// Saves the AI responses JSON for assets to the database.
+  Future<Either<Failure, Unit>> saveAiResponse({
+    required String aiResponseJson,
+    required String jobReqId,
+  });
 }

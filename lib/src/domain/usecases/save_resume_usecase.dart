@@ -22,7 +22,10 @@ class SaveResumeUsecase {
     required String filePath,
   }) async {
     logger.info('Saving resume to: $filePath');
-    final result = await fileRepository.writeFile(filePath, resume.content);
+    final result = await fileRepository.writeFile(
+      path: filePath,
+      content: resume.content,
+    );
     if (result.isRight()) {
       logger.info('Resume saved successfully');
     } else {

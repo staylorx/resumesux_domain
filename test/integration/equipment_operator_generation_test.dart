@@ -63,17 +63,29 @@ void main() {
     digestRepository = DigestRepositoryImpl(
       digestPath: 'test/data/digest/heavy_equipment_operator',
       aiService: aiService,
+      documentSembastDatasource: DocumentSembastDatasource(
+        dbPath: TestDirFactory.instance.setUpDbPath,
+      ),
     );
     jobReqRepository = JobReqRepositoryImpl(
       jobReqDatasource: JobReqSembastDatasource(
         dbPath: TestDirFactory.instance.setUpDbPath,
       ),
+      documentSembastDatasource: DocumentSembastDatasource(
+        dbPath: TestDirFactory.instance.setUpDbPath,
+      ),
       aiService: aiService,
     );
 
-    resumeRepository = ResumeRepositoryImpl(fileRepository: fileRepository);
+    final documentSembastDatasource = DocumentSembastDatasource();
+
+    resumeRepository = ResumeRepositoryImpl(
+      fileRepository: fileRepository,
+      documentSembastDatasource: documentSembastDatasource,
+    );
     coverLetterRepository = CoverLetterRepositoryImpl(
       fileRepository: fileRepository,
+      documentSembastDatasource: documentSembastDatasource,
     );
 
     generateResumeUsecase = GenerateResumeUsecase(

@@ -10,9 +10,19 @@ class AssetRepositoryImpl implements AssetRepository {
   final Logger logger = LoggerFactory.create('AssetRepositoryImpl');
   final String digestPath;
   final AiService aiService;
+  final DocumentSembastDatasource documentSembastDatasource;
   final List<Map<String, dynamic>> _allAiResponses = [];
 
-  AssetRepositoryImpl({required this.digestPath, required this.aiService});
+  AssetRepositoryImpl({
+    required this.digestPath,
+    required this.aiService,
+    required this.documentSembastDatasource,
+  });
+
+  @override
+  String? getLastAiResponsesJson() {
+    return _allAiResponses.isNotEmpty ? jsonEncode(_allAiResponses) : null;
+  }
 
   Future<Either<Failure, Map<String, dynamic>>> _extractAssetData({
     required String content,
@@ -155,19 +165,16 @@ $content
 
   @override
   Future<Either<Failure, Unit>> saveAiResponse({
-    required String filePath,
+    required String aiResponseJson,
+    required String jobReqId,
   }) async {
-    try {
-      if (_allAiResponses.isEmpty) {
-        return Left(ServiceFailure(message: 'No AI responses to save'));
-      }
-      final file = File(filePath);
-      await file.writeAsString(jsonEncode(_allAiResponses));
-      logger.info('Saved AI responses to ${file.path}');
-      _allAiResponses.clear();
-      return Right(unit);
-    } catch (e) {
-      return Left(ServiceFailure(message: 'Failed to save AI responses: $e'));
-    }
+    final dto = DocumentDto(
+      id: 'asset_responses_$jobReqId',
+      content: '',
+      aiResponseJson: aiResponseJson,
+      documentType: 'asset_responses',
+      jobReqId: jobReqId,
+    );
+    return documentSembastDatasource.saveDocument(dto);
   }
 }

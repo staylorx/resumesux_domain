@@ -4,20 +4,25 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 /// Implementation of the DigestRepository.
 class DigestRepositoryImpl implements DigestRepository {
   final String digestPath;
+  @override
   late final GigRepository gigRepository;
+  @override
   late final AssetRepository assetRepository;
 
   DigestRepositoryImpl({
     required this.digestPath,
     required AiService aiService,
+    required DocumentSembastDatasource documentSembastDatasource,
   }) {
     gigRepository = GigRepositoryImpl(
       digestPath: digestPath,
       aiService: aiService,
+      documentSembastDatasource: documentSembastDatasource,
     );
     assetRepository = AssetRepositoryImpl(
       digestPath: digestPath,
       aiService: aiService,
+      documentSembastDatasource: documentSembastDatasource,
     );
   }
 
@@ -44,15 +49,23 @@ class DigestRepositoryImpl implements DigestRepository {
 
   @override
   Future<Either<Failure, Unit>> saveGigAiResponse({
-    required String filePath,
+    required String aiResponseJson,
+    required String jobReqId,
   }) async {
-    return gigRepository.saveAiResponse(filePath: filePath);
+    return gigRepository.saveAiResponse(
+      aiResponseJson: aiResponseJson,
+      jobReqId: jobReqId,
+    );
   }
 
   @override
   Future<Either<Failure, Unit>> saveAssetAiResponse({
-    required String filePath,
+    required String aiResponseJson,
+    required String jobReqId,
   }) async {
-    return assetRepository.saveAiResponse(filePath: filePath);
+    return assetRepository.saveAiResponse(
+      aiResponseJson: aiResponseJson,
+      jobReqId: jobReqId,
+    );
   }
 }

@@ -6,9 +6,21 @@ abstract class DigestRepository {
   /// Retrieves all digests.
   Future<Either<Failure, List<Digest>>> getAllDigests();
 
-  /// Saves the last AI response for gigs to the specified file path.
-  Future<Either<Failure, Unit>> saveGigAiResponse({required String filePath});
+  /// Gets the gig repository.
+  GigRepository get gigRepository;
 
-  /// Saves the last AI response for assets to the specified file path.
-  Future<Either<Failure, Unit>> saveAssetAiResponse({required String filePath});
+  /// Gets the asset repository.
+  AssetRepository get assetRepository;
+
+  /// Saves the AI responses JSON for gigs to the database.
+  Future<Either<Failure, Unit>> saveGigAiResponse({
+    required String aiResponseJson,
+    required String jobReqId,
+  });
+
+  /// Saves the AI responses JSON for assets to the database.
+  Future<Either<Failure, Unit>> saveAssetAiResponse({
+    required String aiResponseJson,
+    required String jobReqId,
+  });
 }

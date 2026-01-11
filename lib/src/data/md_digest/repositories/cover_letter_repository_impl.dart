@@ -1,7 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
-import 'document_repository_impl.dart';
 
 /// Implementation of the CoverLetterRepository.
 class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
@@ -9,7 +8,12 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
   @override
   Logger get logger => LoggerFactory.create('CoverLetterRepositoryImpl');
 
-  CoverLetterRepositoryImpl({required super.fileRepository});
+  final DocumentSembastDatasource documentSembastDatasource;
+
+  CoverLetterRepositoryImpl({
+    required super.fileRepository,
+    required this.documentSembastDatasource,
+  });
 
   @override
   Future<Either<Failure, Unit>> saveCoverLetter({
@@ -26,5 +30,21 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
       content: coverLetter.content,
       documentType: 'CoverLetter',
     );
+  }
+
+  @override
+  Future<Either<Failure, Unit>> saveAiResponse({
+    required String aiResponseJson,
+    required String jobReqId,
+    String? content,
+  }) async {
+    final dto = DocumentDto(
+      id: 'cover_letter_$jobReqId',
+      content: content!,
+      aiResponseJson: aiResponseJson,
+      documentType: 'cover_letter',
+      jobReqId: jobReqId,
+    );
+    return documentSembastDatasource.saveDocument(dto);
   }
 }

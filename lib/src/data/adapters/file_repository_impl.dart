@@ -13,7 +13,7 @@ class FileRepositoryImpl implements FileRepository {
   final Logger logger = LoggerFactory.create('FileRepositoryImpl');
 
   @override
-  Either<Failure, String> readFile(String path) {
+  Either<Failure, String> readFile({required String path}) {
     try {
       final file = File(path);
       if (!file.existsSync()) {
@@ -27,7 +27,10 @@ class FileRepositoryImpl implements FileRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> writeFile(String path, String content) async {
+  Future<Either<Failure, Unit>> writeFile({
+    required String path,
+    required String content,
+  }) async {
     try {
       final file = File(path);
       await file.writeAsString(content);
@@ -39,7 +42,7 @@ class FileRepositoryImpl implements FileRepository {
   }
 
   @override
-  Either<Failure, Unit> createDirectory(String path) {
+  Either<Failure, Unit> createDirectory({required String path}) {
     try {
       final dir = Directory(path);
       if (!dir.existsSync()) {
@@ -53,15 +56,15 @@ class FileRepositoryImpl implements FileRepository {
   }
 
   @override
-  Either<Failure, Unit> validateDirectory(String baseOutputDir) {
+  Either<Failure, Unit> validateDirectory({required String path}) {
     try {
-      final dir = Directory(baseOutputDir);
+      final dir = Directory(path);
       if (!dir.existsSync()) {
         dir.createSync(recursive: true);
       }
 
       // Try to create a test file to check write permissions
-      final testFile = File('$baseOutputDir/.test_write');
+      final testFile = File('$path/.test_write');
       testFile.writeAsStringSync('test');
       testFile.deleteSync();
 
@@ -124,7 +127,9 @@ class FileRepositoryImpl implements FileRepository {
 
   @override
   String getAiResponseFilePath({required String appDir, required String type}) {
-    final suffix = type == 'jobreq' ? '_ai_response.json' : '_ai_responses.json';
+    final suffix = type == 'jobreq'
+        ? '_ai_response.json'
+        : '_ai_responses.json';
     return '$appDir/$type$suffix';
   }
 

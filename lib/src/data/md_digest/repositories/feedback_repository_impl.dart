@@ -2,15 +2,18 @@ import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-import 'document_repository_impl.dart';
-
 /// Implementation of the FeedbackRepository.
 class FeedbackRepositoryImpl extends DocumentRepositoryImpl
     implements FeedbackRepository {
   @override
   Logger get logger => LoggerFactory.create('FeedbackRepositoryImpl');
 
-  FeedbackRepositoryImpl({required super.fileRepository});
+  final DocumentSembastDatasource documentSembastDatasource;
+
+  FeedbackRepositoryImpl({
+    required super.fileRepository,
+    required this.documentSembastDatasource,
+  });
 
   @override
   Future<Either<Failure, Unit>> saveFeedback({
@@ -23,5 +26,21 @@ class FeedbackRepositoryImpl extends DocumentRepositoryImpl
       content: feedback.content,
       documentType: 'Feedback',
     );
+  }
+
+  @override
+  Future<Either<Failure, Unit>> saveAiResponse({
+    required String aiResponseJson,
+    required String content,
+    required String jobReqId,
+  }) async {
+    final dto = DocumentDto(
+      id: 'feedback_$jobReqId',
+      content: content,
+      aiResponseJson: aiResponseJson,
+      documentType: 'feedback',
+      jobReqId: jobReqId,
+    );
+    return documentSembastDatasource.saveDocument(dto);
   }
 }

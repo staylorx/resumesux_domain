@@ -1,5 +1,4 @@
 import 'package:fpdart/fpdart.dart';
-
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
@@ -30,6 +29,9 @@ class GenerateApplicationUsecase {
     required this.fileRepository,
     required this.digestRepository,
   });
+
+  // TODO: verify that this is just a simple orchestration of existing usecases;
+  // it needn't rely on repository internals too much.
 
   /// Generates an application for the given job requirement.
   ///
@@ -95,18 +97,18 @@ class GenerateApplicationUsecase {
     }
     final appDirPath = appDirResult.getOrElse((_) => '');
 
-    // Save AI response to application directory
-    final aiResponseFilePath = fileRepository.getAiResponseFilePath(
-      appDir: appDirPath,
-      type: 'jobreq',
-    );
-    final saveAiResult = await jobReqRepository.saveAiResponse(
-      filePath: aiResponseFilePath,
-    );
-    if (saveAiResult.isLeft()) {
-      final failure = saveAiResult.getLeft().toNullable()!;
-      logger.warning('Failed to save AI response: ${failure.message}');
-      // Continue anyway, as it's not critical
+    // Save AI response to database
+    final aiResponseJson = jobReqRepository.getLastAiResponseJson();
+    if (aiResponseJson != null) {
+      final saveAiResult = await jobReqRepository.saveAiResponse(
+        aiResponseJson: aiResponseJson,
+        jobReqId: jobReq.id,
+      );
+      if (saveAiResult.isLeft()) {
+        final failure = saveAiResult.getLeft().toNullable()!;
+        logger.warning('Failed to save AI response: ${failure.message}');
+        // Continue anyway, as it's not critical
+      }
     }
 
     // Get digest to trigger AI calls for gigs and assets
@@ -118,30 +120,32 @@ class GenerateApplicationUsecase {
     }
 
     // Save AI responses for gigs and assets
-    final gigAiResponseFilePath = fileRepository.getAiResponseFilePath(
-      appDir: appDirPath,
-      type: 'gig',
-    );
-    final saveGigAiResult = await digestRepository.saveGigAiResponse(
-      filePath: gigAiResponseFilePath,
-    );
-    if (saveGigAiResult.isLeft()) {
-      final failure = saveGigAiResult.getLeft().toNullable()!;
-      logger.warning('Failed to save gig AI response: ${failure.message}');
-      // Continue anyway
+    final gigAiResponseJson = digestRepository.gigRepository
+        .getLastAiResponsesJson();
+    if (gigAiResponseJson != null) {
+      final saveGigAiResult = await digestRepository.saveGigAiResponse(
+        aiResponseJson: gigAiResponseJson,
+        jobReqId: jobReq.id,
+      );
+      if (saveGigAiResult.isLeft()) {
+        final failure = saveGigAiResult.getLeft().toNullable()!;
+        logger.warning('Failed to save gig AI response: ${failure.message}');
+        // Continue anyway
+      }
     }
 
-    final assetAiResponseFilePath = fileRepository.getAiResponseFilePath(
-      appDir: appDirPath,
-      type: 'asset',
-    );
-    final saveAssetAiResult = await digestRepository.saveAssetAiResponse(
-      filePath: assetAiResponseFilePath,
-    );
-    if (saveAssetAiResult.isLeft()) {
-      final failure = saveAssetAiResult.getLeft().toNullable()!;
-      logger.warning('Failed to save asset AI response: ${failure.message}');
-      // Continue anyway
+    final assetAiResponseJson = digestRepository.assetRepository
+        .getLastAiResponsesJson();
+    if (assetAiResponseJson != null) {
+      final saveAssetAiResult = await digestRepository.saveAssetAiResponse(
+        aiResponseJson: assetAiResponseJson,
+        jobReqId: jobReq.id,
+      );
+      if (saveAssetAiResult.isLeft()) {
+        final failure = saveAssetAiResult.getLeft().toNullable()!;
+        logger.warning('Failed to save asset AI response: ${failure.message}');
+        // Continue anyway
+      }
     }
 
     progress('Generating resume');

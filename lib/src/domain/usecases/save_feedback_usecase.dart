@@ -22,7 +22,10 @@ class SaveFeedbackUsecase {
     required String filePath,
   }) async {
     logger.info('Saving feedback to: $filePath');
-    final result = await fileRepository.writeFile(filePath, feedback.content);
+    final result = await fileRepository.writeFile(
+      path: filePath,
+      content: feedback.content,
+    );
     if (result.isRight()) {
       logger.info('Feedback saved successfully');
     } else {

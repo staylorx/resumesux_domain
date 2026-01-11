@@ -72,13 +72,16 @@ class TestAiHelper {
 /// Returns a fixed path for createApplicationDirectory and generates file paths with timestamps.
 class TestFileRepository implements FileRepository {
   @override
-  Either<Failure, String> readFile(String path) {
+  Either<Failure, String> readFile({required String path}) {
     // Return dummy content for testing
     return const Right('test file content');
   }
 
   @override
-  Future<Either<Failure, Unit>> writeFile(String path, String content) async {
+  Future<Either<Failure, Unit>> writeFile({
+    required String path,
+    required String content,
+  }) async {
     try {
       File(path).writeAsStringSync(content);
       return const Right(unit);
@@ -88,13 +91,13 @@ class TestFileRepository implements FileRepository {
   }
 
   @override
-  Either<Failure, Unit> createDirectory(String path) {
+  Either<Failure, Unit> createDirectory({required String path}) {
     // Do nothing for testing
     return const Right(unit);
   }
 
   @override
-  Either<Failure, Unit> validateDirectory(String path) {
+  Either<Failure, Unit> validateDirectory({required String path}) {
     // Always valid for testing
     return const Right(unit);
   }
@@ -152,7 +155,9 @@ class TestFileRepository implements FileRepository {
 
   @override
   String getAiResponseFilePath({required String appDir, required String type}) {
-    final suffix = type == 'jobreq' ? '_ai_response.json' : '_ai_responses.json';
+    final suffix = type == 'jobreq'
+        ? '_ai_response.json'
+        : '_ai_responses.json';
     return path.join(appDir, '$type$suffix');
   }
 

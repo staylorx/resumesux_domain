@@ -8,4 +8,11 @@ abstract class FeedbackRepository {
     required Feedback feedback,
     required String outputDir,
   });
+
+  /// Saves the AI response JSON for feedback to the database.
+  Future<Either<Failure, Unit>> saveAiResponse({
+    required String aiResponseJson,
+    required String content,
+    required String jobReqId,
+  });
 }

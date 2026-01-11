@@ -6,19 +6,22 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 abstract class FileRepository {
   /// Reads the content of a file at the given path.
   /// Returns the file content or a failure.
-  Either<Failure, String> readFile(String path);
+  Either<Failure, String> readFile({required String path});
 
   /// Writes content to a file at the given path.
   /// Returns success or a failure.
-  Future<Either<Failure, Unit>> writeFile(String path, String content);
+  Future<Either<Failure, Unit>> writeFile({
+    required String path,
+    required String content,
+  });
 
   /// Creates a directory at the given path if it doesn't exist.
   /// Returns success or a failure.
-  Either<Failure, Unit> createDirectory(String path);
+  Either<Failure, Unit> createDirectory({required String path});
 
   /// Validates that the directory is accessible for writing.
   /// Returns success or a failure.
-  Either<Failure, Unit> validateDirectory(String path);
+  Either<Failure, Unit> validateDirectory({required String path});
 
   /// Creates the application directory path for the given job requirement.
   /// Returns the path to the application directory.

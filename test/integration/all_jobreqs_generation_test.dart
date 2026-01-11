@@ -55,6 +55,9 @@ void main() {
       jobReqDatasource: JobReqSembastDatasource(
         dbPath: TestDirFactory.instance.setUpDbPath,
       ),
+      documentSembastDatasource: DocumentSembastDatasource(
+        dbPath: TestDirFactory.instance.setUpDbPath,
+      ),
       aiService: aiService,
     );
 
@@ -123,6 +126,9 @@ void main() {
         final digestRepository = DigestRepositoryImpl(
           digestPath: digestPath,
           aiService: aiService,
+          documentSembastDatasource: DocumentSembastDatasource(
+            dbPath: TestDirFactory.instance.setUpDbPath,
+          ),
         );
         for (final jobReqPath in scenario['jobReqPaths'] as List<String>) {
           logger.info(

@@ -12,11 +12,18 @@ class JobReqRepositoryImpl implements JobReqRepository {
 
   final AiService aiService;
   final JobReqSembastDatasource jobReqDatasource;
+  final DocumentSembastDatasource documentSembastDatasource;
   Map<String, dynamic>? _lastAiResponse;
+
+  @override
+  String? getLastAiResponseJson() {
+    return _lastAiResponse != null ? jsonEncode(_lastAiResponse) : null;
+  }
 
   JobReqRepositoryImpl({
     required this.aiService,
     required this.jobReqDatasource,
+    required this.documentSembastDatasource,
   });
 
   @override
@@ -144,19 +151,18 @@ $content
 
   @override
   Future<Either<Failure, Unit>> saveAiResponse({
-    required String filePath,
+    required String aiResponseJson,
+    String? content,
+    required String jobReqId,
   }) async {
-    try {
-      if (_lastAiResponse == null) {
-        return Left(ServiceFailure(message: 'No AI response to save'));
-      }
-      final file = File(filePath);
-      await file.writeAsString(jsonEncode(_lastAiResponse));
-      logger.info('Saved AI response to ${file.path}');
-      return Right(unit);
-    } catch (e) {
-      return Left(ServiceFailure(message: 'Failed to save AI response: $e'));
-    }
+    final dto = DocumentDto(
+      id: 'jobreq_response_$jobReqId',
+      content: content ?? '',
+      aiResponseJson: aiResponseJson,
+      documentType: 'jobreq_response',
+      jobReqId: jobReqId,
+    );
+    return documentSembastDatasource.saveDocument(dto);
   }
 
   @override
