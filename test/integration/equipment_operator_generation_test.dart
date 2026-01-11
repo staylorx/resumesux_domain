@@ -20,6 +20,7 @@ void main() {
   late CreateJobReqUsecase createJobReqUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
   late FileRepository fileRepository;
+  late String suiteDir;
 
   late Logger logger;
 
@@ -32,6 +33,8 @@ void main() {
         '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}',
       );
     });
+
+    suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
     // Clear the database before the test group
     final datasource = JobReqSembastDatasource(
@@ -162,20 +165,9 @@ void main() {
       'Resume generated successfully, content length: ${resume.content.length}',
     );
 
-    // Save resume to output folder
-    final outputDir = TestDirFactory.instance.outputDir;
-
-    // Create application directory for consistency
-    final appDirResult = fileRepository.createApplicationDirectory(
-      baseOutputDir: outputDir,
-      jobReq: jobReq,
-    );
-    expect(appDirResult.isRight(), true);
-    final appDir = appDirResult.getOrElse((_) => '');
-
     final saveResult = await resumeRepository.saveResume(
       resume: resume,
-      outputDir: appDir,
+      outputDir: suiteDir,
       jobTitle: 'heavy_equipment_operator',
     );
     expect(saveResult.isRight(), true);
@@ -230,20 +222,9 @@ void main() {
       'Cover letter generated successfully, content length: ${coverLetter.content.length}',
     );
 
-    // Save cover letter to output folder
-    final outputDir = TestDirFactory.instance.outputDir;
-
-    // Create application directory for consistency
-    final appDirResult = fileRepository.createApplicationDirectory(
-      baseOutputDir: outputDir,
-      jobReq: jobReq,
-    );
-    expect(appDirResult.isRight(), true);
-    final appDir = appDirResult.getOrElse((_) => '');
-
     final saveResult = await coverLetterRepository.saveCoverLetter(
       coverLetter: coverLetter,
-      outputDir: appDir,
+      outputDir: suiteDir,
       jobTitle: 'heavy_equipment_operator',
     );
     expect(saveResult.isRight(), true);
@@ -253,9 +234,6 @@ void main() {
   test(
     'generate application for DataDriven Analytics Senior Data Scientist job with heavy equipment operator data',
     () async {
-      // Arrange
-      final outputDir = TestDirFactory.instance.outputDir;
-
       final applicant = Applicant(
         name: 'John Doe',
         preferredName: 'John',
@@ -278,7 +256,7 @@ void main() {
             'test/data/jobreqs/DataDriven Analytics/Senior Data Scientist/job_req.md',
         applicant: applicant,
         prompt: 'Generate a professional application.',
-        outputDir: outputDir,
+        outputDir: suiteDir,
         includeCover: true,
         includeFeedback: true,
         progress: (message) => logger.info(message),
@@ -288,7 +266,7 @@ void main() {
       expect(result.isRight(), true);
 
       // Check that output directory structure is correct
-      final dataDrivenDirectory = Directory('$outputDir/datadriven_analytics');
+      final dataDrivenDirectory = Directory('$suiteDir/datadriven_analytics');
       expect(dataDrivenDirectory.existsSync(), true);
 
       final subDirs = dataDrivenDirectory.listSync().whereType<Directory>();

@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
+import 'package:markdown/markdown.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of FileRepository using dart:io.
@@ -123,7 +124,46 @@ class FileRepositoryImpl implements FileRepository {
 
   @override
   String getAiResponseFilePath({required String appDir, required String type}) {
-    return '$appDir/${type}_ai_response${_getTimestamp()}.json';
+    final suffix = type == 'jobreq' ? '_ai_response.json' : '_ai_responses.json';
+    return '$appDir/$type$suffix';
+  }
+
+  @override
+  Future<Either<Failure, Unit>> validateMarkdownFiles({
+    required String directory,
+    required String fileExtension,
+  }) async {
+    try {
+      final dir = Directory(directory);
+      if (!await dir.exists()) {
+        return Left(
+          ParsingFailure(message: 'Directory $directory does not exist.'),
+        );
+      }
+
+      await for (final file in dir.list()) {
+        if (file.path.endsWith(fileExtension)) {
+          final content = await File(file.path).readAsString();
+
+          // Validate Markdown parsing
+          try {
+            markdownToHtml(content);
+          } catch (e) {
+            return Left(
+              ParsingFailure(
+                message: 'File ${file.path} is not valid Markdown: $e',
+              ),
+            );
+          }
+        }
+      }
+
+      return Right(unit);
+    } catch (e) {
+      return Left(
+        ServiceFailure(message: 'Failed to validate Markdown files: $e'),
+      );
+    }
   }
 
   String _getTimestamp() {

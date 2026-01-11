@@ -11,6 +11,7 @@ void main() {
   late GenerateFeedbackUsecase generateFeedbackUsecase;
   late CreateJobReqUsecase createJobReqUsecase;
   late FileRepository fileRepository;
+  late String suiteDir;
   late Logger logger;
 
   setUpAll(() async {
@@ -24,6 +25,8 @@ void main() {
     });
 
     logger = Logger('AllJobReqsGenerationTest');
+
+    suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
     fileRepository = TestFileRepository();
 
     // Clear the database before the test group
@@ -69,8 +72,6 @@ void main() {
   test(
     'generate applications for all jobreqs in test/data/jobreqs',
     () async {
-      final outputDir = TestDirFactory.instance.createUniqueTestSuiteDir();
-
       final applicant = Applicant(
         name: 'John Doe',
         preferredName: 'John',
@@ -166,7 +167,7 @@ void main() {
             jobReqPath: jobReqPath,
             applicant: applicant,
             prompt: 'Generate a professional application.',
-            outputDir: outputDir,
+            outputDir: suiteDir,
             includeCover: true,
             includeFeedback: true,
             progress: (message) => logger.info(message),
@@ -181,7 +182,7 @@ void main() {
       }
 
       // Assert that output directory structure is correct
-      final outputDirectory = Directory(outputDir);
+      final outputDirectory = Directory(suiteDir);
       expect(outputDirectory.existsSync(), true);
 
       final companyDirs = outputDirectory

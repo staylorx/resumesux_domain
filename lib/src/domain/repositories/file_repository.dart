@@ -45,4 +45,10 @@ abstract class FileRepository {
   /// Gets the path for the AI response file in the application directory.
   /// The file name includes the type to distinguish between different AI calls.
   String getAiResponseFilePath({required String appDir, required String type});
+
+  /// Validates that all Markdown files in the directory are valid Markdown.
+  Future<Either<Failure, Unit>> validateMarkdownFiles({
+    required String directory,
+    required String fileExtension,
+  });
 }

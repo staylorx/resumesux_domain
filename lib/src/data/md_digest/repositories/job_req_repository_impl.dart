@@ -4,27 +4,20 @@ import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
+import '../../models/job_req_dto.dart';
+
 /// Implementation of the JobReqRepository.
 class JobReqRepositoryImpl implements JobReqRepository {
   final Logger logger = LoggerFactory.create('JobReqRepositoryImpl');
-  final JobReqDatasource jobReqDatasource;
+
   final AiService aiService;
-  String? _lastAiResponse;
+  final JobReqSembastDatasource jobReqDatasource;
+  Map<String, dynamic>? _lastAiResponse;
 
   JobReqRepositoryImpl({
-    required this.jobReqDatasource,
     required this.aiService,
+    required this.jobReqDatasource,
   });
-  @override
-  Future<Either<Failure, JobReq>> createJobReq({required JobReq jobReq}) async {
-    return await jobReqDatasource.createJobReq(jobReq: jobReq);
-  }
-
-  @override
-  /// Updates an existing job requirement.
-  Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq}) async {
-    return await jobReqDatasource.updateJobReq(jobReq: jobReq);
-  }
 
   @override
   /// Retrieves a job requirement from the given path.
@@ -52,7 +45,23 @@ class JobReqRepositoryImpl implements JobReqRepository {
     );
 
     // Save to database for persistence
-    await jobReqDatasource.updateJobReq(jobReq: jobReq);
+    final jobReqDto = JobReqDto(
+      id: jobReq.id,
+      title: jobReq.title,
+      content: jobReq.content,
+      salary: jobReq.salary,
+      location: jobReq.location,
+      concern: jobReq.concern != null
+          ? {
+              'name': jobReq.concern!.name,
+              'description': jobReq.concern!.description,
+              'location': jobReq.concern!.location,
+            }
+          : null,
+      createdDate: jobReq.createdDate?.toIso8601String(),
+      whereFound: jobReq.whereFound,
+    );
+    await jobReqDatasource.updateJobReq(jobReqDto: jobReqDto);
     return Right(jobReq);
   }
 
@@ -73,7 +82,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
       }
 
       final aiResponse = aiResult.getOrElse((_) => '');
-      _lastAiResponse = aiResponse;
+      _lastAiResponse = _parseAiResponse(aiResponse);
 
       final extractedData = _parseAiResponse(aiResponse);
       if (extractedData == null) {
@@ -142,11 +151,54 @@ $content
         return Left(ServiceFailure(message: 'No AI response to save'));
       }
       final file = File(filePath);
-      await file.writeAsString(_lastAiResponse!);
+      await file.writeAsString(jsonEncode(_lastAiResponse));
       logger.info('Saved AI response to ${file.path}');
       return Right(unit);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to save AI response: $e'));
     }
+  }
+
+  @override
+  Future<Either<Failure, JobReq>> createJobReq({required JobReq jobReq}) async {
+    final jobReqDto = JobReqDto(
+      id: jobReq.id,
+      title: jobReq.title,
+      content: jobReq.content,
+      salary: jobReq.salary,
+      location: jobReq.location,
+      concern: jobReq.concern != null
+          ? {
+              'name': jobReq.concern!.name,
+              'description': jobReq.concern!.description,
+              'location': jobReq.concern!.location,
+            }
+          : null,
+      createdDate: jobReq.createdDate?.toIso8601String(),
+      whereFound: jobReq.whereFound,
+    );
+    final result = await jobReqDatasource.createJobReq(jobReqDto: jobReqDto);
+    return result.map((_) => jobReq);
+  }
+
+  @override
+  Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq}) async {
+    final jobReqDto = JobReqDto(
+      id: jobReq.id,
+      title: jobReq.title,
+      content: jobReq.content,
+      salary: jobReq.salary,
+      location: jobReq.location,
+      concern: jobReq.concern != null
+          ? {
+              'name': jobReq.concern!.name,
+              'description': jobReq.concern!.description,
+              'location': jobReq.concern!.location,
+            }
+          : null,
+      createdDate: jobReq.createdDate?.toIso8601String(),
+      whereFound: jobReq.whereFound,
+    );
+    return await jobReqDatasource.updateJobReq(jobReqDto: jobReqDto);
   }
 }

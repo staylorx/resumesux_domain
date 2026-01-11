@@ -1,11 +1,9 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:fpdart/fpdart.dart';
 import 'package:path/path.dart' as path;
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Factory for creating temporary directories for tests.
-/// Uses build/test_temp/ as the base directory.
 class TestDirFactory {
   static TestDirFactory? _instance;
 
@@ -17,7 +15,7 @@ class TestDirFactory {
   TestDirFactory._();
 
   /// Base temp directory for tests
-  String get _baseTempDir => path.join('build', 'test_temp');
+  String get _baseTempDir => "build";
 
   /// Database path for setUpAll (shared across tests)
   String get setUpAllDbPath =>
@@ -39,10 +37,9 @@ class TestDirFactory {
   /// Creates a unique directory for a test suite, guaranteed to be unique.
   /// Returns the path to the created directory.
   String createUniqueTestSuiteDir() {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final random = Random().nextInt(10000);
-    final uniqueName = 'suite_${timestamp}_$random';
-    final dirPath = path.join(_baseTempDir, uniqueName);
+    final now = DateTime.now().toUtc().toIso8601String().replaceAll(':', '-');
+    final uniqueName = 'suite_$now';
+    final dirPath = path.join(outputDir, uniqueName);
     Directory(dirPath).createSync(recursive: true);
     return dirPath;
   }
@@ -82,8 +79,12 @@ class TestFileRepository implements FileRepository {
 
   @override
   Future<Either<Failure, Unit>> writeFile(String path, String content) async {
-    // Do nothing for testing
-    return const Right(unit);
+    try {
+      File(path).writeAsStringSync(content);
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to write file: $e'));
+    }
   }
 
   @override
@@ -103,7 +104,23 @@ class TestFileRepository implements FileRepository {
     required String baseOutputDir,
     required JobReq jobReq,
   }) {
-    final appDir = path.join(baseOutputDir, 'test_app_dir');
+    // Sanitize company name for concernDir
+    final companyName = jobReq.concern?.name ?? 'unknown_company';
+    final sanitizedCompany = companyName
+        .replaceAll(RegExp(r'[^\w\s-]'), '')
+        .replaceAll(RegExp(r'\s+'), '_')
+        .toLowerCase();
+    final concernDir = path.join(baseOutputDir, sanitizedCompany);
+
+    // Sanitize job title for dirName
+    final sanitizedTitle = jobReq.title
+        .replaceAll(RegExp(r'[^\w\s-]'), '')
+        .replaceAll(RegExp(r'\s+'), '_')
+        .toLowerCase();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final dirName = '${timestamp}_$sanitizedTitle';
+    final appDir = path.join(concernDir, dirName);
+
     try {
       Directory(appDir).createSync(recursive: true);
       return Right(appDir);
@@ -135,7 +152,16 @@ class TestFileRepository implements FileRepository {
 
   @override
   String getAiResponseFilePath({required String appDir, required String type}) {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    return path.join(appDir, 'ai_response_${type}_$timestamp.md');
+    final suffix = type == 'jobreq' ? '_ai_response.json' : '_ai_responses.json';
+    return path.join(appDir, '$type$suffix');
+  }
+
+  @override
+  Future<Either<Failure, Unit>> validateMarkdownFiles({
+    required String directory,
+    required String fileExtension,
+  }) async {
+    // Always valid for testing
+    return const Right(unit);
   }
 }

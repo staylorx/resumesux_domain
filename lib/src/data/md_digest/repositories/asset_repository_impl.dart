@@ -10,7 +10,7 @@ class AssetRepositoryImpl implements AssetRepository {
   final Logger logger = LoggerFactory.create('AssetRepositoryImpl');
   final String digestPath;
   final AiService aiService;
-  final List<String> _allAiResponses = [];
+  final List<Map<String, dynamic>> _allAiResponses = [];
 
   AssetRepositoryImpl({required this.digestPath, required this.aiService});
 
@@ -27,7 +27,6 @@ class AssetRepositoryImpl implements AssetRepository {
       }
 
       final aiResponse = aiResult.getOrElse((_) => '');
-      _allAiResponses.add(aiResponse);
 
       final extractedData = _parseAiResponse(aiResponse);
       if (extractedData == null) {
@@ -35,6 +34,8 @@ class AssetRepositoryImpl implements AssetRepository {
           ParsingFailure(message: 'Failed to parse AI response as JSON'),
         );
       }
+
+      _allAiResponses.add(extractedData);
 
       return Right(extractedData);
     } catch (e) {
@@ -160,12 +161,9 @@ $content
       if (_allAiResponses.isEmpty) {
         return Left(ServiceFailure(message: 'No AI responses to save'));
       }
-      final basePath = filePath.replaceFirst('asset_ai_response.json', '');
-      for (int i = 0; i < _allAiResponses.length; i++) {
-        final file = File('${basePath}asset_${i}_ai_response.json');
-        await file.writeAsString(_allAiResponses[i]);
-        logger.info('Saved AI response to ${file.path}');
-      }
+      final file = File(filePath);
+      await file.writeAsString(jsonEncode(_allAiResponses));
+      logger.info('Saved AI responses to ${file.path}');
       _allAiResponses.clear();
       return Right(unit);
     } catch (e) {

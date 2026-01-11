@@ -3,10 +3,11 @@ import 'package:fpdart/fpdart.dart';
 import 'package:path/path.dart' as path;
 import 'package:sembast/sembast_io.dart';
 import 'package:sembast/sembast_memory.dart';
-import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/failure.dart';
+import '../../models/job_req_dto.dart';
 
 /// Sembast implementation of JobReqDatasource.
-class JobReqSembastDatasource implements JobReqDatasource {
+class JobReqSembastDatasource {
   Database? _db;
   final StoreRef<String, Map<String, dynamic>> _jobReqStore =
       stringMapStoreFactory.store('jobReqs');
@@ -28,55 +29,42 @@ class JobReqSembastDatasource implements JobReqDatasource {
     return _db!;
   }
 
-  @override
-  Future<Either<Failure, JobReq>> createJobReq({required JobReq jobReq}) async {
+  Future<Either<Failure, JobReqDto>> createJobReq({
+    required JobReqDto jobReqDto,
+  }) async {
     try {
       final db = await _database;
-      final record = _jobReqStore.record(jobReq.id);
-      final data = {
-        'id': jobReq.id,
-        'title': jobReq.title,
-        'content': jobReq.content,
-        'salary': jobReq.salary,
-        'location': jobReq.location,
-        'concern': jobReq.concern != null
-            ? {
-                'name': jobReq.concern!.name,
-                'description': jobReq.concern!.description,
-                'location': jobReq.concern!.location,
-              }
-            : null,
-        'createdDate': jobReq.createdDate?.toIso8601String(),
-        'whereFound': jobReq.whereFound,
-      };
+      final record = _jobReqStore.record(jobReqDto.id);
+      final data = jobReqDto.toMap();
       await record.put(db, data);
-      return Right(jobReq);
+      return Right(jobReqDto);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to create job req: $e'));
     }
   }
 
-  @override
-  Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq}) async {
+  Future<Either<Failure, JobReqDto>> getJobReq({required String id}) async {
     try {
       final db = await _database;
-      final record = _jobReqStore.record(jobReq.id);
-      final data = {
-        'id': jobReq.id,
-        'title': jobReq.title,
-        'content': jobReq.content,
-        'salary': jobReq.salary,
-        'location': jobReq.location,
-        'concern': jobReq.concern != null
-            ? {
-                'name': jobReq.concern!.name,
-                'description': jobReq.concern!.description,
-                'location': jobReq.concern!.location,
-              }
-            : null,
-        'createdDate': jobReq.createdDate?.toIso8601String(),
-        'whereFound': jobReq.whereFound,
-      };
+      final record = _jobReqStore.record(id);
+      final data = await record.get(db);
+      if (data == null) {
+        return Left(NotFoundFailure(message: 'Job req not found: $id'));
+      }
+      final jobReqDto = JobReqDto.fromMap(data);
+      return Right(jobReqDto);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get job req: $e'));
+    }
+  }
+
+  Future<Either<Failure, Unit>> updateJobReq({
+    required JobReqDto jobReqDto,
+  }) async {
+    try {
+      final db = await _database;
+      final record = _jobReqStore.record(jobReqDto.id);
+      final data = jobReqDto.toMap();
       await record.put(db, data);
       return Right(unit);
     } catch (e) {
@@ -85,7 +73,6 @@ class JobReqSembastDatasource implements JobReqDatasource {
   }
 
   /// Clears all job req records from the database.
-  @override
   Future<Either<Failure, Unit>> clearDatabase() async {
     try {
       final db = await _database;

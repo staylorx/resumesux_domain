@@ -21,6 +21,7 @@ void main() {
   late SaveResumeUsecase saveResumeUsecase;
   late SaveFeedbackUsecase saveFeedbackUsecase;
   late SaveCoverLetterUsecase saveCoverLetterUsecase;
+  late String suiteDir;
   late Logger logger;
 
   setUpAll(() async {
@@ -32,6 +33,8 @@ void main() {
         '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}',
       );
     });
+
+    suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
     logger = Logger('ResumeSoftwareEngineerGenerationTest');
     fileRepository = TestFileRepository();
@@ -156,20 +159,9 @@ void main() {
       'Resume generated successfully, content length: ${resume.content.length}',
     );
 
-    // Save resume to output folder
-    final outputDir = TestDirFactory.instance.outputDir;
-
-    // Create application directory for consistency
-    final appDirResult = fileRepository.createApplicationDirectory(
-      baseOutputDir: outputDir,
-      jobReq: jobReq,
-    );
-    expect(appDirResult.isRight(), true);
-    final appDir = appDirResult.getOrElse((_) => '');
-
     final saveResult = await resumeRepository.saveResume(
       resume: resume,
-      outputDir: appDir,
+      outputDir: suiteDir,
       jobTitle: 'software_engineer',
     );
     expect(saveResult.isRight(), true);
@@ -221,7 +213,7 @@ void main() {
     );
 
     // Save cover letter to output folder
-    final outputDir = TestDirFactory.instance.outputDir;
+    final outputDir = suiteDir;
 
     // Create application directory for consistency
     final appDirResult = fileRepository.createApplicationDirectory(
@@ -244,7 +236,7 @@ void main() {
     'generate application for TechInnovate Software Engineer job with correct output path',
     () async {
       // Arrange
-      final outputDir = TestDirFactory.instance.outputDir;
+      final outputDir = suiteDir;
 
       final applicant = Applicant(
         name: 'John Doe',
@@ -278,7 +270,7 @@ void main() {
       expect(result.isRight(), true);
 
       // Check that output directory structure is correct
-      final techInnovateDirectory = Directory('$outputDir/techinnovate_inc');
+      final techInnovateDirectory = Directory('$suiteDir/techinnovate_inc');
       expect(techInnovateDirectory.existsSync(), true);
 
       final subDirs = techInnovateDirectory.listSync().whereType<Directory>();
