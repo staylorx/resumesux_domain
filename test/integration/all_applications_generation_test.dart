@@ -90,8 +90,10 @@ void main() {
     );
   });
 
-  tearDownAll(() {
+  tearDownAll(() async {
     readmeManager.finalize();
+    await dbService.close();
+    aiService.httpClient.close();
   });
 
   final applicant = Applicant(

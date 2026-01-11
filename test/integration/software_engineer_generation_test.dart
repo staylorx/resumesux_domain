@@ -23,6 +23,7 @@ void main() {
   late String suiteDir;
   late Logger logger;
   late TestSuiteReadmeManager readmeManager;
+  late SembastDatabaseService dbService;
 
   setUpAll(() async {
     suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
@@ -50,11 +51,18 @@ void main() {
       httpClient: http.Client(),
       provider: TestAiHelper.defaultProvider,
     );
-    final dbService = SembastDatabaseService(
+
+    dbService = SembastDatabaseService(
       dbPath: suiteDir,
       dbName: 'applications.db',
     );
     applicationDatasource = ApplicationDatasource(dbService: dbService);
+  });
+
+  tearDownAll(() async {
+    readmeManager.finalize();
+    await dbService.close();
+    aiService.httpClient.close();
   });
 
   setUp(() {

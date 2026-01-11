@@ -23,6 +23,7 @@ void main() {
   late Logger logger;
   late ApplicationDatasource applicationDatasource;
   late TestSuiteReadmeManager readmeManager;
+  late SembastDatabaseService dbService;
 
   setUpAll(() async {
     suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
@@ -52,13 +53,19 @@ void main() {
     );
 
     // Initialize the database before the test group
-    final dbService = SembastDatabaseService(
+    dbService = SembastDatabaseService(
       dbPath: suiteDir,
       dbName: 'applications.db',
     );
     await dbService.initialize();
 
     applicationDatasource = ApplicationDatasource(dbService: dbService);
+  });
+
+  tearDownAll(() async {
+    readmeManager.finalize();
+    await dbService.close();
+    aiService.httpClient.close();
   });
 
   setUp(() {
@@ -297,6 +304,8 @@ void main() {
           );
 
           // Act
+          logger.info('Starting generateApplicationUsecase.call');
+          final stopwatch = Stopwatch()..start();
           final result = await generateApplicationUsecase.call(
             jobReq: jobReq,
             applicant: applicant,
@@ -304,6 +313,10 @@ void main() {
             includeCover: true,
             includeFeedback: true,
             progress: (message) => logger.info(message),
+          );
+          stopwatch.stop();
+          logger.info(
+            'generateApplicationUsecase.call completed in ${stopwatch.elapsedMilliseconds} ms',
           );
 
           // Assert
@@ -313,14 +326,22 @@ void main() {
           );
 
           // Save the application artifacts
+          logger.info('Starting saveApplicationArtifacts');
+          final saveStopwatch = Stopwatch()..start();
           final saveResult = await applicationRepository
               .saveApplicationArtifacts(
                 application: application,
                 outputDir: suiteDir,
               );
+          saveStopwatch.stop();
+          logger.info(
+            'saveApplicationArtifacts completed in ${saveStopwatch.elapsedMilliseconds} ms',
+          );
           expect(saveResult.isRight(), true);
 
           // Check that output directory structure is correct
+          logger.info('Starting directory structure checks');
+          final dirCheckStopwatch = Stopwatch()..start();
           final dataDrivenDirectory = Directory(
             '$suiteDir/datadriven_analytics',
           );
@@ -337,6 +358,12 @@ void main() {
           );
           // Check files exist
           final files = appDir.listSync().whereType<File>();
+          dirCheckStopwatch.stop();
+          logger.info(
+            'Directory structure checks completed in ${dirCheckStopwatch.elapsedMilliseconds} ms',
+          );
+          logger.info('Starting file content checks');
+          final fileCheckStopwatch = Stopwatch()..start();
           final resumeFiles = files.where((f) => f.path.contains('resume_'));
           expect(resumeFiles.length, 1);
           expect(resumeFiles.first.existsSync(), true);
@@ -367,6 +394,10 @@ void main() {
           ).readAsStringSync();
           expect(feedbackContent, contains('Strengths'));
           expect(feedbackContent, contains('Areas for Improvement'));
+          fileCheckStopwatch.stop();
+          logger.info(
+            'File content checks completed in ${fileCheckStopwatch.elapsedMilliseconds} ms',
+          );
 
           readmeManager.endTest(testName, true);
         } catch (e) {
@@ -376,9 +407,5 @@ void main() {
       },
       timeout: Timeout(Duration(seconds: 120)),
     );
-  });
-
-  tearDownAll(() {
-    readmeManager.finalize();
   });
 }

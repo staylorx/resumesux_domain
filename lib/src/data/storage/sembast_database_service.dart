@@ -68,4 +68,9 @@ class SembastDatabaseService implements DatabaseService {
     final store = stringMapStoreFactory.store(storeName);
     await store.drop(transaction ?? db);
   }
+
+  Future<void> close() async {
+    await _db?.close();
+    _db = null;
+  }
 }
