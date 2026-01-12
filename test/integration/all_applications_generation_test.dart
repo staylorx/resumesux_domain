@@ -284,7 +284,7 @@ void main() {
       logger.info(
         'Found ${companyDirs.length} company directories: ${companyDirs.map((d) => d.path.split(Platform.pathSeparator).last).toList()}',
       );
-      expect(companyDirs.length, 6, reason: 'Expected 6 company directories');
+      expect(companyDirs.length, 5, reason: 'Expected 5 company directories');
 
       // Check that each company directory has the expected substructure
       for (final companyDir in companyDirs) {

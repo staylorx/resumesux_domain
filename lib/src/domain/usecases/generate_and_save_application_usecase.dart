@@ -25,7 +25,7 @@ class GenerateAndSaveApplicationUsecase {
     required this.fileRepository,
   });
 
-  /// Generates an application and saves it to the specified output directory.
+  /// Generates an application and saves it to the configured output directory.
   ///
   /// This method orchestrates the generation of a resume, optional cover letter,
   /// and optional feedback, then creates an application directory and saves all
@@ -35,11 +35,11 @@ class GenerateAndSaveApplicationUsecase {
   /// - [jobReq]: The job requirement entity.
   /// - [applicant]: The applicant information.
   /// - [prompt]: The prompt for AI generation.
-  /// - [includeCover]: Whether to include a cover letter.
-  /// - [includeFeedback]: Whether to include feedback.
+  /// - [config]: The application configuration containing output directory and settings.
+  /// - [includeCover]: Whether to include a cover letter (defaults to config.includeCover).
+  /// - [includeFeedback]: Whether to include feedback (defaults to config.includeFeedback).
   /// - [tone]: Tone parameter for feedback generation (0.0 = brutal, 1.0 = enthusiastic).
   /// - [length]: Length parameter for feedback generation (0.0 = brief, 1.0 = detailed).
-  /// - [baseOutputDir]: The base output directory where the application folder will be created.
   /// - [progress]: Callback function to report progress messages.
   ///
   /// Returns: [Either<Failure, Unit>] the result containing the application and output directory path, or a failure.
@@ -47,13 +47,17 @@ class GenerateAndSaveApplicationUsecase {
     required JobReq jobReq,
     required Applicant applicant,
     required String prompt,
-    required bool includeCover,
-    required bool includeFeedback,
+    required Config config,
+    bool? includeCover,
+    bool? includeFeedback,
     double tone = 0.5,
     double length = 0.5,
-    required String baseOutputDir,
     required void Function(String) progress,
   }) async {
+    final effectiveIncludeCover = includeCover ?? config.includeCover;
+    final effectiveIncludeFeedback = includeFeedback ?? config.includeFeedback;
+    final baseOutputDir = config.outputDir;
+
     progress(
       'Starting application generation and saving for job: ${jobReq.title}',
     );
@@ -68,8 +72,8 @@ class GenerateAndSaveApplicationUsecase {
       jobReq: jobReq,
       applicant: applicant,
       prompt: prompt,
-      includeCover: includeCover,
-      includeFeedback: includeFeedback,
+      includeCover: effectiveIncludeCover,
+      includeFeedback: effectiveIncludeFeedback,
       tone: tone,
       length: length,
       progress: progress,
@@ -121,7 +125,7 @@ class GenerateAndSaveApplicationUsecase {
     logger.info('Resume saved successfully');
 
     // Save cover letter if included
-    if (includeCover && application.coverLetter.content.isNotEmpty) {
+    if (effectiveIncludeCover && application.coverLetter.content.isNotEmpty) {
       progress('Saving cover letter');
       logger.info('Saving cover letter');
       final coverPath = fileRepository.getCoverLetterFilePath(
@@ -140,7 +144,7 @@ class GenerateAndSaveApplicationUsecase {
     }
 
     // Save feedback if included
-    if (includeFeedback && application.feedback.content.isNotEmpty) {
+    if (effectiveIncludeFeedback && application.feedback.content.isNotEmpty) {
       progress('Saving feedback');
       logger.info('Saving feedback');
       final feedbackPath = fileRepository.getFeedbackFilePath(
