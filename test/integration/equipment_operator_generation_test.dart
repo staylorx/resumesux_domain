@@ -109,7 +109,12 @@ void main() {
       aiService: aiService,
     );
 
-    generateFeedbackUsecase = GenerateFeedbackUsecase(aiService: aiService);
+    generateFeedbackUsecase = GenerateFeedbackUsecase(
+      aiService: aiService,
+      jobReqRepository: jobReqRepository,
+      gigRepository: digestRepository.gigRepository,
+      assetRepository: digestRepository.assetRepository,
+    );
 
     getDigestUsecase = GetDigestUsecase(
       gigRepository: digestRepository.gigRepository,

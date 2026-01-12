@@ -188,7 +188,12 @@ void main() async {
     aiService: aiService,
   );
 
-  final generateFeedbackUsecase = GenerateFeedbackUsecase(aiService: aiService);
+  final generateFeedbackUsecase = GenerateFeedbackUsecase(
+    aiService: aiService,
+    jobReqRepository: jobReqRepository,
+    gigRepository: digestRepository.gigRepository,
+    assetRepository: digestRepository.assetRepository,
+  );
 
   final getDigestUsecase = GetDigestUsecase(
     gigRepository: digestRepository.gigRepository,

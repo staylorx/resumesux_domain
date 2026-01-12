@@ -64,8 +64,6 @@ void main() {
       applicationDatasource: datasource,
     );
 
-    generateFeedbackUsecase = GenerateFeedbackUsecase(aiService: aiService);
-
     final fileRepository = TestFileRepository();
 
     final resumeRepository = ResumeRepositoryImpl(
@@ -153,6 +151,7 @@ void main() {
       late GetDigestUsecase getDigestUsecase;
       late GenerateResumeUsecase generateResumeUsecase;
       late GenerateCoverLetterUsecase generateCoverLetterUsecase;
+      late GenerateFeedbackUsecase generateFeedbackUsecase;
       late GenerateApplicationUsecase generateApplicationUsecase;
 
       setUp(() {
@@ -175,6 +174,13 @@ void main() {
         generateCoverLetterUsecase = GenerateCoverLetterUsecase(
           digestRepository: digestRepository,
           aiService: aiService,
+        );
+
+        generateFeedbackUsecase = GenerateFeedbackUsecase(
+          aiService: aiService,
+          jobReqRepository: jobReqRepository,
+          gigRepository: digestRepository.gigRepository,
+          assetRepository: digestRepository.assetRepository,
         );
 
         generateApplicationUsecase = GenerateApplicationUsecase(

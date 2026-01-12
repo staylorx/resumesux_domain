@@ -11,9 +11,17 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 class GenerateFeedbackUsecase {
   final Logger logger = LoggerFactory.create(name: 'GenerateFeedbackUsecase');
   final AiService aiService;
+  final JobReqRepository jobReqRepository;
+  final GigRepository gigRepository;
+  final AssetRepository assetRepository;
 
   /// Creates a new instance of [GenerateFeedbackUsecase].
-  GenerateFeedbackUsecase({required this.aiService});
+  GenerateFeedbackUsecase({
+    required this.aiService,
+    required this.jobReqRepository,
+    required this.gigRepository,
+    required this.assetRepository,
+  });
 
   /// Generates feedback for the given job requirement, resume, cover letter, and applicant.
   ///
@@ -38,11 +46,21 @@ class GenerateFeedbackUsecase {
   }) async {
     logger.info('Generating feedback');
 
+    // Retrieve AI responses
+    final jobReqAiResponse = jobReqRepository.getLastAiResponseJson();
+    final gigAiResponses = gigRepository.getLastAiResponsesJson();
+    final assetAiResponses = assetRepository.getLastAiResponsesJson();
+
     final fullPrompt = _buildFeedbackPrompt(
       jobReq: jobReq.content,
       resume: resume.content,
       coverLetter: coverLetter?.content ?? '',
       customPrompt: prompt,
+      applicant: applicant,
+      jobReqEntity: jobReq,
+      jobReqAiResponse: jobReqAiResponse,
+      gigAiResponses: gigAiResponses,
+      assetAiResponses: assetAiResponses,
       tone: tone,
       length: length,
     );
@@ -84,14 +102,57 @@ class GenerateFeedbackUsecase {
     required String resume,
     required String coverLetter,
     required String customPrompt,
+    required Applicant applicant,
+    required JobReq jobReqEntity,
+    String? jobReqAiResponse,
+    String? gigAiResponses,
+    String? assetAiResponses,
     required double tone,
     required double length,
   }) {
     final toneInstruction = _getToneInstruction(tone: tone);
     final lengthInstruction = _getLengthInstruction(length: length);
 
+    final applicantSummary =
+        '''
+Applicant Information:
+- Name: ${applicant.name}
+- Preferred Name: ${applicant.preferredName ?? 'N/A'}
+- Email: ${applicant.email}
+- Address: ${applicant.address?.toString() ?? 'N/A'}
+- Phone: ${applicant.phone ?? 'N/A'}
+- LinkedIn: ${applicant.linkedin ?? 'N/A'}
+- GitHub: ${applicant.github ?? 'N/A'}
+- Portfolio: ${applicant.portfolio ?? 'N/A'}
+''';
+
+    final jobReqSummary =
+        '''
+Job Requirement Information:
+- Title: ${jobReqEntity.title}
+- Location: ${jobReqEntity.location ?? 'N/A'}
+- Salary: ${jobReqEntity.salary ?? 'N/A'}
+- Company: ${jobReqEntity.concern?.name ?? 'N/A'}
+''';
+
+    final aiResponses =
+        '''
+Extracted AI Responses:
+- Job Req AI Response: ${jobReqAiResponse ?? 'N/A'}
+- Gig AI Responses: ${gigAiResponses ?? 'N/A'}
+- Asset AI Responses: ${assetAiResponses ?? 'N/A'}
+''';
+
     return '''
 $customPrompt
+
+Start with a summary paragraph that summarizes who the applicant is, what job they are applying for, and where the job is located if available. Use the provided applicant information, job requirement information, and extracted AI responses to build this summary.
+
+$applicantSummary
+
+$jobReqSummary
+
+$aiResponses
 
 Job Requirements:
 $jobReq
@@ -104,7 +165,7 @@ $coverLetter
 
 $toneInstruction $lengthInstruction Include suggestions for improvement on how well this application matches the job requirements.
 
-Do not include the job requirements, resume, or cover letter content in your response. Provide only the feedback analysis in markdown format.
+Do not include the generated job requirements, resume, or cover letter content in your response. The only exception is the summary paragraph which tells us who applied for what. Provide only the feedback analysis in markdown format.
 Output only the plain markdown content without any code blocks, backticks, or additional explanatory text.
 Add a section at the end that summarizes an opinion of a hiring manager reviewing this application: qualified, not qualified, maybe, yes, no, or needs more information. Add this as "tl;dr" for a quick view.
 If there are hidden ideas or biases that a hiring manager might pick up on, put them down here also. 
