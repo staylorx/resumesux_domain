@@ -117,6 +117,7 @@ $content
         return Right([]);
       }
 
+      // TODO: digest already has assets, do we kick it back there?
       final assets = <Asset>[];
 
       // Read files in assets directory
@@ -191,7 +192,7 @@ $content
       content: aiResponseJson,
       contentType: 'application/json',
       aiResponseJson: '',
-      documentType: 'ai_response',
+      documentType: 'asset_response',
       jobReqId: jobReqId,
     );
     return applicationDatasource.saveAiResponseDocument(dto);

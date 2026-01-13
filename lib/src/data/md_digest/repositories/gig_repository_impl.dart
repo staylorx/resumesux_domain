@@ -52,7 +52,7 @@ class GigRepositoryImpl implements GigRepository {
         content: jsonEncode(extractedData),
         contentType: 'application/json',
         aiResponseJson: '',
-        documentType: 'ai_response',
+        documentType: 'gig_response',
         jobReqId: null,
       );
       final saveResult = await applicationDatasource.saveAiResponseDocument(
@@ -128,6 +128,7 @@ $content
         return Right([]);
       }
 
+      // TODO: this is already in the Digest, do we kick it back there (i.e., persist to the datastore?
       final gigs = <Gig>[];
       final files = gigsDir.listSync().whereType<File>().where(
         (file) => file.path.endsWith('.md'),
