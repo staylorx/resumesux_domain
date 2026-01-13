@@ -271,7 +271,7 @@ void main() {
 
             // TODO: replace this with createApplicationUsecase call once fixed
             final saveAppResult = await applicationRepository.save(
-              handle: application.handle,
+              handle: ApplicationHandle.generate(),
               application: application,
             );
             expect(

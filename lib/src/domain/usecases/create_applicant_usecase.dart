@@ -2,12 +2,10 @@ import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for creating a new applicant by importing from digest
-class CreateApplicantUseCase {
+class CreateApplicantUseCase with Loggable {
   final ApplicantRepository repository;
 
-  CreateApplicantUseCase({
-    required this.repository,
-  });
+  CreateApplicantUseCase({required this.repository});
 
   Future<Either<Failure, ApplicantHandle>> call({
     required Applicant applicant,
@@ -24,7 +22,10 @@ class CreateApplicantUseCase {
     }
     final updatedApplicant = importResult.getOrElse((_) => applicant);
     // Save the applicant with gigs and assets
-    final saveResult = await repository.save(handle: handle, applicant: updatedApplicant);
+    final saveResult = await repository.save(
+      handle: handle,
+      applicant: updatedApplicant,
+    );
     if (saveResult.isLeft()) {
       return Left(saveResult.getLeft().toNullable()!);
     }

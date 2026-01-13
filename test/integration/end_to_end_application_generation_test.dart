@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
-import 'package:resumesux_domain/src/domain/usecases/create_applicant_usecase.dart';
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
@@ -17,14 +16,11 @@ void main() {
   late SembastDatabaseService dbService;
   late ApplicationRepository applicationRepository;
   late ApplicantRepository applicantRepository;
-  late CreateApplicantUseCase createApplicantUsecase;
   late GetConfigUsecase getConfigUsecase;
-  late GetApplicantUsecase getApplicantUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
   late TestSuiteReadmeManager readmeManager;
 
   suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
-
   logger = FileLoggerImpl(
     filePath: '$suiteDir/test_log.txt',
     name: 'EndToEndApplicationGenerationTests',
@@ -91,7 +87,6 @@ void main() {
     );
     applicantRepository = createApplicantRepositoryImpl(
       logger: logger,
-      configRepository: configRepository,
       applicationDatasource: datasource,
       aiService: aiService,
     );
@@ -107,11 +102,6 @@ void main() {
     getConfigUsecase = GetConfigUsecase(
       logger: logger,
       configRepository: configRepository,
-    );
-
-    getApplicantUsecase = GetApplicantUsecase(
-      logger: logger,
-      applicantRepository: applicantRepository,
     );
 
     final generateResumeUsecase = GenerateResumeUsecase(
@@ -166,6 +156,10 @@ void main() {
       generateFeedbackUsecase: generateFeedbackUsecase,
       saveAiResponsesUsecase: saveAiResponsesUsecase,
       logger: logger,
+    );
+
+    logger.info(
+      'createApplicantUsecase is declared but not assigned yet - this may cause issues',
     );
   });
 
@@ -230,9 +224,13 @@ void main() {
       );
 
       // Step 4: Save applicant to DB
+      final createApplicantUsecase = CreateApplicantUseCase(
+        repository: applicantRepository,
+      );
       logger.info('Step 4: Saving applicant to DB');
       final saveApplicantResult = await createApplicantUsecase.call(
         applicant: enrichedApplicant,
+        digestPath: config.digestPath,
       );
       expect(
         saveApplicantResult.isRight(),
@@ -312,8 +310,9 @@ void main() {
 
       // Step 7: Save application to DB
       logger.info('Step 7: Saving application to DB');
-      final saveAppResult = await applicationRepository.saveApplication(
+      final saveAppResult = await applicationRepository.save(
         application: application,
+        handle: ApplicationHandle.generate(),
       );
       expect(
         saveAppResult.isRight(),

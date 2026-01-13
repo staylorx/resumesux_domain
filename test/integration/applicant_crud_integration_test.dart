@@ -56,13 +56,6 @@ void main() {
       httpClient: http.Client(),
       provider: provider,
     );
-    print(
-      'AI Service created with provider: ${(aiService as dynamic).provider}',
-    );
-
-    // Test AI service
-    final testResult = await aiService.generateContent(prompt: 'Say hello');
-    print('AI test result: $testResult');
 
     applicantRepository = createApplicantRepositoryImpl(
       applicationDatasource: datasource,
