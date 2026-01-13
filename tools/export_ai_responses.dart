@@ -2,7 +2,7 @@
 
 import 'dart:io';
 import 'package:args/args.dart';
-import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/data/data.dart';
 
 void main(List<String> arguments) async {
   final parser = ArgParser()

@@ -1,5 +1,8 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/domain.dart';
+import 'package:resumesux_domain/src/data/data.dart';
+
+import '../../models/applicant_dto.dart';
 
 /// Datasource for persisting application data and AI responses.
 class ApplicationDatasource {
@@ -29,6 +32,35 @@ class ApplicationDatasource {
       return Right(unit);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to save application: $e'));
+    }
+  }
+
+  /// Saves an applicant DTO to the store.
+  Future<Either<Failure, Unit>> saveApplicant(ApplicantDto dto) async {
+    try {
+      await _ensureInitialized();
+      await _dbService.put(
+        storeName: 'applicants',
+        key: dto.id,
+        value: dto.toMap(),
+      );
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to save applicant: $e'));
+    }
+  }
+
+  /// Retrieves an applicant by ID.
+  Future<Either<Failure, ApplicantDto>> getApplicant(String id) async {
+    try {
+      await _ensureInitialized();
+      final data = await _dbService.get(storeName: 'applicants', key: id);
+      if (data == null) {
+        return Left(NotFoundFailure(message: 'Applicant not found: $id'));
+      }
+      return Right(ApplicantDto.fromMap(data));
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get applicant: $e'));
     }
   }
 
@@ -170,6 +202,106 @@ class ApplicationDatasource {
       return Right(unit);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to clear job reqs: $e'));
+    }
+  }
+
+  /// Saves a gig DTO to the store.
+  Future<Either<Failure, Unit>> saveGig(GigDto dto) async {
+    try {
+      await _ensureInitialized();
+      await _dbService.put(storeName: 'gigs', key: dto.id, value: dto.toMap());
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to save gig: $e'));
+    }
+  }
+
+  /// Retrieves a gig by ID.
+  Future<Either<Failure, GigDto>> getGig(String id) async {
+    try {
+      await _ensureInitialized();
+      final data = await _dbService.get(storeName: 'gigs', key: id);
+      if (data == null) {
+        return Left(NotFoundFailure(message: 'Gig not found: $id'));
+      }
+      return Right(GigDto.fromMap(data));
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get gig: $e'));
+    }
+  }
+
+  /// Retrieves all gigs from the datastore.
+  Future<Either<Failure, List<GigDto>>> getAllPersistedGigs() async {
+    try {
+      await _ensureInitialized();
+      final records = await _dbService.find(storeName: 'gigs');
+      final gigs = records.map((record) => GigDto.fromMap(record)).toList();
+      return Right(gigs);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get all gigs: $e'));
+    }
+  }
+
+  /// Removes a gig by ID.
+  Future<Either<Failure, Unit>> removeGig(String id) async {
+    try {
+      await _ensureInitialized();
+      await _dbService.delete(storeName: 'gigs', key: id);
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to remove gig: $e'));
+    }
+  }
+
+  /// Saves an asset DTO to the store.
+  Future<Either<Failure, Unit>> saveAsset(AssetDto dto) async {
+    try {
+      await _ensureInitialized();
+      await _dbService.put(
+        storeName: 'assets',
+        key: dto.id,
+        value: dto.toMap(),
+      );
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to save asset: $e'));
+    }
+  }
+
+  /// Retrieves an asset by ID.
+  Future<Either<Failure, AssetDto>> getAsset(String id) async {
+    try {
+      await _ensureInitialized();
+      final data = await _dbService.get(storeName: 'assets', key: id);
+      if (data == null) {
+        return Left(NotFoundFailure(message: 'Asset not found: $id'));
+      }
+      return Right(AssetDto.fromMap(data));
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get asset: $e'));
+    }
+  }
+
+  /// Retrieves all assets from the datastore.
+  Future<Either<Failure, List<AssetDto>>> getAllPersistedAssets() async {
+    try {
+      await _ensureInitialized();
+      final records = await _dbService.find(storeName: 'assets');
+      final assets = records.map((record) => AssetDto.fromMap(record)).toList();
+      return Right(assets);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get all assets: $e'));
+    }
+  }
+
+  /// Removes an asset by ID.
+  Future<Either<Failure, Unit>> removeAsset(String id) async {
+    try {
+      await _ensureInitialized();
+      await _dbService.delete(storeName: 'assets', key: id);
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to remove asset: $e'));
     }
   }
 

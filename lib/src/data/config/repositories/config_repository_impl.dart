@@ -1,19 +1,22 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:json_schema/json_schema.dart';
-import 'package:logging/logging.dart';
+
 import 'package:path/path.dart' as p;
 
 import 'package:resumesux_domain/resumesux_domain.dart';
 
+import '../../data.dart';
+
 // Odd name for now
 const String kAppName = 'resumesux';
 
-class ConfigRepositoryImpl implements ConfigRepository {
-  final Logger logger = LoggerFactory.create(name: 'ConfigRepositoryImpl');
+class ConfigRepositoryImpl with Loggable implements ConfigRepository {
   final ConfigDatasource configDatasource;
 
-  ConfigRepositoryImpl({required this.configDatasource});
+  ConfigRepositoryImpl({Logger? logger, required this.configDatasource}) {
+    this.logger = logger;
+  }
 
   Either<Failure, String> _getConfigDir({required String appName}) {
     final homeEnv = Platform.isWindows ? 'USERPROFILE' : 'HOME';
@@ -154,10 +157,10 @@ class ConfigRepositoryImpl implements ConfigRepository {
 
     // Output all issues to the user
     for (final error in errors) {
-      logger.severe('Config validation error: $error');
+      logger?.error('Config validation error: $error');
     }
     for (final warning in warnings) {
-      logger.warning('Config validation warning: $warning');
+      logger?.warn('Config validation warning: $warning');
     }
 
     // If there are errors, fail with ValidationFailure
@@ -171,7 +174,7 @@ class ConfigRepositoryImpl implements ConfigRepository {
 
     // If only warnings, proceed but log them
     if (warnings.isNotEmpty) {
-      logger.warning('Config validation completed with warnings');
+      logger?.warn('Config validation completed with warnings');
     }
 
     // Second pass: Parse the config (proceed since no errors)
@@ -292,11 +295,11 @@ class ConfigRepositoryImpl implements ConfigRepository {
 
     // Validate that exactly one provider is marked as default
     final defaultProviders = providers.where((p) => p.isDefault).toList();
-    logger.info(
+    logger?.info(
       'Found ${defaultProviders.length} default providers: ${defaultProviders.map((p) => p.name).join(', ')}',
     );
     if (defaultProviders.length != 1) {
-      logger.severe(
+      logger?.error(
         'Validation failed: Config must have exactly one provider with "default: true", but found ${defaultProviders.length}',
       );
       return Left(

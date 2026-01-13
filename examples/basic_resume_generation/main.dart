@@ -2,7 +2,8 @@
 
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/domain.dart';
+import 'package:resumesux_domain/src/data/data.dart';
 
 void main() async {
   // This example demonstrates basic resume generation using resumesux_domain.
@@ -43,13 +44,6 @@ void main() async {
 
   final applicationDatasource = ApplicationDatasource(dbService: dbService);
 
-  // For this example, we'll use test data paths
-  final digestRepository = DigestRepositoryImpl(
-    digestPath: '../../../test/data/digest/software_engineer',
-    aiService: aiService,
-    applicationDatasource: applicationDatasource,
-  );
-
   final jobReqRepository = JobReqRepositoryImpl(
     aiService: aiService,
     applicationDatasource: applicationDatasource,
@@ -62,7 +56,6 @@ void main() async {
 
   print('Creating use case...');
   final generateResumeUsecase = GenerateResumeUsecase(
-    digestRepository: digestRepository,
     aiService: aiService,
     resumeRepository: resumeRepository,
   );
@@ -95,6 +88,51 @@ void main() async {
     linkedin: 'https://linkedin.com/in/janedoe',
     github: 'https://github.com/janedoe',
     portfolio: 'https://janedoe.dev',
+    gigs: [
+      Gig(
+        title: 'Software Engineer',
+        concern: 'StartupXYZ',
+        location: 'Remote',
+        dates: 'June 2018 - December 2020',
+        achievements: [
+          'Developed RESTful APIs using Node.js and Express',
+          'Built responsive web applications with React',
+          'Integrated third-party services and payment gateways',
+          'Collaborated with design team for pixel-perfect implementations',
+        ],
+      ),
+      Gig(
+        title: 'Senior Software Engineer',
+        concern: 'TechCorp',
+        location: 'San Francisco, CA',
+        dates: 'January 2021 - Present',
+        achievements: [
+          'Led a team of 5 developers on Flutter mobile app development',
+          'Implemented CI/CD pipelines reducing deployment time by 50%',
+          'Mentored junior developers and conducted code reviews',
+          'Architected microservices using Dart and gRPC',
+        ],
+      ),
+    ],
+    assets: [
+      Asset(
+        content: '''## Skills
+- **Languages**: Dart, JavaScript, Python, SQL
+- **Frameworks**: Flutter, React, Node.js
+- **Tools**: Git, Docker, Firebase, AWS
+- **Methodologies**: Agile, TDD, Clean Architecture''',
+      ),
+      Asset(
+        content: '''## Education
+
+### Bachelor of Science in Computer Science
+University of California, Berkeley  
+*2012 - 2016*
+
+- GPA: 3.8/4.0
+- Relevant Coursework: Data Structures, Algorithms, Software Engineering''',
+      ),
+    ],
   );
 
   print('Generating resume...');

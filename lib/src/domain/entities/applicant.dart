@@ -11,7 +11,8 @@ class Applicant with EquatableMixin {
   final String? linkedin;
   final String? github;
   final String? portfolio;
-  final Digest? digest;
+  final List<Gig> gigs;
+  final List<Asset> assets;
 
   const Applicant({
     required this.name,
@@ -22,7 +23,8 @@ class Applicant with EquatableMixin {
     this.linkedin,
     this.github,
     this.portfolio,
-    this.digest,
+    this.gigs = const [],
+    this.assets = const [],
   });
 
   Applicant copyWith({
@@ -34,7 +36,8 @@ class Applicant with EquatableMixin {
     String? linkedin,
     String? github,
     String? portfolio,
-    Digest? digest,
+    List<Gig>? gigs,
+    List<Asset>? assets,
   }) {
     return Applicant(
       name: name ?? this.name,
@@ -45,7 +48,8 @@ class Applicant with EquatableMixin {
       linkedin: linkedin ?? this.linkedin,
       github: github ?? this.github,
       portfolio: portfolio ?? this.portfolio,
-      digest: digest ?? this.digest,
+      gigs: gigs ?? this.gigs,
+      assets: assets ?? this.assets,
     );
   }
 

@@ -1,19 +1,24 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
-import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/domain.dart';
 
 /// Implementation of AiService for generating content using AI providers.
-class AiServiceImpl implements AiService {
-  final Logger logger = LoggerFactory.create(name: 'AiService');
+class AiServiceImpl with Loggable implements AiService {
   final http.Client httpClient;
   final AiProvider provider;
 
-  AiServiceImpl({required this.httpClient, required this.provider});
+  AiServiceImpl({
+    Logger? logger,
+    required this.httpClient,
+    required this.provider,
+  }) {
+    this.logger = logger;
+  }
 
   /// Creates an AiServiceImpl instance for the given provider.
   static Future<AiServiceImpl> create({
+    Logger? logger,
     required ConfigRepository configRepository,
     required String providerName,
     String? configPath,
@@ -31,7 +36,11 @@ class AiServiceImpl implements AiService {
     final provider = providerResult.getOrElse(
       (_) => throw Exception('Failed to get provider'),
     );
-    return AiServiceImpl(httpClient: httpClient, provider: provider);
+    return AiServiceImpl(
+      logger: logger,
+      httpClient: httpClient,
+      provider: provider,
+    );
   }
 
   /// Generates content using the AI provider.
@@ -39,7 +48,7 @@ class AiServiceImpl implements AiService {
   Future<Either<Failure, String>> generateContent({
     required String prompt,
   }) async {
-    logger.fine('Using default model: ${provider.defaultModel}');
+    logger?.debug('Using default model: ${provider.defaultModel}');
     try {
       final response = await httpClient.post(
         Uri.parse('${provider.url}/chat/completions'),
@@ -60,11 +69,11 @@ class AiServiceImpl implements AiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final content = data['choices'][0]['message']['content'] as String;
-        logger.info('AI response content length: ${content.length}');
-        logger.fine('AI response content: $content');
+        logger?.debug('AI response content length: ${content.length}');
+        logger?.debug('AI response content: $content');
         return Right(content);
       } else {
-        logger.severe('AI API request failed: ${response.statusCode}');
+        logger?.error('AI API request failed: ${response.statusCode}');
         return Left(
           ServiceFailure(
             message:

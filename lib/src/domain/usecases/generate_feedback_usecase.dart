@@ -1,5 +1,4 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
 
 import 'package:resumesux_domain/resumesux_domain.dart';
 
@@ -8,8 +7,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 // - length: Controls the length of feedback (0.0 = brief, 1.0 = detailed)
 
 /// Use case for generating feedback on an application.
-class GenerateFeedbackUsecase {
-  final Logger logger = LoggerFactory.create(name: 'GenerateFeedbackUsecase');
+class GenerateFeedbackUsecase with Loggable {
   final AiService aiService;
   final JobReqRepository jobReqRepository;
   final GigRepository gigRepository;
@@ -18,12 +16,15 @@ class GenerateFeedbackUsecase {
 
   /// Creates a new instance of [GenerateFeedbackUsecase].
   GenerateFeedbackUsecase({
+    Logger? logger,
     required this.aiService,
     required this.jobReqRepository,
     required this.gigRepository,
     required this.assetRepository,
     this.feedbackRepository,
-  });
+  }) {
+    this.logger = logger;
+  }
 
   /// Generates feedback for the given job requirement, resume, cover letter, and applicant.
   ///
@@ -46,7 +47,7 @@ class GenerateFeedbackUsecase {
     double tone = 0.5,
     double length = 0.5,
   }) async {
-    logger.info('Generating feedback');
+    logger?.info('Generating feedback');
 
     // Retrieve AI responses
     final jobReqAiResponse = jobReqRepository.getLastAiResponseJson();

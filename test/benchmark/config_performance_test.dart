@@ -1,23 +1,19 @@
 import 'package:test/test.dart';
-import 'package:resumesux_domain/resumesux_domain.dart';
-import 'package:logging/logging.dart';
+import 'package:resumesux_domain/src/domain/domain.dart';
+import 'package:resumesux_domain/src/data/data.dart';
 
 void main() {
-  Logger.root.level = Level.INFO;
-  Logger.root.onRecord.listen((record) {
-    // ignore: avoid_print
-    print(
-      '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}',
-    );
-  });
-  final logger = LoggerFactory.create(name: 'ConfigPerformanceTest');
+  final logger = ConsoleLoggerImpl(name: 'ConfigPerformanceTest');
 
   late ConfigRepositoryImpl configRepository;
   late ConfigDatasource configDatasource;
 
   setUp(() {
     configDatasource = ConfigDatasource();
-    configRepository = ConfigRepositoryImpl(configDatasource: configDatasource);
+    configRepository = ConfigRepositoryImpl(
+      logger: logger,
+      configDatasource: configDatasource,
+    );
   });
 
   group('Config Loading Performance Benchmarks', () {
@@ -37,7 +33,10 @@ void main() {
         stopwatch.elapsedMilliseconds,
         lessThan(300),
       ); // Should load in under 300ms (accounting for schema validation)
-      logger.info('Config loading took: ${stopwatch.elapsedMilliseconds}ms');
+      logger.log(
+        LogLevel.info,
+        'Config loading took: ${stopwatch.elapsedMilliseconds}ms',
+      );
     });
 
     test('config loading performance - minimal config', () async {
@@ -53,7 +52,8 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       expect(stopwatch.elapsedMilliseconds, lessThan(50)); // Should load faster
-      logger.info(
+      logger.log(
+        LogLevel.info,
         'Minimal config loading took: ${stopwatch.elapsedMilliseconds}ms',
       );
     });
@@ -77,7 +77,8 @@ void main() {
       // Assert
       final averageTime = stopwatch.elapsedMilliseconds / iterations;
       expect(averageTime, lessThan(50)); // Average should be under 50ms
-      logger.info(
+      logger.log(
+        LogLevel.info,
         'Average config loading time over $iterations runs: ${averageTime}ms',
       );
     });
@@ -107,7 +108,8 @@ void main() {
       // Assert
       final averageTime = stopwatch.elapsedMilliseconds / iterations;
       expect(averageTime, lessThan(10)); // Should be very fast
-      logger.info(
+      logger.log(
+        LogLevel.info,
         'Average provider selection time over $iterations runs: ${averageTime}ms',
       );
     });
@@ -132,7 +134,8 @@ void main() {
       // Assert
       final averageTime = stopwatch.elapsedMilliseconds / iterations;
       expect(averageTime, lessThan(10)); // Should be very fast
-      logger.info(
+      logger.log(
+        LogLevel.info,
         'Average default provider retrieval time over $iterations runs: ${averageTime}ms',
       );
     });

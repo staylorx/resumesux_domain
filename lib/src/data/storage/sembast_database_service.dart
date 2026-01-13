@@ -1,15 +1,22 @@
 import 'dart:io';
 import 'package:path/path.dart' as path;
+import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:sembast/sembast_memory.dart';
 import '../../domain/services/database_service.dart';
 
-class SembastDatabaseService implements DatabaseService {
+class SembastDatabaseService with Loggable implements DatabaseService {
   Database? _db;
   final String? dbPath;
   final String dbName;
 
-  SembastDatabaseService({required this.dbPath, required this.dbName});
+  SembastDatabaseService({
+    required this.dbPath,
+    required this.dbName,
+    Logger? logger,
+  }) {
+    this.logger = logger;
+  }
 
   @override
   Future<void> initialize() async {
@@ -67,6 +74,18 @@ class SembastDatabaseService implements DatabaseService {
     final db = _db!;
     final store = stringMapStoreFactory.store(storeName);
     await store.drop(transaction ?? db);
+  }
+
+  @override
+  Future<void> delete({
+    required String storeName,
+    required String key,
+    Transaction? transaction,
+  }) async {
+    final db = _db!;
+    final store = stringMapStoreFactory.store(storeName);
+    final record = store.record(key);
+    await record.delete(transaction ?? db);
   }
 
   Future<void> close() async {

@@ -1,14 +1,15 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Base implementation for document repositories with common file saving logic.
-class DocumentRepositoryImpl {
-  Logger get logger => LoggerFactory.create(name: 'DocumentRepositoryImpl');
+class DocumentRepositoryImpl with Loggable {
   final FileRepository fileRepository;
 
-  DocumentRepositoryImpl({required this.fileRepository});
+  DocumentRepositoryImpl({Logger? logger, required this.fileRepository}) {
+    this.logger = logger;
+  }
 
   /// Protected method to save content to a file.
   /// Subclasses should provide the appropriate file path.
@@ -20,7 +21,9 @@ class DocumentRepositoryImpl {
     try {
       final file = File(filePath);
       await file.writeAsString(content);
-      logger.info('Saved $documentType to $filePath (${content.length} chars)');
+      logger?.info(
+        'Saved $documentType to $filePath (${content.length} chars)',
+      );
       return Right(unit);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to save $documentType: $e'));

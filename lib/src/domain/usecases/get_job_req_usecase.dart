@@ -1,18 +1,20 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for retrieving a job requirement, with preprocessing if needed.
-class GetJobReqUsecase {
-  final Logger logger = LoggerFactory.create(name: 'GetJobReqUsecase');
+class GetJobReqUsecase with Loggable {
   final JobReqRepository jobReqRepository;
   final CreateJobReqUsecase createJobReqUsecase;
 
   /// Creates a new instance of [GetJobReqUsecase].
   GetJobReqUsecase({
+    Logger? logger,
     required this.jobReqRepository,
     required this.createJobReqUsecase,
-  });
+  }) {
+    this.logger = logger;
+  }
 
   /// Retrieves the job requirement for the given path.
   ///
@@ -23,13 +25,13 @@ class GetJobReqUsecase {
   ///
   /// Returns: [Either<Failure, JobReq>] the job requirement or a failure.
   Future<Either<Failure, JobReq>> call({required String path}) async {
-    logger.info('Retrieving job requirement from: $path');
+    logger?.info('Retrieving job requirement from: $path');
 
     var jobReqResult = await jobReqRepository.getJobReq(path: path);
     if (jobReqResult.isLeft()) {
       final failure = jobReqResult.getLeft().toNullable()!;
       if (failure is ParsingFailure) {
-        logger.info('Parsing failed, preprocessing job req for: $path');
+        logger?.info('Parsing failed, preprocessing job req for: $path');
         final preprocessResult = await createJobReqUsecase(path: path);
         if (preprocessResult.isLeft()) {
           return preprocessResult;
@@ -45,7 +47,7 @@ class GetJobReqUsecase {
     }
 
     final jobReq = (jobReqResult as Right<Failure, JobReq>).value;
-    logger.info('Job requirement retrieved successfully: ${jobReq.title}');
+    logger?.info('Job requirement retrieved successfully: ${jobReq.title}');
     return Right(jobReq);
   }
 }

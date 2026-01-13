@@ -1,6 +1,6 @@
 name: resumesux_domain
 description: The cleanarch domain and data layers for Resume Suckage
-version: 1.1.0
+version: 1.1.1
 license: Apache-2.0
 # repository: https://github.com/my_org/my_repo
 publish_to: none # Remove this line if you wish to publish to pub.dev
@@ -20,11 +20,17 @@ dependencies:
   intl: ^0.20.2
   path: ^1.9.1
   json_schema: ^5.2.2
-  logging: ^1.2.0
   mcp_dart: ^1.2.1
   markdown: ^7.2.2
-  sembast: ^3.8.6
   crypto: ^3.0.7
+
+  # TODO: move this dependency to a separate persistence package
+  sembast: ^3.8.6
+
+  # TODO: move these logging dependencies to a separate logging package
+  logging: ^1.2.0
+  logger: ^2.0.0
+  simple_logger: ^1.0.0
 
 dev_dependencies:
   lints: ^6.0.0

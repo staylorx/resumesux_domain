@@ -1,22 +1,26 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 
+import '../../data.dart';
+
 /// Implementation of the GigRepository.
-class GigRepositoryImpl implements GigRepository {
-  final Logger logger = LoggerFactory.create(name: 'GigRepositoryImpl');
+class GigRepositoryImpl with Loggable implements GigRepository {
   final String digestPath;
   final AiService aiService;
   final ApplicationDatasource applicationDatasource;
   final List<Map<String, dynamic>> _allAiResponses = [];
 
   GigRepositoryImpl({
+    Logger? logger,
     required this.digestPath,
     required this.aiService,
     required this.applicationDatasource,
-  });
+  }) {
+    this.logger = logger;
+  }
 
   @override
   String? getLastAiResponsesJson() {
@@ -59,7 +63,7 @@ class GigRepositoryImpl implements GigRepository {
         dto,
       );
       if (saveResult.isLeft()) {
-        logger.warning(
+        logger?.warn(
           'Failed to save AI response for gig $path: ${saveResult.getLeft().toNullable()?.message}',
         );
         // Continue anyway
@@ -112,9 +116,7 @@ $content
       final jsonString = response.substring(jsonStart, jsonEnd);
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e) {
-      logger.warning(
-        'Failed to parse AI response: $e\nResponse was: $response',
-      );
+      logger?.warn('Failed to parse AI response: $e\nResponse was: $response');
       return null;
     }
   }
@@ -128,7 +130,7 @@ $content
         return Right([]);
       }
 
-      // TODO: this is already in the Digest, do we kick it back there (i.e., persist to the datastore?
+      // TODO: is this the same as the applicant collection of Gig?
       final gigs = <Gig>[];
       final files = gigsDir.listSync().whereType<File>().where(
         (file) => file.path.endsWith('.md'),
@@ -142,13 +144,13 @@ $content
         );
         final data = extractResult.getOrElse((_) => {});
         if (extractResult.isLeft()) {
-          logger.warning(
+          logger?.warn(
             'Failed to extract gig data from ${file.path}: ${extractResult.getLeft().toNullable()?.message}',
           );
           continue;
         }
         if (data.isNotEmpty) {
-          logger.fine('Extracted gig data: $data');
+          logger?.debug('Extracted gig data: $data');
         }
 
         final gig = Gig(
@@ -160,6 +162,23 @@ $content
               ?.cast<String>(),
         );
         gigs.add(gig);
+
+        // Persist the gig to datastore
+        final dto = GigDto(
+          id: 'gig_${gig.title.hashCode}_${gig.concern?.hashCode ?? ''}',
+          concern: gig.concern,
+          location: gig.location,
+          title: gig.title,
+          dates: gig.dates,
+          achievements: gig.achievements,
+        );
+        final saveResult = await applicationDatasource.saveGig(dto);
+        if (saveResult.isLeft()) {
+          logger?.warn(
+            'Failed to persist gig ${gig.title}: ${saveResult.getLeft().toNullable()?.message}',
+          );
+          // Continue anyway
+        }
       }
 
       return Right(gigs);
@@ -178,7 +197,7 @@ $content
       content: aiResponseJson,
       contentType: 'application/json',
       aiResponseJson: '',
-      documentType: 'ai_response',
+      documentType: 'gig_response',
       jobReqId: jobReqId,
     );
     return applicationDatasource.saveAiResponseDocument(dto);

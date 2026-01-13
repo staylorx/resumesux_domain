@@ -1,24 +1,21 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
-import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/domain.dart';
 
 /// Use case for generating a complete job application including resume, cover letter, and feedback.
 class GenerateApplicationUsecase {
-  final Logger logger = LoggerFactory.create(
-    name: 'GenerateApplicationUsecase',
-  );
+  final Logger? logger;
   final GenerateResumeUsecase generateResumeUsecase;
   final GenerateCoverLetterUsecase generateCoverLetterUsecase;
   final GenerateFeedbackUsecase generateFeedbackUsecase;
-  final GetDigestUsecase getDigestUsecase;
+
   final SaveAiResponsesUsecase saveAiResponsesUsecase;
 
   /// Creates a new instance of [GenerateApplicationUsecase].
   GenerateApplicationUsecase({
+    this.logger,
     required this.generateResumeUsecase,
     required this.generateCoverLetterUsecase,
     required this.generateFeedbackUsecase,
-    required this.getDigestUsecase,
     required this.saveAiResponsesUsecase,
   });
 
@@ -49,18 +46,10 @@ class GenerateApplicationUsecase {
     required void Function(String) progress,
   }) async {
     progress('Starting application generation for job: ${jobReq.title}');
-    logger.info('Starting application generation for job: ${jobReq.title}');
-
-    // Get digest to trigger AI calls for gigs and assets
-    progress('Retrieving applicant data');
-    logger.info('Retrieving applicant data');
-    final digestResult = await getDigestUsecase();
-    if (digestResult.isLeft()) {
-      return Left(digestResult.getLeft().toNullable()!);
-    }
+    logger?.info('Starting application generation for job: ${jobReq.title}');
 
     progress('Generating resume');
-    logger.info('Generating resume');
+    logger?.info('Generating resume');
     // Generate resume
     final resumeResult = await generateResumeUsecase(
       jobReq: jobReq,
@@ -73,13 +62,13 @@ class GenerateApplicationUsecase {
 
     final resume = resumeResult.getOrElse((_) => Resume(content: ''));
     progress('Resume generated successfully');
-    logger.info('Resume generated successfully');
+    logger?.info('Resume generated successfully');
 
     // Generate cover letter if requested
     CoverLetter coverLetter;
     if (includeCover) {
       progress('Generating cover letter');
-      logger.info('Generating cover letter');
+      logger?.info('Generating cover letter');
       final coverResult = await generateCoverLetterUsecase(
         jobReq: jobReq,
         resume: resume,
@@ -99,7 +88,7 @@ class GenerateApplicationUsecase {
     Feedback feedback;
     if (includeFeedback) {
       progress('Generating feedback');
-      logger.info('Generating feedback');
+      logger?.info('Generating feedback');
       final feedbackResult = await generateFeedbackUsecase(
         jobReq: jobReq,
         resume: resume,
@@ -132,12 +121,12 @@ class GenerateApplicationUsecase {
     );
     if (saveResult.isLeft()) {
       final failure = saveResult.getLeft().toNullable()!;
-      logger.warning('Failed to save AI responses: ${failure.message}');
+      logger?.warn('Failed to save AI responses: ${failure.message}');
       // Continue anyway, as it's not critical
     }
 
     progress('Application generated successfully');
-    logger.info('Application generated successfully');
+    logger?.info('Application generated successfully');
     return Right(application);
   }
 }

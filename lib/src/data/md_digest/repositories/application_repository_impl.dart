@@ -3,6 +3,8 @@ import 'package:crypto/crypto.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
+import '../../data.dart';
+
 /// Implementation of ApplicationRepository.
 class ApplicationRepositoryImpl implements ApplicationRepository {
   final ApplicationDatasource applicationDatasource;
@@ -10,6 +12,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   final ResumeRepository resumeRepository;
   final CoverLetterRepository coverLetterRepository;
   final FeedbackRepository feedbackRepository;
+  final ApplicantRepository? applicantRepository;
 
   /// Creates a new instance of [ApplicationRepositoryImpl].
   ApplicationRepositoryImpl({
@@ -18,12 +21,23 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     required this.resumeRepository,
     required this.coverLetterRepository,
     required this.feedbackRepository,
+    this.applicantRepository,
   });
 
   @override
   Future<Either<Failure, Unit>> saveApplication({
     required Application application,
   }) async {
+    // Save applicant if repository available
+    if (applicantRepository != null) {
+      final saveApplicantResult = await applicantRepository!.saveApplicant(
+        applicant: application.applicant,
+      );
+      if (saveApplicantResult.isLeft()) {
+        return saveApplicantResult;
+      }
+    }
+
     final dto = ApplicationDto(
       id: sha256
           .convert(utf8.encode(DateTime.now().toIso8601String()))

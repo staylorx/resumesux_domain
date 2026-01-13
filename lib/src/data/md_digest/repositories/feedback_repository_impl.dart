@@ -1,18 +1,18 @@
 import 'dart:convert';
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
+
+import '../../data.dart';
 
 /// Implementation of the FeedbackRepository.
 class FeedbackRepositoryImpl extends DocumentRepositoryImpl
     implements FeedbackRepository {
-  @override
-  Logger get logger => LoggerFactory.create(name: 'FeedbackRepositoryImpl');
-
   final ApplicationDatasource applicationDatasource;
   Map<String, dynamic>? _lastAiResponse;
 
   FeedbackRepositoryImpl({
+    super.logger,
     required super.fileRepository,
     required this.applicationDatasource,
   });
@@ -51,7 +51,7 @@ class FeedbackRepositoryImpl extends DocumentRepositoryImpl
       );
       final dbResult = await applicationDatasource.saveDocument(dto);
       if (dbResult.isLeft()) {
-        logger.warning(
+        logger?.warn(
           'Failed to save feedback to DB: ${dbResult.getLeft().toNullable()?.message}',
         );
       }

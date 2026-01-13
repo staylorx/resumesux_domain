@@ -1,22 +1,26 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 
+import '../../data.dart';
+
 /// Implementation of the AssetRepository.
-class AssetRepositoryImpl implements AssetRepository {
-  final Logger logger = LoggerFactory.create(name: 'AssetRepositoryImpl');
+class AssetRepositoryImpl with Loggable implements AssetRepository {
   final String digestPath;
   final AiService aiService;
   final ApplicationDatasource applicationDatasource;
   final List<Map<String, dynamic>> _allAiResponses = [];
 
   AssetRepositoryImpl({
+    Logger? logger,
     required this.digestPath,
     required this.aiService,
     required this.applicationDatasource,
-  });
+  }) {
+    this.logger = logger;
+  }
 
   @override
   String? getLastAiResponsesJson() {
@@ -59,7 +63,7 @@ class AssetRepositoryImpl implements AssetRepository {
         dto,
       );
       if (saveResult.isLeft()) {
-        logger.warning(
+        logger?.warn(
           'Failed to save AI response for asset $path: ${saveResult.getLeft().toNullable()?.message}',
         );
         // Continue anyway
@@ -117,7 +121,7 @@ $content
         return Right([]);
       }
 
-      // TODO: digest already has assets, do we kick it back there?
+      // TODO: is the same as the collection in Applicatant of Asset?
       final assets = <Asset>[];
 
       // Read files in assets directory
@@ -134,21 +138,34 @@ $content
         );
         final data = extractResult.getOrElse((_) => {});
         if (extractResult.isLeft()) {
-          logger.warning(
+          logger?.warn(
             'Failed to extract asset data from ${file.path}: ${extractResult.getLeft().toNullable()?.message}',
           );
           // Fallback to basic extraction
           final type = _getAssetType(path: file.path);
-          assets.add(
-            Asset(
-              tags: [Tag(name: type)],
-              content: content,
-            ),
+          final asset = Asset(
+            tags: [Tag(name: type)],
+            content: content,
           );
+          assets.add(asset);
+
+          // Persist the asset to datastore
+          final dto = AssetDto(
+            id: 'asset_${asset.content.hashCode}',
+            tagNames: asset.tags.map((tag) => tag.name).toList(),
+            content: asset.content,
+          );
+          final saveResult = await applicationDatasource.saveAsset(dto);
+          if (saveResult.isLeft()) {
+            logger?.warn(
+              'Failed to persist asset from ${file.path}: ${saveResult.getLeft().toNullable()?.message}',
+            );
+            // Continue anyway
+          }
           continue;
         }
         if (data.isNotEmpty) {
-          logger.fine('Extracted asset data: $data');
+          logger?.debug('Extracted asset data: $data');
         }
 
         final tags =
@@ -157,7 +174,22 @@ $content
                 .toList() ??
             [Tag(name: _getAssetType(path: file.path))];
 
-        assets.add(Asset(tags: tags, content: content));
+        final asset = Asset(tags: tags, content: content);
+        assets.add(asset);
+
+        // Persist the asset to datastore
+        final dto = AssetDto(
+          id: 'asset_${asset.content.hashCode}',
+          tagNames: asset.tags.map((tag) => tag.name).toList(),
+          content: asset.content,
+        );
+        final saveResult = await applicationDatasource.saveAsset(dto);
+        if (saveResult.isLeft()) {
+          logger?.warn(
+            'Failed to persist asset from ${file.path}: ${saveResult.getLeft().toNullable()?.message}',
+          );
+          // Continue anyway
+        }
       }
 
       return Right(assets);

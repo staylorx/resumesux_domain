@@ -3,7 +3,8 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
-import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/domain.dart';
+import 'package:resumesux_domain/src/data/data.dart';
 
 // Simple file repository for example
 class ExampleFileRepository implements FileRepository {
@@ -109,10 +110,18 @@ class ExampleFileRepository implements FileRepository {
 void main() async {
   // This example demonstrates generating a complete job application
   // including resume, cover letter, and feedback using resumesux_domain.
+  // It shows how to import applicant data from a digest path.
   // Note: This requires a running AI service for actual generation.
+
+  // Path to the applicant's digest directory containing gigs and assets
+  final digestPath = '../../../test/data/digest/software_engineer';
+
+  print('Setting up Logger...');
+  final logger = LoggerImpl(name: 'FullApplicationExample');
 
   print('Setting up AI service...');
   final aiService = AiServiceImpl(
+    logger: logger,
     httpClient: http.Client(),
     provider: AiProvider(
       name: 'lmstudio',
@@ -145,25 +154,36 @@ void main() async {
   final applicationDatasource = ApplicationDatasource(dbService: dbService);
 
   print('Setting up repositories...');
-  final digestRepository = DigestRepositoryImpl(
-    digestPath: '../../../test/data/digest/software_engineer',
-    aiService: aiService,
-    applicationDatasource: applicationDatasource,
-  );
 
   final jobReqRepository = JobReqRepositoryImpl(
+    logger: logger,
     aiService: aiService,
     applicationDatasource: applicationDatasource,
   );
 
   final fileRepository = ExampleFileRepository();
 
+  final gigRepository = GigRepositoryImpl(
+    logger: logger,
+    digestPath: digestPath,
+    aiService: aiService,
+    applicationDatasource: applicationDatasource,
+  );
+  final assetRepository = AssetRepositoryImpl(
+    logger: logger,
+    digestPath: digestPath,
+    aiService: aiService,
+    applicationDatasource: applicationDatasource,
+  );
+
   final resumeRepository = ResumeRepositoryImpl(
+    logger: logger,
     fileRepository: fileRepository,
     applicationDatasource: applicationDatasource,
   );
 
   final coverLetterRepository = CoverLetterRepositoryImpl(
+    logger: logger,
     fileRepository: fileRepository,
     applicationDatasource: applicationDatasource,
   );
@@ -174,6 +194,7 @@ void main() async {
     resumeRepository: resumeRepository,
     coverLetterRepository: coverLetterRepository,
     feedbackRepository: FeedbackRepositoryImpl(
+      logger: logger,
       fileRepository: fileRepository,
       applicationDatasource: applicationDatasource,
     ),
@@ -181,39 +202,36 @@ void main() async {
 
   print('Creating use cases...');
   final generateResumeUsecase = GenerateResumeUsecase(
-    digestRepository: digestRepository,
+    logger: logger,
     aiService: aiService,
     resumeRepository: resumeRepository,
   );
 
   final generateCoverLetterUsecase = GenerateCoverLetterUsecase(
-    digestRepository: digestRepository,
+    logger: logger,
     aiService: aiService,
   );
 
   final generateFeedbackUsecase = GenerateFeedbackUsecase(
+    logger: logger,
     aiService: aiService,
     jobReqRepository: jobReqRepository,
-    gigRepository: digestRepository.gigRepository,
-    assetRepository: digestRepository.assetRepository,
-  );
-
-  final getDigestUsecase = GetDigestUsecase(
-    gigRepository: digestRepository.gigRepository,
-    assetRepository: digestRepository.assetRepository,
+    gigRepository: gigRepository,
+    assetRepository: assetRepository,
   );
 
   final saveAiResponsesUsecase = SaveAiResponsesUsecase(
+    logger: logger,
     jobReqRepository: jobReqRepository,
-    gigRepository: digestRepository.gigRepository,
-    assetRepository: digestRepository.assetRepository,
+    gigRepository: gigRepository,
+    assetRepository: assetRepository,
   );
 
   final generateApplicationUsecase = GenerateApplicationUsecase(
+    logger: logger,
     generateResumeUsecase: generateResumeUsecase,
     generateCoverLetterUsecase: generateCoverLetterUsecase,
     generateFeedbackUsecase: generateFeedbackUsecase,
-    getDigestUsecase: getDigestUsecase,
     saveAiResponsesUsecase: saveAiResponsesUsecase,
   );
 
@@ -230,21 +248,41 @@ void main() async {
 
   final jobReq = jobReqResult.getOrElse((_) => throw 'Failed');
 
-  print('Creating applicant...');
-  final applicant = Applicant(
-    name: 'Jane Doe',
-    preferredName: 'Jane',
-    email: 'jane.doe@example.com',
+  print('Creating basic applicant...');
+  final basicApplicant = Applicant(
+    name: 'John Doe',
+    preferredName: 'John',
+    email: 'john.doe@example.com',
     address: Address(
-      street1: '456 Elm St',
-      city: 'Somewhere',
-      state: 'NY',
-      zip: '67890',
+      street1: '123 Main St',
+      city: 'Anytown',
+      state: 'CA',
+      zip: '12345',
     ),
-    phone: '(555) 987-6543',
-    linkedin: 'https://linkedin.com/in/janedoe',
-    github: 'https://github.com/janedoe',
-    portfolio: 'https://janedoe.dev',
+    phone: '(555) 123-4567',
+    linkedin: 'https://linkedin.com/in/johndoe',
+    github: 'https://github.com/johndoe',
+    portfolio: 'https://johndoe.dev',
+  );
+
+  print('Importing applicant data from digest path...');
+  final gigsResult = await gigRepository.getAllGigs();
+  if (gigsResult.isLeft()) {
+    print('Error loading gigs: ${gigsResult.getLeft()}');
+    return;
+  }
+  final gigs = gigsResult.getOrElse((_) => []);
+
+  final assetsResult = await assetRepository.getAllAssets();
+  if (assetsResult.isLeft()) {
+    print('Error loading assets: ${assetsResult.getLeft()}');
+    return;
+  }
+  final assets = assetsResult.getOrElse((_) => []);
+
+  final applicant = basicApplicant.copyWith(gigs: gigs, assets: assets);
+  print(
+    'Applicant data imported successfully. Gigs: ${gigs.length}, Assets: ${assets.length}',
   );
 
   print('Generating full application...');

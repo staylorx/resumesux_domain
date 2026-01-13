@@ -1,17 +1,18 @@
 import 'dart:convert';
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for creating a new job requirement.
 class CreateJobReqUsecase {
-  final Logger logger = LoggerFactory.create(name: 'CreateJobReqUsecase');
+  final Logger? logger;
   final JobReqRepository jobReqRepository;
   final AiService aiService;
   final FileRepository fileRepository;
 
   /// Creates a new instance of [CreateJobReqUsecase].
   CreateJobReqUsecase({
+    this.logger,
     required this.jobReqRepository,
     required this.aiService,
     required this.fileRepository,
@@ -46,7 +47,7 @@ class CreateJobReqUsecase {
     String? finalWhereFound = whereFound;
 
     if (path != null) {
-      logger.info(
+      logger?.info(
         '[CreateJobReqUsecase] Extracting job req data from path: $path',
       );
       final extractResult = await _extractJobReqData(path: path);
@@ -72,7 +73,7 @@ class CreateJobReqUsecase {
       }
     }
 
-    logger.info(
+    logger?.info(
       '[CreateJobReqUsecase] Creating job req with title $finalTitle',
     );
 

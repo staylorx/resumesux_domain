@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:logging/logging.dart';
-import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
-import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/domain.dart';
+import 'package:resumesux_domain/src/data/data.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -13,21 +12,15 @@ void main() {
   late Logger logger;
   late SembastDatabaseService dbService;
   late ApplicationRepository applicationRepository;
+  late ApplicantRepository applicantRepository;
   late TestSuiteReadmeManager readmeManager;
 
   suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
-  // Set up logging
-  Logger.root.level = Level.ALL;
-  final logFile = File(path.join(suiteDir, 'log.txt'));
-  Logger.root.onRecord.listen((record) {
-    logFile.writeAsStringSync(
-      '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}\n',
-      mode: FileMode.append,
-    );
-  });
-
-  logger = Logger('AllJobReqsGenerationTest');
+  logger = FileLoggerImpl(
+    filePath: '$suiteDir/test_log.txt',
+    name: 'AllApplicationsGenerationTests',
+  );
 
   readmeManager = TestSuiteReadmeManager(
     suiteDir: suiteDir,
@@ -37,6 +30,7 @@ void main() {
 
   setUpAll(() async {
     aiService = AiServiceImpl(
+      logger: logger,
       httpClient: http.Client(),
       provider: TestAiHelper.defaultProvider,
     );
@@ -49,7 +43,7 @@ void main() {
     final datasource = ApplicationDatasource(dbService: dbService);
     final result = await datasource.clearJobReqs();
     result.fold(
-      (failure) => logger.severe('Failure: ${failure.message}'),
+      (failure) => logger.error('Failure: ${failure.message}'),
       (_) => {},
     );
     expect(
@@ -59,6 +53,7 @@ void main() {
     );
 
     jobReqRepository = JobReqRepositoryImpl(
+      logger: logger,
       aiService: aiService,
       applicationDatasource: datasource,
     );
@@ -66,16 +61,30 @@ void main() {
     final fileRepository = TestFileRepository();
 
     final resumeRepository = ResumeRepositoryImpl(
+      logger: logger,
       fileRepository: fileRepository,
       applicationDatasource: datasource,
     );
     final coverLetterRepository = CoverLetterRepositoryImpl(
+      logger: logger,
       fileRepository: fileRepository,
       applicationDatasource: datasource,
     );
     final feedbackRepository = FeedbackRepositoryImpl(
+      logger: logger,
       fileRepository: fileRepository,
       applicationDatasource: datasource,
+    );
+
+    final configRepository = ConfigRepositoryImpl(
+      logger: logger,
+      configDatasource: ConfigDatasource(),
+    );
+    applicantRepository = ApplicantRepositoryImpl(
+      logger: logger,
+      configRepository: configRepository,
+      applicationDatasource: datasource,
+      aiService: aiService,
     );
 
     applicationRepository = ApplicationRepositoryImpl(
@@ -84,6 +93,7 @@ void main() {
       resumeRepository: resumeRepository,
       coverLetterRepository: coverLetterRepository,
       feedbackRepository: feedbackRepository,
+      applicantRepository: applicantRepository,
     );
   });
 
@@ -146,59 +156,76 @@ void main() {
     group(groupName, () {
       readmeManager.startGroup(groupName);
 
-      late DigestRepository digestRepository;
-      late GetDigestUsecase getDigestUsecase;
+      late GigRepository gigRepository;
+      late AssetRepository assetRepository;
+      late Applicant loadedApplicant;
       late GenerateResumeUsecase generateResumeUsecase;
       late GenerateCoverLetterUsecase generateCoverLetterUsecase;
       late GenerateFeedbackUsecase generateFeedbackUsecase;
       late SaveAiResponsesUsecase saveAiResponsesUsecase;
       late GenerateApplicationUsecase generateApplicationUsecase;
 
-      setUp(() {
-        digestRepository = DigestRepositoryImpl(
+      setUp(() async {
+        gigRepository = GigRepositoryImpl(
+          logger: logger,
           digestPath: digestPath,
           aiService: aiService,
           applicationDatasource: ApplicationDatasource(dbService: dbService),
         );
 
-        getDigestUsecase = GetDigestUsecase(
-          gigRepository: digestRepository.gigRepository,
-          assetRepository: digestRepository.assetRepository,
+        assetRepository = AssetRepositoryImpl(
+          logger: logger,
+          digestPath: digestPath,
+          aiService: aiService,
+          applicationDatasource: ApplicationDatasource(dbService: dbService),
+        );
+
+        // Load applicant with gigs and assets
+        final importResult = await applicantRepository.importDigest(
+          applicant: applicant,
+          digestPath: digestPath,
+        );
+        loadedApplicant = importResult.getOrElse(
+          (failure) =>
+              throw Exception('Failed to import digest: ${failure.message}'),
         );
 
         generateResumeUsecase = GenerateResumeUsecase(
-          digestRepository: digestRepository,
           aiService: aiService,
+          logger: logger,
           resumeRepository: ResumeRepositoryImpl(
+            logger: logger,
             fileRepository: TestFileRepository(),
             applicationDatasource: ApplicationDatasource(dbService: dbService),
           ),
         );
 
         generateCoverLetterUsecase = GenerateCoverLetterUsecase(
-          digestRepository: digestRepository,
           aiService: aiService,
+          logger: logger,
         );
 
         generateFeedbackUsecase = GenerateFeedbackUsecase(
+          logger: logger,
           aiService: aiService,
           jobReqRepository: jobReqRepository,
-          gigRepository: digestRepository.gigRepository,
-          assetRepository: digestRepository.assetRepository,
+          gigRepository: gigRepository,
+          assetRepository: assetRepository,
         );
 
         saveAiResponsesUsecase = SaveAiResponsesUsecase(
           jobReqRepository: jobReqRepository,
-          gigRepository: digestRepository.gigRepository,
-          assetRepository: digestRepository.assetRepository,
+          gigRepository: gigRepository,
+          assetRepository: assetRepository,
+          logger: logger,
         );
 
         generateApplicationUsecase = GenerateApplicationUsecase(
           generateResumeUsecase: generateResumeUsecase,
           generateCoverLetterUsecase: generateCoverLetterUsecase,
           generateFeedbackUsecase: generateFeedbackUsecase,
-          getDigestUsecase: getDigestUsecase,
           saveAiResponsesUsecase: saveAiResponsesUsecase,
+          logger: logger,
         );
       });
 
@@ -223,7 +250,7 @@ void main() {
 
             final result = await generateApplicationUsecase.call(
               jobReq: jobReq,
-              applicant: applicant,
+              applicant: loadedApplicant,
               prompt: 'Generate a professional application.',
               includeCover: true,
               includeFeedback: true,

@@ -28,4 +28,11 @@ abstract class DatabaseService {
 
   /// Drops the specified store.
   Future<void> drop({required String storeName, Transaction? transaction});
+
+  /// Deletes a record from the specified store by key.
+  Future<void> delete({
+    required String storeName,
+    required String key,
+    Transaction? transaction,
+  });
 }

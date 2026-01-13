@@ -1,14 +1,15 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for updating an existing job requirement.
-class UpdateJobReqUsecase {
-  final Logger logger = LoggerFactory.create(name: 'UpdateJobReqUsecase');
+class UpdateJobReqUsecase with Loggable {
   final JobReqRepository jobReqRepository;
 
   /// Creates a new instance of [UpdateJobReqUsecase].
-  UpdateJobReqUsecase({required this.jobReqRepository});
+  UpdateJobReqUsecase({Logger? logger, required this.jobReqRepository}) {
+    this.logger = logger;
+  }
 
   /// Updates the given job requirement.
   ///
@@ -17,7 +18,7 @@ class UpdateJobReqUsecase {
   ///
   /// Returns: [Either<Failure, Unit>] success or a failure.
   Future<Either<Failure, Unit>> call({required JobReq jobReq}) async {
-    logger.info('[UpdateJobReqUsecase] Updating job req with ${jobReq.title}');
+    logger?.info('[UpdateJobReqUsecase] Updating job req with ${jobReq.title}');
 
     try {
       return await jobReqRepository.updateJobReq(jobReq: jobReq);

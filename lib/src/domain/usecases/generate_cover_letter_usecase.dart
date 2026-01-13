@@ -1,19 +1,17 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for generating a cover letter.
 class GenerateCoverLetterUsecase {
-  final Logger logger = LoggerFactory.create(
-    name: 'GenerateCoverLetterUsecase',
-  );
-  final DigestRepository digestRepository;
+  final Logger? logger;
+
   final AiService aiService;
   final CoverLetterRepository? coverLetterRepository;
 
   /// Creates a new instance of [GenerateCoverLetterUsecase].
   GenerateCoverLetterUsecase({
-    required this.digestRepository,
+    this.logger,
     required this.aiService,
     this.coverLetterRepository,
   });
@@ -33,25 +31,23 @@ class GenerateCoverLetterUsecase {
     required Applicant applicant,
     required String prompt,
   }) async {
-    logger.info('Generating cover letter');
+    logger?.info('Generating cover letter');
 
-    final digestResult = await digestRepository.getAllDigests();
-    if (digestResult.isLeft()) {
-      return Left(digestResult.getLeft().toNullable()!);
-    }
-
-    final digests = digestResult.getOrElse((failure) => []);
-    if (digests.isEmpty) {
-      return Left(ValidationFailure(message: 'No digest found'));
-    }
-
-    final digest = digests.first;
+    final gigsContent = applicant.gigs
+        .map(
+          (gig) =>
+              '${gig.concern} - ${gig.title}\n${gig.achievements?.join('\n') ?? ''}',
+        )
+        .toList();
+    final assetsContent = applicant.assets
+        .map((asset) => asset.content)
+        .toList();
 
     final fullPrompt = _buildCoverLetterPrompt(
       jobReq: jobReq.content,
       resume: resume.content,
-      gigs: digest.gigsContent,
-      assets: digest.assetsContent,
+      gigs: gigsContent,
+      assets: assetsContent,
       customPrompt: prompt,
       applicant: applicant,
     );

@@ -3,14 +3,17 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:intl/intl.dart';
-import 'package:logging/logging.dart';
+
 import 'package:markdown/markdown.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Implementation of FileRepository using dart:io.
 /// This belongs in the adapters layer as it deals with framework concerns.
-class FileRepositoryImpl implements FileRepository {
-  final Logger logger = LoggerFactory.create(name: 'FileRepositoryImpl');
+class FileRepositoryImpl with Loggable implements FileRepository {
+
+  FileRepositoryImpl({Logger? logger}) {
+    this.logger = logger;
+  }
 
   @override
   Either<Failure, String> readFile({required String path}) {
@@ -34,7 +37,7 @@ class FileRepositoryImpl implements FileRepository {
     try {
       final file = File(path);
       await file.writeAsString(content);
-      logger.info('Wrote file: $path (${content.length} chars)');
+      logger?.info('Wrote file: $path (${content.length} chars)');
       return Right(unit);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to write file: $e'));
@@ -47,7 +50,7 @@ class FileRepositoryImpl implements FileRepository {
       final dir = Directory(path);
       if (!dir.existsSync()) {
         dir.createSync(recursive: true);
-        logger.info('Created directory: $path');
+        logger?.info('Created directory: $path');
       }
       return Right(unit);
     } catch (e) {
@@ -92,9 +95,9 @@ class FileRepositoryImpl implements FileRepository {
       final appDir = Directory(appDirPath);
       if (!appDir.existsSync()) {
         appDir.createSync(recursive: true);
-        logger.info('Created application directory: $appDirPath');
+        logger?.info('Created application directory: $appDirPath');
       } else {
-        logger.info('Reusing existing application directory: $appDirPath');
+        logger?.debug('Reusing existing application directory: $appDirPath');
       }
 
       return Right(appDirPath);

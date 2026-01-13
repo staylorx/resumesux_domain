@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_print
 
-import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/domain.dart';
 
 void main() {
   // This example demonstrates creating configuration and applicant data
@@ -73,7 +73,7 @@ void main() {
         'Generate professional content tailored to the job requirements.',
     appendPrompt: true,
     applicant: applicant,
-    digestPath: './digest',
+    digestPath: '',
   );
 
   print('Configuration created successfully!');
@@ -82,7 +82,6 @@ void main() {
   print('Include Feedback: ${config.includeFeedback}');
   print('Custom Prompt: ${config.customPrompt}');
   print('Append Prompt: ${config.appendPrompt}');
-  print('Digest Path: ${config.digestPath}');
 
   print('\nAI Providers:');
   for (final provider in config.providers) {

@@ -1,22 +1,21 @@
-import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:logging/logging.dart';
-import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
-import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/domain.dart';
+import 'package:resumesux_domain/src/data/data.dart';
 import '../test_utils.dart';
 
 void main() {
-  late DigestRepository digestRepository;
+  late GigRepository gigRepository;
+  late AssetRepository assetRepository;
   late JobReqRepository jobReqRepository;
   late ResumeRepository resumeRepository;
   late CoverLetterRepository coverLetterRepository;
   late ApplicationRepository applicationRepository;
+  late ApplicantRepository applicantRepository;
   late AiServiceImpl aiService;
   late GenerateResumeUsecase generateResumeUsecase;
   late GenerateCoverLetterUsecase generateCoverLetterUsecase;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
-  late GetDigestUsecase getDigestUsecase;
   late SaveAiResponsesUsecase saveAiResponsesUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
   late FileRepository fileRepository;
@@ -28,17 +27,7 @@ void main() {
 
   suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
-  // Set up logging
-  Logger.root.level = Level.ALL;
-  final logFile = File(path.join(suiteDir, 'log.txt'));
-  Logger.root.onRecord.listen((record) {
-    logFile.writeAsStringSync(
-      '${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}\n',
-      mode: FileMode.append,
-    );
-  });
-
-  logger = Logger('SoftwareEngineerGenerationTest');
+  logger = ConsoleLoggerImpl(name: 'SoftwareEngineerGenerationTest');
 
   readmeManager = TestSuiteReadmeManager(
     suiteDir: suiteDir,
@@ -46,16 +35,23 @@ void main() {
   );
   readmeManager.initialize();
 
+  logger = FileLoggerImpl(
+    filePath: '$suiteDir/test_log.txt',
+    name: 'SoftwareEngineerGenerationTests',
+  );
+
   setUpAll(() async {
     readmeManager.startGroup('Software Engineer Tests');
 
     aiService = AiServiceImpl(
+      logger: logger,
       httpClient: http.Client(),
       provider: TestAiHelper.defaultProvider,
     );
 
     // Initialize the database before the test group
     dbService = SembastDatabaseService(
+      logger: logger,
       dbPath: suiteDir,
       dbName: 'applications.db',
     );
@@ -73,7 +69,12 @@ void main() {
   setUp(() {
     fileRepository = TestFileRepository();
 
-    digestRepository = DigestRepositoryImpl(
+    gigRepository = GigRepositoryImpl(
+      digestPath: 'test/data/digest/software_engineer',
+      aiService: aiService,
+      applicationDatasource: applicationDatasource,
+    );
+    assetRepository = AssetRepositoryImpl(
       digestPath: 'test/data/digest/software_engineer',
       aiService: aiService,
       applicationDatasource: applicationDatasource,
@@ -81,6 +82,15 @@ void main() {
     jobReqRepository = JobReqRepositoryImpl(
       aiService: aiService,
       applicationDatasource: applicationDatasource,
+    );
+
+    final configRepository = ConfigRepositoryImpl(
+      configDatasource: ConfigDatasource(),
+    );
+    applicantRepository = ApplicantRepositoryImpl(
+      configRepository: configRepository,
+      applicationDatasource: applicationDatasource,
+      aiService: aiService,
     );
 
     resumeRepository = ResumeRepositoryImpl(
@@ -103,42 +113,38 @@ void main() {
     );
 
     generateResumeUsecase = GenerateResumeUsecase(
-      digestRepository: digestRepository,
       aiService: aiService,
+      logger: logger,
+      resumeRepository: resumeRepository,
     );
 
     generateCoverLetterUsecase = GenerateCoverLetterUsecase(
-      digestRepository: digestRepository,
       aiService: aiService,
+      logger: logger,
     );
 
     generateFeedbackUsecase = GenerateFeedbackUsecase(
       aiService: aiService,
+      logger: logger,
       jobReqRepository: jobReqRepository,
-      gigRepository: digestRepository.gigRepository,
-      assetRepository: digestRepository.assetRepository,
-    );
-
-    getDigestUsecase = GetDigestUsecase(
-      gigRepository: digestRepository.gigRepository,
-      assetRepository: digestRepository.assetRepository,
+      gigRepository: gigRepository,
+      assetRepository: assetRepository,
     );
 
     saveAiResponsesUsecase = SaveAiResponsesUsecase(
       jobReqRepository: jobReqRepository,
-      gigRepository: digestRepository.gigRepository,
-      assetRepository: digestRepository.assetRepository,
+      gigRepository: gigRepository,
+      assetRepository: assetRepository,
+      logger: logger,
     );
 
     generateApplicationUsecase = GenerateApplicationUsecase(
       generateResumeUsecase: generateResumeUsecase,
       generateCoverLetterUsecase: generateCoverLetterUsecase,
       generateFeedbackUsecase: generateFeedbackUsecase,
-      getDigestUsecase: getDigestUsecase,
       saveAiResponsesUsecase: saveAiResponsesUsecase,
+      logger: logger,
     );
-
-    logger = Logger('ResumeGenerationTest');
   });
 
   group('Software Engineer Tests', () {
@@ -156,7 +162,7 @@ void main() {
           (_) => throw Exception('Failed to load job req'),
         );
 
-        final applicant = Applicant(
+        final baseApplicant = Applicant(
           name: 'John Doe',
           preferredName: 'John',
           email: 'john.doe@example.com',
@@ -170,6 +176,15 @@ void main() {
           linkedin: 'https://linkedin.com/in/johndoe',
           github: 'https://github.com/johndoe',
           portfolio: 'https://johndoe.dev',
+        );
+
+        final importResult = await applicantRepository.importDigest(
+          applicant: baseApplicant,
+          digestPath: 'test/data/digest/software_engineer',
+        );
+        final applicant = importResult.getOrElse(
+          (failure) =>
+              throw Exception('Failed to import digest: ${failure.message}'),
         );
 
         // Act
@@ -222,7 +237,7 @@ void main() {
             (_) => throw Exception('Failed to load job req'),
           );
 
-          final applicant = Applicant(
+          final baseApplicant = Applicant(
             name: 'John Doe',
             preferredName: 'John',
             email: 'john.doe@example.com',
@@ -236,6 +251,15 @@ void main() {
             linkedin: 'https://linkedin.com/in/johndoe',
             github: 'https://github.com/johndoe',
             portfolio: 'https://johndoe.dev',
+          );
+
+          final importResult = await applicantRepository.importDigest(
+            applicant: baseApplicant,
+            digestPath: 'test/data/digest/software_engineer',
+          );
+          final applicant = importResult.getOrElse(
+            (failure) =>
+                throw Exception('Failed to import digest: ${failure.message}'),
           );
 
           // Generate a resume first
@@ -304,7 +328,7 @@ void main() {
         readmeManager.startTest(testName);
 
         try {
-          final applicant = Applicant(
+          final baseApplicant = Applicant(
             name: 'John Doe',
             preferredName: 'John',
             email: 'john.doe@example.com',
@@ -318,6 +342,15 @@ void main() {
             linkedin: 'https://linkedin.com/in/johndoe',
             github: 'https://github.com/johndoe',
             portfolio: 'https://johndoe.dev',
+          );
+
+          final importResult = await applicantRepository.importDigest(
+            applicant: baseApplicant,
+            digestPath: 'test/data/digest/software_engineer',
+          );
+          final applicant = importResult.getOrElse(
+            (failure) =>
+                throw Exception('Failed to import digest: ${failure.message}'),
           );
 
           final jobReqResult = await jobReqRepository.getJobReq(

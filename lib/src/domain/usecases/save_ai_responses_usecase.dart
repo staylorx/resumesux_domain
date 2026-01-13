@@ -1,10 +1,9 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for saving AI responses to the database.
-class SaveAiResponsesUsecase {
-  final Logger logger = LoggerFactory.create(name: 'SaveAiResponsesUsecase');
+class SaveAiResponsesUsecase with Loggable {
   final JobReqRepository jobReqRepository;
   final GigRepository gigRepository;
   final AssetRepository assetRepository;
@@ -14,13 +13,16 @@ class SaveAiResponsesUsecase {
 
   /// Creates a new instance of [SaveAiResponsesUsecase].
   SaveAiResponsesUsecase({
+    Logger? logger,
     required this.jobReqRepository,
     required this.gigRepository,
     required this.assetRepository,
     this.resumeRepository,
     this.coverLetterRepository,
     this.feedbackRepository,
-  });
+  }) {
+    this.logger = logger;
+  }
 
   /// Saves AI responses for the job requirement, gigs, and assets.
   ///
@@ -29,7 +31,7 @@ class SaveAiResponsesUsecase {
   ///
   /// Returns: [Either<Failure, Unit>] indicating success or failure.
   Future<Either<Failure, Unit>> call({required String jobReqId}) async {
-    logger.info('Saving AI responses for job requirement: $jobReqId');
+    logger?.info('Saving AI responses for job requirement: $jobReqId');
 
     // Save AI response for job req
     final aiResponseJson = jobReqRepository.getLastAiResponseJson();
@@ -40,7 +42,7 @@ class SaveAiResponsesUsecase {
       );
       if (saveAiResult.isLeft()) {
         final failure = saveAiResult.getLeft().toNullable()!;
-        logger.warning('Failed to save AI response: ${failure.message}');
+        logger?.warn('Failed to save AI response: ${failure.message}');
         // Continue anyway, as it's not critical
       }
     }
@@ -54,7 +56,7 @@ class SaveAiResponsesUsecase {
       );
       if (saveGigAiResult.isLeft()) {
         final failure = saveGigAiResult.getLeft().toNullable()!;
-        logger.warning('Failed to save gig AI response: ${failure.message}');
+        logger?.warn('Failed to save gig AI response: ${failure.message}');
         // Continue anyway
       }
     }
@@ -68,7 +70,7 @@ class SaveAiResponsesUsecase {
       );
       if (saveAssetAiResult.isLeft()) {
         final failure = saveAssetAiResult.getLeft().toNullable()!;
-        logger.warning('Failed to save asset AI response: ${failure.message}');
+        logger?.warn('Failed to save asset AI response: ${failure.message}');
         // Continue anyway
       }
     }
@@ -83,7 +85,7 @@ class SaveAiResponsesUsecase {
       );
       if (saveResumeAiResult.isLeft()) {
         final failure = saveResumeAiResult.getLeft().toNullable()!;
-        logger.warning('Failed to save resume AI response: ${failure.message}');
+        logger?.warn('Failed to save resume AI response: ${failure.message}');
         // Continue anyway
       }
     }
@@ -100,7 +102,7 @@ class SaveAiResponsesUsecase {
           );
       if (saveCoverLetterAiResult.isLeft()) {
         final failure = saveCoverLetterAiResult.getLeft().toNullable()!;
-        logger.warning(
+        logger?.warn(
           'Failed to save cover letter AI response: ${failure.message}',
         );
         // Continue anyway
@@ -117,14 +119,12 @@ class SaveAiResponsesUsecase {
       );
       if (saveFeedbackAiResult.isLeft()) {
         final failure = saveFeedbackAiResult.getLeft().toNullable()!;
-        logger.warning(
-          'Failed to save feedback AI response: ${failure.message}',
-        );
+        logger?.warn('Failed to save feedback AI response: ${failure.message}');
         // Continue anyway
       }
     }
 
-    logger.info('AI responses saved successfully');
+    logger?.info('AI responses saved successfully');
     return Right(unit);
   }
 }

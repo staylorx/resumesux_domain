@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
-import 'package:logging/logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-/// Implementation of the JobReqRepository.
-class JobReqRepositoryImpl implements JobReqRepository {
-  final Logger logger = LoggerFactory.create(name: 'JobReqRepositoryImpl');
+import '../../data.dart';
 
+/// Implementation of the JobReqRepository.
+class JobReqRepositoryImpl with Loggable implements JobReqRepository {
   final AiService aiService;
   final ApplicationDatasource applicationDatasource;
   Map<String, dynamic>? _lastAiResponse;
@@ -23,9 +23,12 @@ class JobReqRepositoryImpl implements JobReqRepository {
   }
 
   JobReqRepositoryImpl({
+    Logger? logger,
     required this.aiService,
     required this.applicationDatasource,
-  });
+  }) {
+    this.logger = logger;
+  }
 
   @override
   /// Retrieves a job requirement from the given path.
@@ -36,7 +39,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
       return Left(extractResult.getLeft().toNullable()!);
     }
     if (data.isNotEmpty) {
-      logger.fine('Extracted job req data: $data');
+      logger?.debug('Extracted job req data: $data');
     }
 
     final jobReq = JobReq(
