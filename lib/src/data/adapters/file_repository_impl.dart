@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:intl/intl.dart';
+import 'package:id_logging/id_logging.dart';
 
 import 'package:markdown/markdown.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
@@ -10,7 +11,6 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 /// Implementation of FileRepository using dart:io.
 /// This belongs in the adapters layer as it deals with framework concerns.
 class FileRepositoryImpl with Loggable implements FileRepository {
-
   FileRepositoryImpl({Logger? logger}) {
     this.logger = logger;
   }

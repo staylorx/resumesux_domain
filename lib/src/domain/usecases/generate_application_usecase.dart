@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/src/domain/domain.dart';
+import 'package:id_logging/id_logging.dart';
 
 /// Use case for generating a complete job application including resume, cover letter, and feedback.
 class GenerateApplicationUsecase {
@@ -121,7 +122,7 @@ class GenerateApplicationUsecase {
     );
     if (saveResult.isLeft()) {
       final failure = saveResult.getLeft().toNullable()!;
-      logger?.warn('Failed to save AI responses: ${failure.message}');
+      logger?.warning('Failed to save AI responses: ${failure.message}');
       // Continue anyway, as it's not critical
     }
 

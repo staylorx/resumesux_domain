@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:resumesux_logging/resumesux_logging.dart';
+import 'package:id_logging/id_logging.dart';
 import 'package:test/test.dart';
 import 'package:resumesux_domain/src/domain/domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
@@ -53,7 +53,6 @@ void main() {
 
     // Initialize the database before the test group
     dbService = SembastDatabaseService(
-      logger: logger,
       dbPath: suiteDir,
       dbName: 'applications.db',
     );

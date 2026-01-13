@@ -4,18 +4,12 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:sembast/sembast_memory.dart';
 
-class SembastDatabaseService with Loggable implements DatabaseService {
+class SembastDatabaseService implements DatabaseService {
   Database? _db;
   final String? dbPath;
   final String dbName;
 
-  SembastDatabaseService({
-    required this.dbPath,
-    required this.dbName,
-    Logger? logger,
-  }) {
-    this.logger = logger;
-  }
+  SembastDatabaseService({required this.dbPath, required this.dbName});
 
   @override
   Future<void> initialize() async {

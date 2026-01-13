@@ -55,7 +55,7 @@ class ResumeRepositoryImpl extends DocumentRepositoryImpl
       );
       final dbResult = await applicationDatasource.saveDocument(dto);
       if (dbResult.isLeft()) {
-        logger?.warn(
+        logger?.warning(
           'Failed to save resume to DB: ${dbResult.getLeft().toNullable()?.message}',
         );
       }

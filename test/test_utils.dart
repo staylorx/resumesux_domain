@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:path/path.dart' as path;
 import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:id_logging/id_logging.dart';
 
 /// Manages README.md file for test suites, tracking progress and status.
 class TestSuiteReadmeManager {
@@ -248,7 +249,7 @@ class TestFileRepository with Loggable implements FileRepository {
       Directory(appDir).createSync(recursive: true);
       return Right(appDir);
     } catch (e) {
-      logger?.warn('Failed to create app dir: $appDir, error: $e');
+      logger?.warning('Failed to create app dir: $appDir, error: $e');
       return Left(ServiceFailure(message: 'Failed to create app dir: $e'));
     }
   }

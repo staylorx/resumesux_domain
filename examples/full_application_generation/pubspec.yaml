@@ -9,8 +9,9 @@ dependencies:
     path: ../..
   resumesux_db_sembast:
     path: ../../packages/resumesux_db_sembast
-  resumesux_logging:
-    path: ../../packages/resumesux_logging
+  id_logging:
+    git: github.com/yourusername/id_logging.git
+
   fpdart: ^1.2.0
   http: ^1.0.0
 

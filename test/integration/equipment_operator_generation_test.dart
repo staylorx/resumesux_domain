@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:resumesux_logging/resumesux_logging.dart';
+import 'package:id_logging/id_logging.dart';
 
 import 'package:test/test.dart';
 import 'package:resumesux_domain/src/domain/domain.dart';

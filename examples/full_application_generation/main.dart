@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
-import 'package:resumesux_logging/resumesux_logging.dart';
+import 'package:id_logging/id_logging.dart';
 
 // Simple file repository for example
 class ExampleFileRepository implements FileRepository {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/src/domain/domain.dart';
+import 'package:id_logging/id_logging.dart';
 
 /// Implementation of AiService for generating content using AI providers.
 class AiServiceImpl with Loggable implements AiService {

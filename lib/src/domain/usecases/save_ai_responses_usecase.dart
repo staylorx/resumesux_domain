@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-
+import 'package:id_logging/id_logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Use case for saving AI responses to the database.
@@ -42,7 +42,7 @@ class SaveAiResponsesUsecase with Loggable {
       );
       if (saveAiResult.isLeft()) {
         final failure = saveAiResult.getLeft().toNullable()!;
-        logger?.warn('Failed to save AI response: ${failure.message}');
+        logger?.warning('Failed to save AI response: ${failure.message}');
         // Continue anyway, as it's not critical
       }
     }
@@ -56,7 +56,7 @@ class SaveAiResponsesUsecase with Loggable {
       );
       if (saveGigAiResult.isLeft()) {
         final failure = saveGigAiResult.getLeft().toNullable()!;
-        logger?.warn('Failed to save gig AI response: ${failure.message}');
+        logger?.warning('Failed to save gig AI response: ${failure.message}');
         // Continue anyway
       }
     }
@@ -70,7 +70,7 @@ class SaveAiResponsesUsecase with Loggable {
       );
       if (saveAssetAiResult.isLeft()) {
         final failure = saveAssetAiResult.getLeft().toNullable()!;
-        logger?.warn('Failed to save asset AI response: ${failure.message}');
+        logger?.warning('Failed to save asset AI response: ${failure.message}');
         // Continue anyway
       }
     }
@@ -85,7 +85,9 @@ class SaveAiResponsesUsecase with Loggable {
       );
       if (saveResumeAiResult.isLeft()) {
         final failure = saveResumeAiResult.getLeft().toNullable()!;
-        logger?.warn('Failed to save resume AI response: ${failure.message}');
+        logger?.warning(
+          'Failed to save resume AI response: ${failure.message}',
+        );
         // Continue anyway
       }
     }
@@ -102,7 +104,7 @@ class SaveAiResponsesUsecase with Loggable {
           );
       if (saveCoverLetterAiResult.isLeft()) {
         final failure = saveCoverLetterAiResult.getLeft().toNullable()!;
-        logger?.warn(
+        logger?.warning(
           'Failed to save cover letter AI response: ${failure.message}',
         );
         // Continue anyway
@@ -119,7 +121,9 @@ class SaveAiResponsesUsecase with Loggable {
       );
       if (saveFeedbackAiResult.isLeft()) {
         final failure = saveFeedbackAiResult.getLeft().toNullable()!;
-        logger?.warn('Failed to save feedback AI response: ${failure.message}');
+        logger?.warning(
+          'Failed to save feedback AI response: ${failure.message}',
+        );
         // Continue anyway
       }
     }

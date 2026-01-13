@@ -55,7 +55,7 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
       );
       final dbResult = await applicationDatasource.saveDocument(dto);
       if (dbResult.isLeft()) {
-        logger?.warn(
+        logger?.warning(
           'Failed to save cover letter to DB: ${dbResult.getLeft().toNullable()?.message}',
         );
       }

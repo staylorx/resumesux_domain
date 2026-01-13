@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
+import 'package:id_logging/id_logging.dart';
 
 import 'package:resumesux_domain/resumesux_domain.dart';
 
@@ -63,7 +64,7 @@ class AssetRepositoryImpl with Loggable implements AssetRepository {
         dto,
       );
       if (saveResult.isLeft()) {
-        logger?.warn(
+        logger?.warning(
           'Failed to save AI response for asset $path: ${saveResult.getLeft().toNullable()?.message}',
         );
         // Continue anyway
@@ -138,7 +139,7 @@ $content
         );
         final data = extractResult.getOrElse((_) => {});
         if (extractResult.isLeft()) {
-          logger?.warn(
+          logger?.warning(
             'Failed to extract asset data from ${file.path}: ${extractResult.getLeft().toNullable()?.message}',
           );
           // Fallback to basic extraction
@@ -157,7 +158,7 @@ $content
           );
           final saveResult = await applicationDatasource.saveAsset(dto);
           if (saveResult.isLeft()) {
-            logger?.warn(
+            logger?.warning(
               'Failed to persist asset from ${file.path}: ${saveResult.getLeft().toNullable()?.message}',
             );
             // Continue anyway
@@ -185,7 +186,7 @@ $content
         );
         final saveResult = await applicationDatasource.saveAsset(dto);
         if (saveResult.isLeft()) {
-          logger?.warn(
+          logger?.warning(
             'Failed to persist asset from ${file.path}: ${saveResult.getLeft().toNullable()?.message}',
           );
           // Continue anyway

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
+import 'package:id_logging/id_logging.dart';
 
 import 'package:resumesux_domain/resumesux_domain.dart';
 
@@ -63,7 +64,7 @@ class GigRepositoryImpl with Loggable implements GigRepository {
         dto,
       );
       if (saveResult.isLeft()) {
-        logger?.warn(
+        logger?.warning(
           'Failed to save AI response for gig $path: ${saveResult.getLeft().toNullable()?.message}',
         );
         // Continue anyway
@@ -116,7 +117,9 @@ $content
       final jsonString = response.substring(jsonStart, jsonEnd);
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e) {
-      logger?.warn('Failed to parse AI response: $e\nResponse was: $response');
+      logger?.warning(
+        'Failed to parse AI response: $e\nResponse was: $response',
+      );
       return null;
     }
   }
@@ -144,7 +147,7 @@ $content
         );
         final data = extractResult.getOrElse((_) => {});
         if (extractResult.isLeft()) {
-          logger?.warn(
+          logger?.warning(
             'Failed to extract gig data from ${file.path}: ${extractResult.getLeft().toNullable()?.message}',
           );
           continue;
@@ -174,7 +177,7 @@ $content
         );
         final saveResult = await applicationDatasource.saveGig(dto);
         if (saveResult.isLeft()) {
-          logger?.warn(
+          logger?.warning(
             'Failed to persist gig ${gig.title}: ${saveResult.getLeft().toNullable()?.message}',
           );
           // Continue anyway

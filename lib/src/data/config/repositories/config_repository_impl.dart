@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:json_schema/json_schema.dart';
+import 'package:id_logging/id_logging.dart';
 
 import 'package:path/path.dart' as p;
 
@@ -160,7 +161,7 @@ class ConfigRepositoryImpl with Loggable implements ConfigRepository {
       logger?.error('Config validation error: $error');
     }
     for (final warning in warnings) {
-      logger?.warn('Config validation warning: $warning');
+      logger?.warning('Config validation warning: $warning');
     }
 
     // If there are errors, fail with ValidationFailure
@@ -174,7 +175,7 @@ class ConfigRepositoryImpl with Loggable implements ConfigRepository {
 
     // If only warnings, proceed but log them
     if (warnings.isNotEmpty) {
-      logger?.warn('Config validation completed with warnings');
+      logger?.warning('Config validation completed with warnings');
     }
 
     // Second pass: Parse the config (proceed since no errors)
