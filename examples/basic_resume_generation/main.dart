@@ -3,7 +3,6 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:resumesux_domain/resumesux_domain.dart';
-import 'package:resumesux_domain/src/data/data.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 
 void main() async {
@@ -13,8 +12,9 @@ void main() async {
 
   print('Setting up AI service...');
   // Using test helper for AI provider
-  final aiService = AiServiceImpl(
-    httpClient: http.Client(),
+  final httpClient = http.Client();
+  final aiService = createAiServiceImpl(
+    httpClient: httpClient,
     provider: AiProvider(
       name: 'lmstudio',
       url: 'http://127.0.0.1:1234/v1',
@@ -43,15 +43,17 @@ void main() async {
   );
   await dbService.initialize();
 
-  final applicationDatasource = ApplicationDatasource(dbService: dbService);
+  final applicationDatasource = createApplicationDatasource(
+    dbService: dbService,
+  );
 
-  final jobReqRepository = JobReqRepositoryImpl(
+  final jobReqRepository = createJobReqRepositoryImpl(
     aiService: aiService,
     applicationDatasource: applicationDatasource,
   );
 
-  final resumeRepository = ResumeRepositoryImpl(
-    fileRepository: FileRepositoryImpl(), // Assuming it has a default
+  final resumeRepository = createResumeRepositoryImpl(
+    fileRepository: createFileRepositoryImpl(),
     applicationDatasource: applicationDatasource,
   );
 
@@ -161,5 +163,5 @@ University of California, Berkeley
 
   // Clean up
   await dbService.close();
-  aiService.httpClient.close();
+  httpClient.close();
 }

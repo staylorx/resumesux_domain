@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:test/test.dart';
 import 'package:resumesux_domain/src/data/data.dart';
+import 'package:resumesux_domain/src/domain/factories/factories.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 
 void main() {
@@ -18,7 +19,7 @@ void main() {
 
     dbService = SembastDatabaseService(dbPath: dbPath, dbName: 'test.db');
 
-    datasource = ApplicationDatasource(dbService: dbService);
+    datasource = createApplicationDatasource(dbService: dbService);
   });
 
   tearDownAll(() async {

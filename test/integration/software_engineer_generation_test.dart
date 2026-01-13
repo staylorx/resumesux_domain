@@ -1,5 +1,4 @@
 import 'package:http/http.dart' as http;
-
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
@@ -14,7 +13,7 @@ void main() {
   late CoverLetterRepository coverLetterRepository;
   late ApplicationRepository applicationRepository;
   late ApplicantRepository applicantRepository;
-  late AiServiceImpl aiService;
+  late AiService aiService;
   late GenerateResumeUsecase generateResumeUsecase;
   late GenerateCoverLetterUsecase generateCoverLetterUsecase;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
@@ -26,6 +25,7 @@ void main() {
   late Logger logger;
   late TestSuiteReadmeManager readmeManager;
   late SembastDatabaseService dbService;
+  late http.Client httpClient;
 
   suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
@@ -45,9 +45,10 @@ void main() {
   setUpAll(() async {
     readmeManager.startGroup('Software Engineer Tests');
 
-    aiService = AiServiceImpl(
+    httpClient = http.Client();
+    aiService = createAiServiceImpl(
       logger: logger,
-      httpClient: http.Client(),
+      httpClient: httpClient,
       provider: TestAiHelper.defaultProvider,
     );
 
@@ -58,56 +59,56 @@ void main() {
     );
     await dbService.initialize();
 
-    applicationDatasource = ApplicationDatasource(dbService: dbService);
+    applicationDatasource = createApplicationDatasource(dbService: dbService);
   });
 
   tearDownAll(() async {
     readmeManager.finalize();
     await dbService.close();
-    aiService.httpClient.close();
+    httpClient.close();
   });
 
   setUp(() {
     fileRepository = TestFileRepository();
 
-    gigRepository = GigRepositoryImpl(
+    gigRepository = createGigRepositoryImpl(
       digestPath: 'test/data/digest/software_engineer',
       aiService: aiService,
       applicationDatasource: applicationDatasource,
     );
-    assetRepository = AssetRepositoryImpl(
+    assetRepository = createAssetRepositoryImpl(
       digestPath: 'test/data/digest/software_engineer',
       aiService: aiService,
       applicationDatasource: applicationDatasource,
     );
-    jobReqRepository = JobReqRepositoryImpl(
+    jobReqRepository = createJobReqRepositoryImpl(
       aiService: aiService,
       applicationDatasource: applicationDatasource,
     );
 
-    final configRepository = ConfigRepositoryImpl(
-      configDatasource: ConfigDatasource(),
+    final configRepository = createConfigRepositoryImpl(
+      configDatasource: createConfigDatasource(),
     );
-    applicantRepository = ApplicantRepositoryImpl(
+    applicantRepository = createApplicantRepositoryImpl(
       configRepository: configRepository,
       applicationDatasource: applicationDatasource,
       aiService: aiService,
     );
 
-    resumeRepository = ResumeRepositoryImpl(
+    resumeRepository = createResumeRepositoryImpl(
       fileRepository: fileRepository,
       applicationDatasource: applicationDatasource,
     );
-    coverLetterRepository = CoverLetterRepositoryImpl(
+    coverLetterRepository = createCoverLetterRepositoryImpl(
       fileRepository: fileRepository,
       applicationDatasource: applicationDatasource,
     );
-    applicationRepository = ApplicationRepositoryImpl(
+    applicationRepository = createApplicationRepositoryImpl(
       applicationDatasource: applicationDatasource,
       fileRepository: fileRepository,
       resumeRepository: resumeRepository,
       coverLetterRepository: coverLetterRepository,
-      feedbackRepository: FeedbackRepositoryImpl(
+      feedbackRepository: createFeedbackRepositoryImpl(
         fileRepository: fileRepository,
         applicationDatasource: applicationDatasource,
       ),

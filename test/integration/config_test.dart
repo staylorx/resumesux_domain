@@ -3,12 +3,14 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 
 void main() {
-  late ConfigRepositoryImpl configRepository;
+  late ConfigRepository configRepository;
   late ConfigDatasource configDatasource;
 
   setUp(() {
-    configDatasource = ConfigDatasource();
-    configRepository = ConfigRepositoryImpl(configDatasource: configDatasource);
+    configDatasource = createConfigDatasource();
+    configRepository = createConfigRepositoryImpl(
+      configDatasource: configDatasource,
+    );
   });
 
   group('Config Loading Integration Tests', () {

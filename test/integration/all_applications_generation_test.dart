@@ -1,15 +1,14 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
-
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
-import 'package:resumesux_domain/src/data/data.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 import '../test_utils.dart';
 
 void main() {
   late JobReqRepository jobReqRepository;
-  late AiServiceImpl aiService;
+  late AiService aiService;
+  late http.Client httpClient;
   late String suiteDir;
   late Logger logger;
   late SembastDatabaseService dbService;
@@ -31,9 +30,10 @@ void main() {
   readmeManager.initialize();
 
   setUpAll(() async {
-    aiService = AiServiceImpl(
+    httpClient = http.Client();
+    aiService = createAiServiceImpl(
       logger: logger,
-      httpClient: http.Client(),
+      httpClient: httpClient,
       provider: TestAiHelper.defaultProvider,
     );
 
@@ -42,7 +42,7 @@ void main() {
       dbName: 'applications.db',
     );
 
-    final datasource = ApplicationDatasource(dbService: dbService);
+    final datasource = createApplicationDatasource(dbService: dbService);
     final result = await datasource.clearJobReqs();
     result.fold(
       (failure) => logger.error('Failure: ${failure.message}'),
@@ -54,7 +54,7 @@ void main() {
       reason: 'Failed to clear database before test group',
     );
 
-    jobReqRepository = JobReqRepositoryImpl(
+    jobReqRepository = createJobReqRepositoryImpl(
       logger: logger,
       aiService: aiService,
       applicationDatasource: datasource,
@@ -62,47 +62,46 @@ void main() {
 
     final fileRepository = TestFileRepository();
 
-    final resumeRepository = ResumeRepositoryImpl(
+    final resumeRepository = createResumeRepositoryImpl(
       logger: logger,
       fileRepository: fileRepository,
       applicationDatasource: datasource,
     );
-    final coverLetterRepository = CoverLetterRepositoryImpl(
+    final coverLetterRepository = createCoverLetterRepositoryImpl(
       logger: logger,
       fileRepository: fileRepository,
       applicationDatasource: datasource,
     );
-    final feedbackRepository = FeedbackRepositoryImpl(
+    final feedbackRepository = createFeedbackRepositoryImpl(
       logger: logger,
       fileRepository: fileRepository,
       applicationDatasource: datasource,
     );
 
-    final configRepository = ConfigRepositoryImpl(
+    final configRepository = createConfigRepositoryImpl(
       logger: logger,
-      configDatasource: ConfigDatasource(),
+      configDatasource: createConfigDatasource(),
     );
-    applicantRepository = ApplicantRepositoryImpl(
+    applicantRepository = createApplicantRepositoryImpl(
       logger: logger,
       configRepository: configRepository,
       applicationDatasource: datasource,
       aiService: aiService,
     );
 
-    applicationRepository = ApplicationRepositoryImpl(
+    applicationRepository = createApplicationRepositoryImpl(
       applicationDatasource: datasource,
       fileRepository: fileRepository,
       resumeRepository: resumeRepository,
       coverLetterRepository: coverLetterRepository,
       feedbackRepository: feedbackRepository,
-      applicantRepository: applicantRepository,
     );
   });
 
   tearDownAll(() async {
     readmeManager.finalize();
     await dbService.close();
-    aiService.httpClient.close();
+    httpClient.close();
   });
 
   final applicant = Applicant(
@@ -168,18 +167,22 @@ void main() {
       late GenerateApplicationUsecase generateApplicationUsecase;
 
       setUp(() async {
-        gigRepository = GigRepositoryImpl(
+        gigRepository = createGigRepositoryImpl(
           logger: logger,
           digestPath: digestPath,
           aiService: aiService,
-          applicationDatasource: ApplicationDatasource(dbService: dbService),
+          applicationDatasource: createApplicationDatasource(
+            dbService: dbService,
+          ),
         );
 
-        assetRepository = AssetRepositoryImpl(
+        assetRepository = createAssetRepositoryImpl(
           logger: logger,
           digestPath: digestPath,
           aiService: aiService,
-          applicationDatasource: ApplicationDatasource(dbService: dbService),
+          applicationDatasource: createApplicationDatasource(
+            dbService: dbService,
+          ),
         );
 
         // Load applicant with gigs and assets
@@ -195,10 +198,12 @@ void main() {
         generateResumeUsecase = GenerateResumeUsecase(
           aiService: aiService,
           logger: logger,
-          resumeRepository: ResumeRepositoryImpl(
+          resumeRepository: createResumeRepositoryImpl(
             logger: logger,
             fileRepository: TestFileRepository(),
-            applicationDatasource: ApplicationDatasource(dbService: dbService),
+            applicationDatasource: createApplicationDatasource(
+              dbService: dbService,
+            ),
           ),
         );
 
@@ -305,7 +310,7 @@ void main() {
 
     try {
       // Assert applications saved to DB
-      final datasource = ApplicationDatasource(dbService: dbService);
+      final datasource = createApplicationDatasource(dbService: dbService);
       final appsResult = await datasource.getAllApplications();
       expect(
         appsResult.isRight(),

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
 import 'package:resumesux_domain/resumesux_domain.dart';
-import 'package:resumesux_domain/src/data/data.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 
 // Simple file repository for example
@@ -121,9 +120,10 @@ void main() async {
   final logger = LoggerImpl(name: 'FullApplicationExample');
 
   print('Setting up AI service...');
-  final aiService = AiServiceImpl(
+  final httpClient = http.Client();
+  final aiService = createAiServiceImpl(
     logger: logger,
-    httpClient: http.Client(),
+    httpClient: httpClient,
     provider: AiProvider(
       name: 'lmstudio',
       url: 'http://127.0.0.1:1234/v1',
@@ -152,11 +152,13 @@ void main() async {
   );
   await dbService.initialize();
 
-  final applicationDatasource = ApplicationDatasource(dbService: dbService);
+  final applicationDatasource = createApplicationDatasource(
+    dbService: dbService,
+  );
 
   print('Setting up repositories...');
 
-  final jobReqRepository = JobReqRepositoryImpl(
+  final jobReqRepository = createJobReqRepositoryImpl(
     logger: logger,
     aiService: aiService,
     applicationDatasource: applicationDatasource,
@@ -164,37 +166,37 @@ void main() async {
 
   final fileRepository = ExampleFileRepository();
 
-  final gigRepository = GigRepositoryImpl(
+  final gigRepository = createGigRepositoryImpl(
     logger: logger,
     digestPath: digestPath,
     aiService: aiService,
     applicationDatasource: applicationDatasource,
   );
-  final assetRepository = AssetRepositoryImpl(
+  final assetRepository = createAssetRepositoryImpl(
     logger: logger,
     digestPath: digestPath,
     aiService: aiService,
     applicationDatasource: applicationDatasource,
   );
 
-  final resumeRepository = ResumeRepositoryImpl(
+  final resumeRepository = createResumeRepositoryImpl(
     logger: logger,
     fileRepository: fileRepository,
     applicationDatasource: applicationDatasource,
   );
 
-  final coverLetterRepository = CoverLetterRepositoryImpl(
+  final coverLetterRepository = createCoverLetterRepositoryImpl(
     logger: logger,
     fileRepository: fileRepository,
     applicationDatasource: applicationDatasource,
   );
 
-  final applicationRepository = ApplicationRepositoryImpl(
+  final applicationRepository = createApplicationRepositoryImpl(
     applicationDatasource: applicationDatasource,
     fileRepository: fileRepository,
     resumeRepository: resumeRepository,
     coverLetterRepository: coverLetterRepository,
-    feedbackRepository: FeedbackRepositoryImpl(
+    feedbackRepository: createFeedbackRepositoryImpl(
       logger: logger,
       fileRepository: fileRepository,
       applicationDatasource: applicationDatasource,
@@ -319,5 +321,5 @@ void main() async {
 
   // Clean up
   await dbService.close();
-  aiService.httpClient.close();
+  httpClient.close();
 }

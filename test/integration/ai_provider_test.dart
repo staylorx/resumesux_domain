@@ -18,14 +18,16 @@ void main() {
     registerFallbackValue(<String, String>{});
     registerFallbackValue(<String, dynamic>{});
   });
-  late ConfigRepositoryImpl configRepository;
+  late ConfigRepository configRepository;
   late ConfigDatasource configDatasource;
   late AiService aiService;
   late MockHttpClient mockHttpClient;
 
   setUp(() {
-    configDatasource = ConfigDatasource();
-    configRepository = ConfigRepositoryImpl(configDatasource: configDatasource);
+    configDatasource = createConfigDatasource();
+    configRepository = createConfigRepositoryImpl(
+      configDatasource: configDatasource,
+    );
     mockHttpClient = MockHttpClient();
   });
 
@@ -291,7 +293,7 @@ void main() {
         );
 
         // Create AI service
-        aiService = AiServiceImpl(
+        aiService = createAiServiceImpl(
           httpClient: mockHttpClient,
           provider: provider,
         );
