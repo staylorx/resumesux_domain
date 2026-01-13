@@ -24,7 +24,7 @@ dependencies:
   markdown: ^7.2.2
   crypto: ^3.0.7
   id_logging:
-    git: https://github.com/staylorx/id_logging.git
+    git: https://github.com/staylorx/id_logging
 
 dev_dependencies:
   lints: ^6.0.0
