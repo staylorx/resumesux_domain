@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:intl/intl.dart';
-import 'package:id_logging/id_logging.dart';
 
 import 'package:markdown/markdown.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';

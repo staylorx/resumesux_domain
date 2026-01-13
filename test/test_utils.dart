@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:path/path.dart' as path;
 import 'package:resumesux_domain/resumesux_domain.dart';
-import 'package:id_logging/id_logging.dart';
 
 /// Manages README.md file for test suites, tracking progress and status.
 class TestSuiteReadmeManager {

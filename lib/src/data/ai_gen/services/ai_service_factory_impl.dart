@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:fpdart/fpdart.dart';
-import 'package:id_logging/id_logging.dart';
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/ai_gen/services/ai_service.dart';
 

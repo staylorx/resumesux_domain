@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:json_schema/json_schema.dart';
-import 'package:id_logging/id_logging.dart';
 
 import 'package:path/path.dart' as p;
 

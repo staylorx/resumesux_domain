@@ -1,5 +1,4 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:id_logging/id_logging.dart';
 
 import 'package:resumesux_domain/resumesux_domain.dart';
 

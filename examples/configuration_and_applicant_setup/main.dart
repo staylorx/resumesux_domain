@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_print
 
-import 'package:resumesux_domain/src/domain/domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 void main() {
   // This example demonstrates creating configuration and applicant data

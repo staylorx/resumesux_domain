@@ -2,7 +2,7 @@
 
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:resumesux_domain/src/domain/domain.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 

@@ -1,4 +1,4 @@
-import 'package:id_logging/id_logging.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:test/test.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 
