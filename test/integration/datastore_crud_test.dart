@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
@@ -104,11 +105,10 @@ void main() {
       );
 
       final dto = DocumentDto(
-        id: 'jobreq_1',
+        id: jobReqDto.id,
         content: 'Job description',
         contentType: 'text/markdown',
-        aiResponseJson:
-            '{"title": "Software Engineer", "concern": {"name": "TechCorp"}}',
+        aiResponseJson: jsonEncode(jobReqDto.toMap()),
         documentType: 'jobreq',
       );
 
