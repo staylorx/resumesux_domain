@@ -24,7 +24,5 @@ abstract class ApplicantRepository {
     required ApplicantHandle handle,
   });
   Future<Either<Failure, List<ApplicantWithHandle>>> getAll(); // For listing
-  Future<Either<Failure, Unit>> remove({
-    required ApplicantHandle handle,
-  });
+  Future<Either<Failure, Unit>> remove({required ApplicantHandle handle});
 }

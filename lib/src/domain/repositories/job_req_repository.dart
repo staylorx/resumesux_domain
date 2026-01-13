@@ -37,4 +37,5 @@ abstract class JobReqRepository implements DocRepository {
   });
   Future<Either<Failure, JobReq>> getByHandle({required JobReqHandle handle});
   Future<Either<Failure, List<JobReqWithHandle>>> getAll(); // For listing
+  Future<Either<Failure, Unit>> remove({required JobReqHandle handle});
 }

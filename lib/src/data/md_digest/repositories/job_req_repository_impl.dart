@@ -199,7 +199,7 @@ $content
       content: jobReqDto.content,
       contentType: 'text/markdown',
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
-      documentType: 'jobreq',
+      documentType: 'jobReq',
     );
     final result = await applicationDatasource.saveDocument(dto);
     return result.map((_) => jobReq);
@@ -228,7 +228,7 @@ $content
       content: jobReqDto.content,
       contentType: 'text/markdown',
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
-      documentType: 'jobreq',
+      documentType: 'jobReq',
     );
     return await applicationDatasource.saveDocument(dto);
   }
@@ -255,7 +255,9 @@ $content
   }
 
   @override
-  Future<Either<Failure, JobReq>> getByHandle({required JobReqHandle handle}) async {
+  Future<Either<Failure, JobReq>> getByHandle({
+    required JobReqHandle handle,
+  }) async {
     final result = await applicationDatasource.getJobReq(handle.toString());
     result.match(
       (failure) => logger?.warning(
@@ -293,8 +295,13 @@ $content
       content: jobReqDto.content,
       contentType: 'text/markdown',
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
-      documentType: 'jobreq',
+      documentType: 'jobReq',
     );
     return await applicationDatasource.saveDocument(dto);
+  }
+
+  @override
+  Future<Either<Failure, Unit>> remove({required JobReqHandle handle}) async {
+    return await applicationDatasource.deleteJobReq(handle.toString());
   }
 }

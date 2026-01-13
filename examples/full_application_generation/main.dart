@@ -223,11 +223,40 @@ void main() async {
     assetRepository: assetRepository,
   );
 
-  final saveAiResponsesUsecase = SaveAiResponsesUsecase(
+  final feedbackRepository = createFeedbackRepositoryImpl(
+    logger: logger,
+    fileRepository: fileRepository,
+    applicationDatasource: applicationDatasource,
+  );
+
+  final saveJobReqAiResponseUsecase = SaveJobReqAiResponseUsecase(
     logger: logger,
     jobReqRepository: jobReqRepository,
+  );
+
+  final saveGigAiResponseUsecase = SaveGigAiResponseUsecase(
+    logger: logger,
     gigRepository: gigRepository,
+  );
+
+  final saveAssetAiResponseUsecase = SaveAssetAiResponseUsecase(
+    logger: logger,
     assetRepository: assetRepository,
+  );
+
+  final saveResumeAiResponseUsecase = SaveResumeAiResponseUsecase(
+    logger: logger,
+    resumeRepository: resumeRepository,
+  );
+
+  final saveCoverLetterAiResponseUsecase = SaveCoverLetterAiResponseUsecase(
+    logger: logger,
+    coverLetterRepository: coverLetterRepository,
+  );
+
+  final saveFeedbackAiResponseUsecase = SaveFeedbackAiResponseUsecase(
+    logger: logger,
+    feedbackRepository: feedbackRepository,
   );
 
   final generateApplicationUsecase = GenerateApplicationUsecase(
@@ -235,7 +264,12 @@ void main() async {
     generateResumeUsecase: generateResumeUsecase,
     generateCoverLetterUsecase: generateCoverLetterUsecase,
     generateFeedbackUsecase: generateFeedbackUsecase,
-    saveAiResponsesUsecase: saveAiResponsesUsecase,
+    saveJobReqAiResponseUsecase: saveJobReqAiResponseUsecase,
+    saveGigAiResponseUsecase: saveGigAiResponseUsecase,
+    saveAssetAiResponseUsecase: saveAssetAiResponseUsecase,
+    saveResumeAiResponseUsecase: saveResumeAiResponseUsecase,
+    saveCoverLetterAiResponseUsecase: saveCoverLetterAiResponseUsecase,
+    saveFeedbackAiResponseUsecase: saveFeedbackAiResponseUsecase,
   );
 
   print('Loading job requirement...');

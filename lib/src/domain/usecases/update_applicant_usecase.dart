@@ -15,8 +15,13 @@ class UpdateApplicantUsecase with Loggable {
     required ApplicantHandle handle,
     required Applicant applicant,
   }) async {
-    logger?.info('[UpdateApplicantUsecase] updating applicant ${handle.toString()}');
-    final result = await applicantRepository.save(handle: handle, applicant: applicant);
+    logger?.info(
+      '[UpdateApplicantUsecase] updating applicant ${handle.toString()}',
+    );
+    final result = await applicantRepository.save(
+      handle: handle,
+      applicant: applicant,
+    );
     result.match(
       (failure) => logger?.error(
         '[UpdateApplicantUsecase] Failed to update applicant: ${failure.message}',

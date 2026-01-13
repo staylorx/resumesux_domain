@@ -158,7 +158,12 @@ void main() {
       late GenerateResumeUsecase generateResumeUsecase;
       late GenerateCoverLetterUsecase generateCoverLetterUsecase;
       late GenerateFeedbackUsecase generateFeedbackUsecase;
-      late SaveAiResponsesUsecase saveAiResponsesUsecase;
+      late SaveJobReqAiResponseUsecase saveJobReqAiResponseUsecase;
+      late SaveGigAiResponseUsecase saveGigAiResponseUsecase;
+      late SaveAssetAiResponseUsecase saveAssetAiResponseUsecase;
+      late SaveResumeAiResponseUsecase saveResumeAiResponseUsecase;
+      late SaveCoverLetterAiResponseUsecase saveCoverLetterAiResponseUsecase;
+      late SaveFeedbackAiResponseUsecase saveFeedbackAiResponseUsecase;
       late GenerateApplicationUsecase generateApplicationUsecase;
 
       setUp(() async {
@@ -215,10 +220,51 @@ void main() {
           assetRepository: assetRepository,
         );
 
-        saveAiResponsesUsecase = SaveAiResponsesUsecase(
+        saveJobReqAiResponseUsecase = SaveJobReqAiResponseUsecase(
           jobReqRepository: jobReqRepository,
+          logger: logger,
+        );
+
+        saveGigAiResponseUsecase = SaveGigAiResponseUsecase(
           gigRepository: gigRepository,
+          logger: logger,
+        );
+
+        saveAssetAiResponseUsecase = SaveAssetAiResponseUsecase(
           assetRepository: assetRepository,
+          logger: logger,
+        );
+
+        saveResumeAiResponseUsecase = SaveResumeAiResponseUsecase(
+          resumeRepository: createResumeRepositoryImpl(
+            logger: logger,
+            fileRepository: TestFileRepository(),
+            applicationDatasource: createApplicationDatasource(
+              dbService: dbService,
+            ),
+          ),
+          logger: logger,
+        );
+
+        saveCoverLetterAiResponseUsecase = SaveCoverLetterAiResponseUsecase(
+          coverLetterRepository: createCoverLetterRepositoryImpl(
+            logger: logger,
+            fileRepository: TestFileRepository(),
+            applicationDatasource: createApplicationDatasource(
+              dbService: dbService,
+            ),
+          ),
+          logger: logger,
+        );
+
+        saveFeedbackAiResponseUsecase = SaveFeedbackAiResponseUsecase(
+          feedbackRepository: createFeedbackRepositoryImpl(
+            logger: logger,
+            fileRepository: TestFileRepository(),
+            applicationDatasource: createApplicationDatasource(
+              dbService: dbService,
+            ),
+          ),
           logger: logger,
         );
 
@@ -226,7 +272,12 @@ void main() {
           generateResumeUsecase: generateResumeUsecase,
           generateCoverLetterUsecase: generateCoverLetterUsecase,
           generateFeedbackUsecase: generateFeedbackUsecase,
-          saveAiResponsesUsecase: saveAiResponsesUsecase,
+          saveJobReqAiResponseUsecase: saveJobReqAiResponseUsecase,
+          saveGigAiResponseUsecase: saveGigAiResponseUsecase,
+          saveAssetAiResponseUsecase: saveAssetAiResponseUsecase,
+          saveResumeAiResponseUsecase: saveResumeAiResponseUsecase,
+          saveCoverLetterAiResponseUsecase: saveCoverLetterAiResponseUsecase,
+          saveFeedbackAiResponseUsecase: saveFeedbackAiResponseUsecase,
           logger: logger,
         );
       });

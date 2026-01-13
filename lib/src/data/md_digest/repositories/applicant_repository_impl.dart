@@ -126,7 +126,10 @@ class ApplicantRepositoryImpl with Loggable implements ApplicantRepository {
       assetIds.add(assetId);
     }
 
-    final dto = ApplicantDto.fromDomain(applicant, id).copyWith(gigIds: gigIds, assetIds: assetIds);
+    final dto = ApplicantDto.fromDomain(
+      applicant,
+      id,
+    ).copyWith(gigIds: gigIds, assetIds: assetIds);
     return applicationDatasource.saveApplicant(dto);
   }
 

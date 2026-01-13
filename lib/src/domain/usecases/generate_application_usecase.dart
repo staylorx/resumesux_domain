@@ -8,7 +8,12 @@ class GenerateApplicationUsecase {
   final GenerateCoverLetterUsecase generateCoverLetterUsecase;
   final GenerateFeedbackUsecase generateFeedbackUsecase;
 
-  final SaveAiResponsesUsecase saveAiResponsesUsecase;
+  final SaveJobReqAiResponseUsecase saveJobReqAiResponseUsecase;
+  final SaveGigAiResponseUsecase saveGigAiResponseUsecase;
+  final SaveAssetAiResponseUsecase saveAssetAiResponseUsecase;
+  final SaveResumeAiResponseUsecase saveResumeAiResponseUsecase;
+  final SaveCoverLetterAiResponseUsecase saveCoverLetterAiResponseUsecase;
+  final SaveFeedbackAiResponseUsecase saveFeedbackAiResponseUsecase;
 
   /// Creates a new instance of [GenerateApplicationUsecase].
   GenerateApplicationUsecase({
@@ -16,7 +21,12 @@ class GenerateApplicationUsecase {
     required this.generateResumeUsecase,
     required this.generateCoverLetterUsecase,
     required this.generateFeedbackUsecase,
-    required this.saveAiResponsesUsecase,
+    required this.saveJobReqAiResponseUsecase,
+    required this.saveGigAiResponseUsecase,
+    required this.saveAssetAiResponseUsecase,
+    required this.saveResumeAiResponseUsecase,
+    required this.saveCoverLetterAiResponseUsecase,
+    required this.saveFeedbackAiResponseUsecase,
   });
 
   /// Generates an application for the given job requirement.
@@ -116,14 +126,13 @@ class GenerateApplicationUsecase {
     );
 
     // Save AI responses
-    final saveResult = await saveAiResponsesUsecase.call(
-      jobReqId: jobReq.hashCode.toString(),
-    );
-    if (saveResult.isLeft()) {
-      final failure = saveResult.getLeft().toNullable()!;
-      logger?.warning('Failed to save AI responses: ${failure.message}');
-      // Continue anyway, as it's not critical
-    }
+    final jobReqId = jobReq.hashCode.toString();
+    await saveJobReqAiResponseUsecase.call(jobReqId: jobReqId);
+    await saveGigAiResponseUsecase.call(jobReqId: jobReqId);
+    await saveAssetAiResponseUsecase.call(jobReqId: jobReqId);
+    await saveResumeAiResponseUsecase.call(jobReqId: jobReqId);
+    await saveCoverLetterAiResponseUsecase.call(jobReqId: jobReqId);
+    await saveFeedbackAiResponseUsecase.call(jobReqId: jobReqId);
 
     progress('Application generated successfully');
     logger?.info('Application generated successfully');

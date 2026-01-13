@@ -11,10 +11,10 @@ class RemoveApplicantUsecase with Loggable {
   }
 
   /// Remove the applicant
-  Future<Either<Failure, Unit>> call({
-    required ApplicantHandle handle,
-  }) async {
-    logger?.info('[RemoveApplicantUsecase] removing applicant ${handle.toString()}');
+  Future<Either<Failure, Unit>> call({required ApplicantHandle handle}) async {
+    logger?.info(
+      '[RemoveApplicantUsecase] removing applicant ${handle.toString()}',
+    );
     final result = await applicantRepository.remove(handle: handle);
     result.match(
       (failure) => logger?.error(

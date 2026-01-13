@@ -133,20 +133,41 @@ void main() {
       ),
     );
 
-    final saveAiResponsesUsecase = SaveAiResponsesUsecase(
+    final gigRepository = createGigRepositoryImpl(
+      logger: logger,
+      digestPath: 'test/data/digest/software_engineer',
+      aiService: aiService,
+      applicationDatasource: datasource,
+    );
+    final assetRepository = createAssetRepositoryImpl(
+      logger: logger,
+      digestPath: 'test/data/digest/software_engineer',
+      aiService: aiService,
+      applicationDatasource: datasource,
+    );
+
+    final saveJobReqAiResponseUsecase = SaveJobReqAiResponseUsecase(
       jobReqRepository: jobReqRepository,
-      gigRepository: createGigRepositoryImpl(
-        logger: logger,
-        digestPath: 'test/data/digest/software_engineer',
-        aiService: aiService,
-        applicationDatasource: datasource,
-      ),
-      assetRepository: createAssetRepositoryImpl(
-        logger: logger,
-        digestPath: 'test/data/digest/software_engineer',
-        aiService: aiService,
-        applicationDatasource: datasource,
-      ),
+      logger: logger,
+    );
+    final saveGigAiResponseUsecase = SaveGigAiResponseUsecase(
+      gigRepository: gigRepository,
+      logger: logger,
+    );
+    final saveAssetAiResponseUsecase = SaveAssetAiResponseUsecase(
+      assetRepository: assetRepository,
+      logger: logger,
+    );
+    final saveResumeAiResponseUsecase = SaveResumeAiResponseUsecase(
+      resumeRepository: resumeRepository,
+      logger: logger,
+    );
+    final saveCoverLetterAiResponseUsecase = SaveCoverLetterAiResponseUsecase(
+      coverLetterRepository: coverLetterRepository,
+      logger: logger,
+    );
+    final saveFeedbackAiResponseUsecase = SaveFeedbackAiResponseUsecase(
+      feedbackRepository: feedbackRepository,
       logger: logger,
     );
 
@@ -154,7 +175,12 @@ void main() {
       generateResumeUsecase: generateResumeUsecase,
       generateCoverLetterUsecase: generateCoverLetterUsecase,
       generateFeedbackUsecase: generateFeedbackUsecase,
-      saveAiResponsesUsecase: saveAiResponsesUsecase,
+      saveJobReqAiResponseUsecase: saveJobReqAiResponseUsecase,
+      saveGigAiResponseUsecase: saveGigAiResponseUsecase,
+      saveAssetAiResponseUsecase: saveAssetAiResponseUsecase,
+      saveResumeAiResponseUsecase: saveResumeAiResponseUsecase,
+      saveCoverLetterAiResponseUsecase: saveCoverLetterAiResponseUsecase,
+      saveFeedbackAiResponseUsecase: saveFeedbackAiResponseUsecase,
       logger: logger,
     );
 
