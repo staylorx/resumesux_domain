@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-/// Use case for retrieving and enriching applicant information.
+/// Use case for retrieving  applicant information from database
 class GetApplicantUsecase with Loggable {
   final ApplicantRepository applicantRepository;
 
@@ -11,26 +11,17 @@ class GetApplicantUsecase with Loggable {
     this.logger = logger;
   }
 
-  /// Enriches the provided applicant with additional data from the digest.
-  ///
-  /// Parameters:
-  /// - [applicant]: The applicant to enrich.
-  ///
-  /// Returns: [Either<Failure, Applicant>] containing the enriched applicant or a failure.
-  Future<Either<Failure, Applicant>> call({
-    required Applicant applicant,
-  }) async {
+  /// get the applicant record from database
+  Future<Either<Failure, Applicant>> call(ApplicantHandle handle) async {
     logger?.info(
-      '[GetApplicantUsecase] Enriching applicant information with digest data',
+      '[GetApplicantUsecase] getting applicant information from database',
     );
-    final result = await applicantRepository.getApplicant(applicant: applicant);
-    result.fold(
+    final result = await applicantRepository.getByHandle(handle: handle);
+    result.match(
       (failure) => logger?.error(
-        '[GetApplicantUsecase] Failed to enrich applicant: ${failure.message}',
+        '[GetApplicantUsecase] Failed to get applicant: ${failure.message}',
       ),
-      (enrichedApplicant) => logger?.info(
-        '[GetApplicantUsecase] Applicant enriched successfully: ${enrichedApplicant.name}',
-      ),
+      (_) => {},
     );
     return result;
   }

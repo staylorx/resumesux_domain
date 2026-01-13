@@ -85,7 +85,7 @@ $header
 Generate an ATS-optimized resume. $customPrompt
 
 Job Requirements:
-$jobReq
+$jobReq'
 
 Work Experiences:
 ${gigs.map((g) => '---\n$g').join('\n')}

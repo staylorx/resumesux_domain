@@ -164,7 +164,7 @@ $jobReqSummary
 $aiResponses
 
 Job Requirements:
-$jobReq
+$jobReq'
 
 Generated Resume:
 $resume

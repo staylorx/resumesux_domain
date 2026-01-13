@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 
 import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/value_objects/handles/asset_handle.dart';
 
 import '../../data.dart';
 
@@ -56,7 +57,7 @@ class AssetRepositoryImpl with Loggable implements AssetRepository {
         content: jsonEncode(extractedData),
         contentType: 'application/json',
         aiResponseJson: '',
-        documentType: 'ai_response',
+        documentType: 'asset_response',
         jobReqId: null,
       );
       final saveResult = await applicationDatasource.saveAiResponseDocument(
@@ -212,6 +213,19 @@ $content
       }
     }
     return 'unknown';
+  }
+
+  @override
+  Future<Either<Failure, List<AssetWithHandle>>> getAll() async {
+    final result = await applicationDatasource.getAllPersistedAssets();
+    return result.map(
+      (dtos) => dtos.map((dto) {
+        final handle = AssetHandle(dto.id);
+        final tags = dto.tagNames.map((name) => Tag(name: name)).toList();
+        final asset = Asset(tags: tags, content: dto.content);
+        return AssetWithHandle(handle: handle, asset: asset);
+      }).toList(),
+    );
   }
 
   @override

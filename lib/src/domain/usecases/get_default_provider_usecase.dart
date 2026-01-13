@@ -24,7 +24,7 @@ class GetDefaultProviderUsecase with Loggable {
     final result = await configRepository.getDefaultProvider(
       configPath: configPath,
     );
-    result.fold(
+    result.match(
       (failure) => logger?.error(
         '[GetDefaultProviderUsecase] Failed to retrieve default provider: ${failure.message}',
       ),

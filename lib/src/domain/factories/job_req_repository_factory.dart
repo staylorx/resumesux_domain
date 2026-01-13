@@ -6,9 +6,8 @@ JobReqRepository createJobReqRepositoryImpl({
   Logger? logger,
   required AiService aiService,
   required ApplicationDatasource applicationDatasource,
-}) =>
-    JobReqRepositoryImpl(
-      logger: logger,
-      aiService: aiService,
-      applicationDatasource: applicationDatasource,
-    );
+}) => JobReqRepositoryImpl(
+  logger: logger,
+  aiService: aiService,
+  applicationDatasource: applicationDatasource,
+);

@@ -119,7 +119,7 @@ class ConfigRepositoryImpl with Loggable implements ConfigRepository {
     } else {
       // Use default config directory
       final configDirResult = _getConfigDir(appName: kAppName);
-      return configDirResult.fold((failure) => Left(failure), (configDir) {
+      return configDirResult.match((failure) => Left(failure), (configDir) {
         final configFilePath = p.join(configDir, 'config.yaml');
         return Right(configFilePath);
       });
@@ -329,7 +329,7 @@ class ConfigRepositoryImpl with Loggable implements ConfigRepository {
     String? configPath,
   }) async {
     final configResult = await loadConfig(configPath: configPath);
-    return configResult.fold((failure) => Left(failure), (config) {
+    return configResult.match((failure) => Left(failure), (config) {
       try {
         AiProvider provider;
         if (providerName == 'default') {
@@ -351,7 +351,7 @@ class ConfigRepositoryImpl with Loggable implements ConfigRepository {
     String? configPath,
   }) async {
     final configResult = await loadConfig(configPath: configPath);
-    return configResult.fold((failure) => Left(failure), (config) {
+    return configResult.match((failure) => Left(failure), (config) {
       try {
         final provider = config.providers.firstWhere((p) => p.isDefault);
         return Right(provider);
@@ -364,7 +364,7 @@ class ConfigRepositoryImpl with Loggable implements ConfigRepository {
   @override
   Future<Either<Failure, AiModel>> getDefaultModel({String? configPath}) async {
     final providerResult = await getDefaultProvider(configPath: configPath);
-    return providerResult.fold((failure) => Left(failure), (provider) {
+    return providerResult.match((failure) => Left(failure), (provider) {
       return Right(provider.defaultModel!);
     });
   }

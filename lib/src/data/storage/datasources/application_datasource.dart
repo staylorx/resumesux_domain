@@ -4,6 +4,8 @@ import 'package:resumesux_domain/src/data/data.dart';
 
 import '../../models/applicant_dto.dart';
 
+// TODO: this is getting big, consider splitting into multiple datasources
+
 /// Datasource for persisting application data and AI responses.
 class ApplicationDatasource {
   final DatabaseService _dbService;
@@ -91,6 +93,31 @@ class ApplicationDatasource {
       return Left(
         ServiceFailure(message: 'Failed to get all applications: $e'),
       );
+    }
+  }
+
+  /// Retrieves all applicants.
+  Future<Either<Failure, List<ApplicantDto>>> getAllApplicants() async {
+    try {
+      await _ensureInitialized();
+      final records = await _dbService.find(storeName: 'applicants');
+      final applicants = records
+          .map((record) => ApplicantDto.fromMap(record))
+          .toList();
+      return Right(applicants);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get all applicants: $e'));
+    }
+  }
+
+  /// Deletes an applicant by ID.
+  Future<Either<Failure, Unit>> deleteApplicant(String id) async {
+    try {
+      await _ensureInitialized();
+      await _dbService.delete(storeName: 'applicants', key: id);
+      return Right(unit);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to delete applicant: $e'));
     }
   }
 
@@ -326,10 +353,36 @@ class ApplicationDatasource {
         return 'cover_letters';
       case 'feedback':
         return 'feedbacks';
-      case 'jobreq':
+      case 'jobReq':
         return 'jobreqs';
       default:
         throw ArgumentError('Unknown document type: $documentType');
+    }
+  }
+
+  Future<Either<Failure, List<JobReqDto>>> getAllJobReqs() async {
+    try {
+      await _ensureInitialized();
+      final records = await _dbService.find(storeName: 'jobreqs');
+      final jobReqs = records
+          .map((record) => JobReqDto.fromMap(record))
+          .toList();
+      return Right(jobReqs);
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get all job reqs: $e'));
+    }
+  }
+
+  Future<Either<Failure, JobReqDto>> getJobReq(String id) async {
+    try {
+      await _ensureInitialized();
+      final data = await _dbService.get(storeName: 'jobreqs', key: id);
+      if (data == null) {
+        return Left(NotFoundFailure(message: 'JobReq not found: $id'));
+      }
+      return Right(JobReqDto.fromMap(data));
+    } catch (e) {
+      return Left(ServiceFailure(message: 'Failed to get job req: $e'));
     }
   }
 }

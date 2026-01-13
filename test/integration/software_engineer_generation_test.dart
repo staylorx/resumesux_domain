@@ -86,11 +86,7 @@ void main() {
       applicationDatasource: applicationDatasource,
     );
 
-    final configRepository = createConfigRepositoryImpl(
-      configDatasource: createConfigDatasource(),
-    );
     applicantRepository = createApplicantRepositoryImpl(
-      configRepository: configRepository,
       applicationDatasource: applicationDatasource,
       aiService: aiService,
     );

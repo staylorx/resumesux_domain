@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:resumesux_domain/src/domain/entities/job_req.dart';
+import 'package:resumesux_domain/src/domain/entities/concern.dart';
 
 /// Data Transfer Object for JobReq, matching the Sembast storage format.
 class JobReqDto with EquatableMixin {
@@ -48,6 +50,25 @@ class JobReqDto with EquatableMixin {
       'createdDate': createdDate,
       'whereFound': whereFound,
     };
+  }
+
+  /// Converts to domain entity.
+  JobReq toDomain() {
+    return JobReq(
+      title: title,
+      content: content,
+      salary: salary,
+      location: location,
+      concern: concern != null
+          ? Concern(
+              name: concern!['name'] as String? ?? 'Unknown',
+              description: concern!['description'] as String?,
+              location: concern!['location'] as String?,
+            )
+          : null,
+      createdDate: createdDate != null ? DateTime.parse(createdDate!) : null,
+      whereFound: whereFound,
+    );
   }
 
   @override

@@ -5,8 +5,4 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 ConfigRepository createConfigRepositoryImpl({
   Logger? logger,
   required ConfigDatasource configDatasource,
-}) =>
-    ConfigRepositoryImpl(
-      logger: logger,
-      configDatasource: configDatasource,
-    );
+}) => ConfigRepositoryImpl(logger: logger, configDatasource: configDatasource);

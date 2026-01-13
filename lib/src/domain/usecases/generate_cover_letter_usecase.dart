@@ -77,7 +77,7 @@ $header
 Generate a professional cover letter. $customPrompt
 
 Job Requirements:
-$jobReq
+$jobReq'
 
 Generated Resume:
 $resume

@@ -7,10 +7,9 @@ AssetRepository createAssetRepositoryImpl({
   required String digestPath,
   required AiService aiService,
   required ApplicationDatasource applicationDatasource,
-}) =>
-    AssetRepositoryImpl(
-      logger: logger,
-      digestPath: digestPath,
-      aiService: aiService,
-      applicationDatasource: applicationDatasource,
-    );
+}) => AssetRepositoryImpl(
+  logger: logger,
+  digestPath: digestPath,
+  aiService: aiService,
+  applicationDatasource: applicationDatasource,
+);

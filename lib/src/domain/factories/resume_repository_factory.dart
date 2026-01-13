@@ -6,9 +6,8 @@ ResumeRepository createResumeRepositoryImpl({
   Logger? logger,
   required FileRepository fileRepository,
   required ApplicationDatasource applicationDatasource,
-}) =>
-    ResumeRepositoryImpl(
-      logger: logger,
-      fileRepository: fileRepository,
-      applicationDatasource: applicationDatasource,
-    );
+}) => ResumeRepositoryImpl(
+  logger: logger,
+  fileRepository: fileRepository,
+  applicationDatasource: applicationDatasource,
+);

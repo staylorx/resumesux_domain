@@ -3,16 +3,14 @@ import 'package:fpdart/fpdart.dart';
 
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-/// Use case for creating a new job requirement.
-class CreateJobReqUsecase {
-  final Logger? logger;
+/// Use case for creating a new job requirement from a file.
+class ExtractJobReqFromFileUsecase with Loggable {
   final JobReqRepository jobReqRepository;
   final AiService aiService;
   final FileRepository fileRepository;
 
-  /// Creates a new instance of [CreateJobReqUsecase].
-  CreateJobReqUsecase({
-    this.logger,
+  /// Creates a new instance of [ExtractJobReqFromFileUsecase].
+  ExtractJobReqFromFileUsecase({
     required this.jobReqRepository,
     required this.aiService,
     required this.fileRepository,

@@ -232,4 +232,69 @@ $content
     );
     return await applicationDatasource.saveDocument(dto);
   }
+
+  @override
+  Future<Either<Failure, List<JobReqWithHandle>>> getAll() async {
+    final result = await applicationDatasource.getAllJobReqs();
+    result.match(
+      (failure) => logger?.warning(
+        'Failed to get all job reqs. Error: ${failure.message}',
+      ),
+      (dtos) => logger?.info('Successfully retrieved all job reqs.'),
+    );
+    return result.map(
+      (dtos) => dtos
+          .map(
+            (dto) => JobReqWithHandle(
+              handle: JobReqHandle(dto.id),
+              jobReq: dto.toDomain(),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  @override
+  Future<Either<Failure, JobReq>> getByHandle({required JobReqHandle handle}) async {
+    final result = await applicationDatasource.getJobReq(handle.toString());
+    result.match(
+      (failure) => logger?.warning(
+        'Failed to get job req by handle: $handle, Error: ${failure.message}',
+      ),
+      (jobReq) =>
+          logger?.info('Successfully retrieved job req by handle: $handle'),
+    );
+    return result.map((dto) => dto.toDomain());
+  }
+
+  @override
+  Future<Either<Failure, Unit>> save({
+    required JobReqHandle handle,
+    required JobReq jobReq,
+  }) async {
+    final jobReqDto = JobReqDto(
+      id: handle.toString(),
+      title: jobReq.title,
+      content: jobReq.content,
+      salary: jobReq.salary,
+      location: jobReq.location,
+      concern: jobReq.concern != null
+          ? {
+              'name': jobReq.concern!.name,
+              'description': jobReq.concern!.description,
+              'location': jobReq.concern!.location,
+            }
+          : null,
+      createdDate: jobReq.createdDate?.toIso8601String(),
+      whereFound: jobReq.whereFound,
+    );
+    final dto = DocumentDto(
+      id: jobReqDto.id,
+      content: jobReqDto.content,
+      contentType: 'text/markdown',
+      aiResponseJson: jsonEncode(jobReqDto.toMap()),
+      documentType: 'jobreq',
+    );
+    return await applicationDatasource.saveDocument(dto);
+  }
 }

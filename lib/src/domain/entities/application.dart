@@ -6,7 +6,7 @@ import 'feedback.dart';
 import 'job_req.dart';
 import 'resume.dart';
 
-/// Represents a complete job application including resume, cover letter, feedback,
+/// Represents a complete job application including resume and optional cover letter and feedback,
 /// and links to the applicant and job requirement.
 /// Applications are saved to disk in a structured format, within an output directory
 /// specified by the user, then in `<concern>/<job_title>/application_<timestamp>/*.md` files
@@ -14,8 +14,8 @@ class Application with EquatableMixin {
   final Applicant applicant;
   final JobReq jobReq;
   final Resume resume;
-  final CoverLetter coverLetter;
-  final Feedback feedback;
+  final CoverLetter? coverLetter;
+  final Feedback? feedback;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -23,8 +23,8 @@ class Application with EquatableMixin {
     required this.applicant,
     required this.jobReq,
     required this.resume,
-    required this.coverLetter,
-    required this.feedback,
+    this.coverLetter,
+    this.feedback,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) : createdAt = createdAt ?? DateTime.now(),
@@ -51,7 +51,7 @@ class Application with EquatableMixin {
   }
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
     applicant,
     jobReq,
     resume,

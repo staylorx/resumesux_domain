@@ -6,9 +6,8 @@ FeedbackRepository createFeedbackRepositoryImpl({
   Logger? logger,
   required FileRepository fileRepository,
   required ApplicationDatasource applicationDatasource,
-}) =>
-    FeedbackRepositoryImpl(
-      logger: logger,
-      fileRepository: fileRepository,
-      applicationDatasource: applicationDatasource,
-    );
+}) => FeedbackRepositoryImpl(
+  logger: logger,
+  fileRepository: fileRepository,
+  applicationDatasource: applicationDatasource,
+);

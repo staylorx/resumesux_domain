@@ -5,7 +5,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 /// Use case for retrieving a job requirement, with preprocessing if needed.
 class GetJobReqUsecase with Loggable {
   final JobReqRepository jobReqRepository;
-  final CreateJobReqUsecase createJobReqUsecase;
+  final ExtractJobReqFromFileUsecase createJobReqUsecase;
 
   /// Creates a new instance of [GetJobReqUsecase].
   GetJobReqUsecase({
@@ -36,7 +36,7 @@ class GetJobReqUsecase with Loggable {
         if (preprocessResult.isLeft()) {
           return preprocessResult;
         }
-        // Retry getJobReq
+        // Retry getjobReq'
         jobReqResult = await jobReqRepository.getJobReq(path: path);
         if (jobReqResult.isLeft()) {
           return jobReqResult;

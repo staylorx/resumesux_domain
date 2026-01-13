@@ -1,32 +1,40 @@
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/data/data.dart';
 
-import '../../data.dart';
 import '../../models/applicant_dto.dart';
 
-/// Implementation of the ApplicantRepository.
 class ApplicantRepositoryImpl with Loggable implements ApplicantRepository {
-  final ConfigRepository configRepository;
   final ApplicationDatasource applicationDatasource;
   final AiService aiService;
 
+  /// Creates a new instance of [ApplicantRepositoryImpl].
   ApplicantRepositoryImpl({
-    Logger? logger,
-    required this.configRepository,
     required this.applicationDatasource,
     required this.aiService,
+    Logger? logger,
   }) {
     this.logger = logger;
   }
 
   @override
+  Future<Either<Failure, List<ApplicantWithHandle>>> getAll() async {
+    final result = await applicationDatasource.getAllApplicants();
+    return result.map(
+      (dtos) => dtos.map((dto) {
+        final handle = ApplicantHandle(dto.id);
+        final applicant = dto.toDomain();
+        return ApplicantWithHandle(handle: handle, applicant: applicant);
+      }).toList(),
+    );
+  }
+
+  @override
   /// Retrieves the applicant with updated gigs and assets information.
-  Future<Either<Failure, Applicant>> getApplicant({
-    required Applicant applicant,
+  Future<Either<Failure, Applicant>> getByHandle({
+    required ApplicantHandle handle,
   }) async {
-    final id = sha256.convert(utf8.encode(applicant.email)).toString();
+    final id = handle.toString();
     final applicantResult = await applicationDatasource.getApplicant(id);
     if (applicantResult.isLeft()) {
       return Left(applicantResult.getLeft().toNullable()!);
@@ -68,43 +76,57 @@ class ApplicantRepositoryImpl with Loggable implements ApplicantRepository {
       }
     }
 
-    final updatedApplicant = applicant.copyWith(gigs: gigs, assets: assets);
+    final updatedApplicant = dto.toDomain().copyWith(
+      gigs: gigs,
+      assets: assets,
+    );
     return Right(updatedApplicant);
   }
 
   @override
-  Future<Either<Failure, Unit>> saveApplicant({
+  Future<Either<Failure, Unit>> save({
     required Applicant applicant,
+    required ApplicantHandle handle,
   }) async {
-    final id = sha256.convert(utf8.encode(applicant.email)).toString();
-    final gigIds = applicant.gigs
-        .map((gig) => sha256.convert(utf8.encode(gig.title)).toString())
-        .toList();
-    final assetIds = applicant.assets
-        .map((asset) => sha256.convert(utf8.encode(asset.content)).toString())
-        .toList();
-    final addressMap = applicant.address != null
-        ? {
-            'street1': applicant.address!.street1,
-            'street2': applicant.address!.street2,
-            'city': applicant.address!.city,
-            'state': applicant.address!.state,
-            'zip': applicant.address!.zip,
-          }
-        : null;
-    final dto = ApplicantDto(
-      id: id,
-      name: applicant.name,
-      preferredName: applicant.preferredName,
-      email: applicant.email,
-      address: addressMap,
-      phone: applicant.phone,
-      linkedin: applicant.linkedin,
-      github: applicant.github,
-      portfolio: applicant.portfolio,
-      gigIds: gigIds,
-      assetIds: assetIds,
-    );
+    final id = handle.toString();
+
+    // Save gigs and collect ids
+    final gigIds = <String>[];
+    for (final gig in applicant.gigs) {
+      final gigId = 'gig_${gig.title.hashCode}_${gig.concern?.hashCode ?? ''}';
+      final gigDto = GigDto(
+        id: gigId,
+        concern: gig.concern,
+        location: gig.location,
+        title: gig.title,
+        dates: gig.dates,
+        achievements: gig.achievements,
+      );
+      final saveResult = await applicationDatasource.saveGig(gigDto);
+      if (saveResult.isLeft()) {
+        return Left(saveResult.getLeft().toNullable()!);
+      }
+      gigIds.add(gigId);
+    }
+
+    // Save assets and collect ids
+    final assetIds = <String>[];
+    for (final asset in applicant.assets) {
+      final assetId = 'asset_${asset.content.hashCode}';
+      final tagNames = asset.tags.map((tag) => tag.name).toList();
+      final assetDto = AssetDto(
+        id: assetId,
+        tagNames: tagNames,
+        content: asset.content,
+      );
+      final saveResult = await applicationDatasource.saveAsset(assetDto);
+      if (saveResult.isLeft()) {
+        return Left(saveResult.getLeft().toNullable()!);
+      }
+      assetIds.add(assetId);
+    }
+
+    final dto = ApplicantDto.fromDomain(applicant, id).copyWith(gigIds: gigIds, assetIds: assetIds);
     return applicationDatasource.saveApplicant(dto);
   }
 
@@ -145,5 +167,13 @@ class ApplicantRepositoryImpl with Loggable implements ApplicantRepository {
 
     final updatedApplicant = applicant.copyWith(gigs: gigs, assets: assets);
     return Right(updatedApplicant);
+  }
+
+  @override
+  Future<Either<Failure, Unit>> remove({
+    required ApplicantHandle handle,
+  }) async {
+    final id = handle.toString();
+    return applicationDatasource.deleteApplicant(id);
   }
 }

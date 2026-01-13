@@ -6,9 +6,8 @@ CoverLetterRepository createCoverLetterRepositoryImpl({
   Logger? logger,
   required FileRepository fileRepository,
   required ApplicationDatasource applicationDatasource,
-}) =>
-    CoverLetterRepositoryImpl(
-      logger: logger,
-      fileRepository: fileRepository,
-      applicationDatasource: applicationDatasource,
-    );
+}) => CoverLetterRepositoryImpl(
+  logger: logger,
+  fileRepository: fileRepository,
+  applicationDatasource: applicationDatasource,
+);

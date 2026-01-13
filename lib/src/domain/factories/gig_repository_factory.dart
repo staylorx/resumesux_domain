@@ -7,10 +7,9 @@ GigRepository createGigRepositoryImpl({
   required String digestPath,
   required AiService aiService,
   required ApplicationDatasource applicationDatasource,
-}) =>
-    GigRepositoryImpl(
-      logger: logger,
-      digestPath: digestPath,
-      aiService: aiService,
-      applicationDatasource: applicationDatasource,
-    );
+}) => GigRepositoryImpl(
+  logger: logger,
+  digestPath: digestPath,
+  aiService: aiService,
+  applicationDatasource: applicationDatasource,
+);

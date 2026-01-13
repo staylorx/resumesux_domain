@@ -22,7 +22,7 @@ class GetConfigUsecase with Loggable {
       '[GetConfigUsecase] Loading configuration from path: ${configPath ?? 'default'}',
     );
     final result = await configRepository.loadConfig(configPath: configPath);
-    result.fold(
+    result.match(
       (failure) => logger?.error(
         '[GetConfigUsecase] Failed to load config: ${failure.message}',
       ),

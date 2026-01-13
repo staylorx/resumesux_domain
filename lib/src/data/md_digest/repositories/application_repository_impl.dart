@@ -1,12 +1,10 @@
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 import '../../data.dart';
 
 /// Implementation of ApplicationRepository.
-class ApplicationRepositoryImpl implements ApplicationRepository {
+class ApplicationRepositoryImpl with Loggable implements ApplicationRepository {
   final ApplicationDatasource applicationDatasource;
   final FileRepository fileRepository;
   final ResumeRepository resumeRepository;
@@ -25,36 +23,6 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   });
 
   @override
-  Future<Either<Failure, Unit>> saveApplication({
-    required Application application,
-  }) async {
-    // Save applicant if repository available
-    if (applicantRepository != null) {
-      final saveApplicantResult = await applicantRepository!.saveApplicant(
-        applicant: application.applicant,
-      );
-      if (saveApplicantResult.isLeft()) {
-        return saveApplicantResult;
-      }
-    }
-
-    final dto = ApplicationDto(
-      id: sha256
-          .convert(utf8.encode(DateTime.now().toIso8601String()))
-          .toString(),
-      applicantId: sha256
-          .convert(utf8.encode(application.applicant.email))
-          .toString(),
-      jobReqId: sha256
-          .convert(utf8.encode(application.jobReq.content))
-          .toString(),
-      createdAt: application.createdAt,
-      updatedAt: application.updatedAt,
-    );
-    return applicationDatasource.saveApplication(dto);
-  }
-
-  @override
   Future<Either<Failure, Unit>> saveApplicationArtifacts({
     required Application application,
     required String outputDir,
@@ -70,7 +38,8 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     final appDirPath = appDirResult.getOrElse((_) => '');
 
     // Save resume
-    final jobReqId = application.jobReq.hashCode.toString();
+    final jobReqId =
+        'jobreq_${application.jobReq.title.hashCode}_${application.jobReq.content.hashCode}';
     final saveResumeResult = await resumeRepository.saveResume(
       resume: application.resume,
       outputDir: appDirPath,
@@ -82,9 +51,9 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     }
 
     // Save cover letter if not empty
-    if (application.coverLetter.content.isNotEmpty) {
+    if (application.coverLetter!.content.isNotEmpty) {
       final saveCoverResult = await coverLetterRepository.saveCoverLetter(
-        coverLetter: application.coverLetter,
+        coverLetter: application.coverLetter!,
         outputDir: appDirPath,
         jobTitle: application.jobReq.title,
         jobReqId: jobReqId,
@@ -95,9 +64,9 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     }
 
     // Save feedback if not empty
-    if (application.feedback.content.isNotEmpty) {
+    if (application.feedback!.content.isNotEmpty) {
       final saveFeedbackResult = await feedbackRepository.saveFeedback(
-        feedback: application.feedback,
+        feedback: application.feedback!,
         outputDir: appDirPath,
         jobReqId: jobReqId,
       );
@@ -107,5 +76,53 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     }
 
     return Right(unit);
+  }
+
+  @override
+  Future<Either<Failure, List<ApplicationWithHandle>>> getAll() async {
+    final result = await applicationDatasource.getAllApplications();
+    return result.map(
+      (dtos) => dtos.map((dto) {
+        final handle = ApplicationHandle(dto.id);
+        final application = dto.toDomain();
+        return ApplicationWithHandle(handle: handle, application: application);
+      }).toList(),
+    );
+  }
+
+  @override
+  Future<Either<Failure, Application>> getByHandle({
+    required ApplicationHandle handle,
+  }) async {
+    final result = await applicationDatasource.getApplication(
+      handle.toString(),
+    );
+    result.match(
+      (failure) => logger?.warning(
+        'Failed to get application by handle: $handle, Error: ${failure.message}',
+      ),
+      (application) =>
+          logger?.info('Successfully retrieved application by handle: $handle'),
+    );
+    return result.map((dto) => dto.toDomain());
+  }
+
+  @override
+  Future<Either<Failure, Unit>> save({
+    required ApplicationHandle handle,
+    required Application application,
+  }) {
+    final applicantId =
+        'applicant_${application.applicant.name.hashCode}_${application.applicant.email.hashCode}';
+    final jobReqId =
+        'jobreq_${application.jobReq.title.hashCode}_${application.jobReq.content.hashCode}';
+    final dto = ApplicationDto(
+      id: handle.toString(),
+      applicantId: applicantId,
+      jobReqId: jobReqId,
+      createdAt: application.createdAt,
+      updatedAt: application.updatedAt,
+    );
+    return applicationDatasource.saveApplication(dto);
   }
 }

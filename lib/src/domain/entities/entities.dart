@@ -13,7 +13,11 @@ export 'doc.dart';
 export 'feedback.dart';
 export 'gig.dart';
 export 'job_req.dart';
-export '../value_objects/ai_model.dart';
 export 'ai_provider.dart';
 export 'resume.dart';
 export 'tag.dart';
+
+export '../value_objects/ai_model.dart';
+export '../value_objects/handles/application_handle.dart';
+export '../value_objects/handles/applicant_handle.dart';
+export '../value_objects/handles/jobreq_handle.dart';

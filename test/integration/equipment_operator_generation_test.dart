@@ -68,46 +68,41 @@ void main() {
   setUp(() {
     fileRepository = TestFileRepository();
 
-    gigRepository = GigRepositoryImpl(
+    gigRepository = createGigRepositoryImpl(
       digestPath: 'test/data/digest/heavy_equipment_operator',
       aiService: aiService,
       applicationDatasource: applicationDatasource,
     );
-    assetRepository = AssetRepositoryImpl(
+    assetRepository = createAssetRepositoryImpl(
       digestPath: 'test/data/digest/heavy_equipment_operator',
       aiService: aiService,
       applicationDatasource: applicationDatasource,
     );
-    jobReqRepository = JobReqRepositoryImpl(
-      logger: logger,
+    jobReqRepository = createJobReqRepositoryImpl(
       aiService: aiService,
       applicationDatasource: applicationDatasource,
     );
 
-    final configRepository = ConfigRepositoryImpl(
-      configDatasource: ConfigDatasource(),
-    );
-    applicantRepository = ApplicantRepositoryImpl(
-      configRepository: configRepository,
+    applicantRepository = createApplicantRepositoryImpl(
+      logger: logger,
       applicationDatasource: applicationDatasource,
       aiService: aiService,
     );
 
-    resumeRepository = ResumeRepositoryImpl(
-      logger: logger,
+    resumeRepository = createResumeRepositoryImpl(
       fileRepository: fileRepository,
       applicationDatasource: applicationDatasource,
     );
-    coverLetterRepository = CoverLetterRepositoryImpl(
+    coverLetterRepository = createCoverLetterRepositoryImpl(
       fileRepository: fileRepository,
       applicationDatasource: applicationDatasource,
     );
-    applicationRepository = ApplicationRepositoryImpl(
+    applicationRepository = createApplicationRepositoryImpl(
       applicationDatasource: applicationDatasource,
       fileRepository: fileRepository,
       resumeRepository: resumeRepository,
       coverLetterRepository: coverLetterRepository,
-      feedbackRepository: FeedbackRepositoryImpl(
+      feedbackRepository: createFeedbackRepositoryImpl(
         fileRepository: fileRepository,
         applicationDatasource: applicationDatasource,
       ),

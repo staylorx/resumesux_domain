@@ -44,7 +44,7 @@ void main() {
 
     final datasource = createApplicationDatasource(dbService: dbService);
     final result = await datasource.clearJobReqs();
-    result.fold(
+    result.match(
       (failure) => logger.error('Failure: ${failure.message}'),
       (_) => {},
     );
@@ -78,13 +78,8 @@ void main() {
       applicationDatasource: datasource,
     );
 
-    final configRepository = createConfigRepositoryImpl(
-      logger: logger,
-      configDatasource: createConfigDatasource(),
-    );
     applicantRepository = createApplicantRepositoryImpl(
       logger: logger,
-      configRepository: configRepository,
       applicationDatasource: datasource,
       aiService: aiService,
     );
@@ -274,7 +269,9 @@ void main() {
               (_) => throw Exception('Failed to generate application'),
             );
 
-            final saveAppResult = await applicationRepository.saveApplication(
+            // TODO: replace this with createApplicationUsecase call once fixed
+            final saveAppResult = await applicationRepository.save(
+              handle: application.handle,
               application: application,
             );
             expect(

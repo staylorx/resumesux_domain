@@ -5,7 +5,7 @@ export 'ai_gen/services/ai_service_factory_impl.dart';
 
 export 'config/config_schema.dart';
 export 'config/datasources/config_datasource.dart';
-export 'config/repositories/applicant_repository_impl.dart';
+export 'md_digest/repositories/applicant_repository_impl.dart';
 export 'config/repositories/config_repository_impl.dart';
 
 export 'md_digest/repositories/asset_repository_impl.dart';

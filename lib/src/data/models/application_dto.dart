@@ -1,3 +1,8 @@
+import '../../domain/entities/applicant.dart';
+import '../../domain/entities/application.dart';
+import '../../domain/entities/job_req.dart';
+import '../../domain/entities/resume.dart';
+
 /// DTO for persisting Application data to Sembast.
 class ApplicationDto {
   final String id;
@@ -34,6 +39,17 @@ class ApplicationDto {
       jobReqId: map['jobReqId'] as String,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),
+    );
+  }
+
+  /// Converts to domain entity.
+  /// Note: This creates an Application with empty applicant and jobReq.
+  /// The repository should load the actual applicant and jobReq separately.
+  Application toDomain() {
+    return Application(
+      applicant: Applicant(name: '', email: ''), // Placeholder
+      jobReq: JobReq(title: '', content: ''), // Placeholder
+      resume: Resume(content: ''), // Placeholder
     );
   }
 }

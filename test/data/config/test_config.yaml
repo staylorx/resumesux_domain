@@ -3,7 +3,7 @@ config:
   outputDir: "output"
   includeCover: true
   includeFeedback: true
-  digestPath: "digest"
+  digestPath: "test/data/digest/software_engineer"
   applicant:
     name: "John Doe"
     preferred_name: "John"
@@ -20,20 +20,17 @@ config:
     portfolio: "https://johndoe.dev"
   providers:
     lmstudio:
-      url: "http://127.0.0.1:1234/v1"
+      url: "http://127.0.0.1:1234"
       key: "dummy-key"
       default: true
       models:
         - name: "qwen/qwen2.5-coder-14b"
-          default: true
+          default: false
           settings:
             temperature: 0.8
-    openai:
-      url: "https://api.openai.com/v1"
-      key: "sk-test-key"
-      default: false
-      models:
-        - name: "gpt-4"
-          default: true
+        - name: "google/gemma-3-12b"
+          default: false
           settings:
             temperature: 0.7
+        - name: "qwen2.5-7b-instruct"
+          default: true

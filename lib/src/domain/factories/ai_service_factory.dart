@@ -7,9 +7,4 @@ AiService createAiServiceImpl({
   Logger? logger,
   required http.Client httpClient,
   required AiProvider provider,
-}) =>
-    AiServiceImpl(
-      logger: logger,
-      httpClient: httpClient,
-      provider: provider,
-    );
+}) => AiServiceImpl(logger: logger, httpClient: httpClient, provider: provider);

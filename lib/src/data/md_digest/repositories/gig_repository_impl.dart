@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 
 import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/value_objects/handles/gig_handle.dart';
 
 import '../../data.dart';
 
@@ -187,6 +188,24 @@ $content
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to read gigs: $e'));
     }
+  }
+
+  @override
+  Future<Either<Failure, List<GigWithHandle>>> getAll() async {
+    final result = await applicationDatasource.getAllPersistedGigs();
+    return result.map(
+      (dtos) => dtos.map((dto) {
+        final handle = GigHandle(dto.id);
+        final gig = Gig(
+          title: dto.title,
+          concern: dto.concern,
+          location: dto.location,
+          dates: dto.dates,
+          achievements: dto.achievements,
+        );
+        return GigWithHandle(handle: handle, gig: gig);
+      }).toList(),
+    );
   }
 
   @override

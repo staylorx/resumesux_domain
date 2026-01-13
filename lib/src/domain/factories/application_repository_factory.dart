@@ -8,11 +8,10 @@ ApplicationRepository createApplicationRepositoryImpl({
   required ResumeRepository resumeRepository,
   required CoverLetterRepository coverLetterRepository,
   required FeedbackRepository feedbackRepository,
-}) =>
-    ApplicationRepositoryImpl(
-      applicationDatasource: applicationDatasource,
-      fileRepository: fileRepository,
-      resumeRepository: resumeRepository,
-      coverLetterRepository: coverLetterRepository,
-      feedbackRepository: feedbackRepository,
-    );
+}) => ApplicationRepositoryImpl(
+  applicationDatasource: applicationDatasource,
+  fileRepository: fileRepository,
+  resumeRepository: resumeRepository,
+  coverLetterRepository: coverLetterRepository,
+  feedbackRepository: feedbackRepository,
+);
