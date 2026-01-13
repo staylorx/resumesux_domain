@@ -10,6 +10,30 @@ A clean architecture Dart package for resume and job application generation usin
 - Job requirement preprocessing
 - Feedback generation for applications
 
+## Using the Database Package
+
+This package provides a separate database implementation using Sembast. For applications that need persistent storage, include the `resumesux_db_sembast` package:
+
+### In your pubspec.yaml:
+```yaml
+dependencies:
+  resumesux_domain:
+    path: ../path/to/resumesux_domain
+  resumesux_db_sembast:
+    path: ../path/to/resumesux_domain/packages/resumesux_db_sembast
+```
+
+### Usage:
+```dart
+import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
+
+final dbService = SembastDatabaseService(
+  dbPath: 'data',
+  dbName: 'my_app.db',
+);
+await dbService.initialize();
+```
+
 ## Testing
 
 This package includes comprehensive unit and integration tests. Integration tests that involve AI generation require a local AI provider to be running.

@@ -3,7 +3,6 @@ import 'package:path/path.dart' as path;
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:sembast/sembast_memory.dart';
-import '../../domain/services/database_service.dart';
 
 class SembastDatabaseService with Loggable implements DatabaseService {
   Database? _db;
@@ -35,57 +34,54 @@ class SembastDatabaseService with Loggable implements DatabaseService {
     required String storeName,
     required String key,
     required Map<String, dynamic> value,
-    Transaction? transaction,
+    dynamic transaction,
   }) async {
     final db = _db!;
     final store = stringMapStoreFactory.store(storeName);
     final record = store.record(key);
-    await record.put(transaction ?? db, value);
+    await record.put((transaction as Transaction?) ?? db, value);
   }
 
   @override
   Future<Map<String, dynamic>?> get({
     required String storeName,
     required String key,
-    Transaction? transaction,
+    dynamic transaction,
   }) async {
     final db = _db!;
     final store = stringMapStoreFactory.store(storeName);
     final record = store.record(key);
-    return await record.get(transaction ?? db);
+    return await record.get((transaction as Transaction?) ?? db);
   }
 
   @override
   Future<List<Map<String, dynamic>>> find({
     required String storeName,
-    Transaction? transaction,
+    dynamic transaction,
   }) async {
     final db = _db!;
     final store = stringMapStoreFactory.store(storeName);
-    final records = await store.find(transaction ?? db);
+    final records = await store.find((transaction as Transaction?) ?? db);
     return records.map((r) => r.value).toList();
   }
 
   @override
-  Future<void> drop({
-    required String storeName,
-    Transaction? transaction,
-  }) async {
+  Future<void> drop({required String storeName, dynamic transaction}) async {
     final db = _db!;
     final store = stringMapStoreFactory.store(storeName);
-    await store.drop(transaction ?? db);
+    await store.drop((transaction as Transaction?) ?? db);
   }
 
   @override
   Future<void> delete({
     required String storeName,
     required String key,
-    Transaction? transaction,
+    dynamic transaction,
   }) async {
     final db = _db!;
     final store = stringMapStoreFactory.store(storeName);
     final record = store.record(key);
-    await record.delete(transaction ?? db);
+    await record.delete((transaction as Transaction?) ?? db);
   }
 
   Future<void> close() async {

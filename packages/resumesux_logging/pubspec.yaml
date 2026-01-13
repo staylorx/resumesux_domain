@@ -1,0 +1,18 @@
+name: resumesux_logging
+description: Logging implementations for resumesux_domain.
+version: 1.0.0
+license: Apache-2.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  resumesux_domain:
+    path: ../..
+  logger: ^2.0.0
+  logging: ^1.2.0
+  crypto: ^3.0.7
+  fpdart: ^1.2.0
+  intl: ^0.20.2
+  markdown: ^7.2.2

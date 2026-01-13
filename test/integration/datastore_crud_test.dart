@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:test/test.dart';
 import 'package:resumesux_domain/src/data/data.dart';
+import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 
 void main() {
   late SembastDatabaseService dbService;

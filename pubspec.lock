@@ -218,7 +218,7 @@ packages:
     source: hosted
     version: "6.0.0"
   logger:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: logger
       sha256: a7967e31b703831a893bbc3c3dd11db08126fe5f369b5c648a36f821979f5be3
@@ -226,7 +226,7 @@ packages:
     source: hosted
     version: "2.6.2"
   logging:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: logging
       sha256: c8245ada5f1717ed44271ed1c26b8ce85ca3228fd2ffdb75468ab01979309d61
@@ -329,6 +329,20 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.2"
+  resumesux_db_sembast:
+    dependency: "direct dev"
+    description:
+      path: "packages/resumesux_db_sembast"
+      relative: true
+    source: path
+    version: "1.0.0"
+  resumesux_logging:
+    dependency: "direct dev"
+    description:
+      path: "packages/resumesux_logging"
+      relative: true
+    source: path
+    version: "1.0.0"
   rfc_6901:
     dependency: transitive
     description:
@@ -338,7 +352,7 @@ packages:
     source: hosted
     version: "0.2.1"
   sembast:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: sembast
       sha256: "139cf71496105de32e7a08a4e3a1ead0f81c4a616ec9703ed07e8f0d10cdd505"
@@ -377,14 +391,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  simple_logger:
-    dependency: "direct main"
-    description:
-      name: simple_logger
-      sha256: "1de79f22bf31e5c33b91e9e302394dac02d8269d474848d33153c3a15c08e970"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.10.0"
   source_map_stack_trace:
     dependency: transitive
     description:

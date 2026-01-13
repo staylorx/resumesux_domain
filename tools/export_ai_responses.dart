@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:resumesux_domain/src/data/data.dart';
+import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 
 void main(List<String> arguments) async {
   final parser = ArgParser()

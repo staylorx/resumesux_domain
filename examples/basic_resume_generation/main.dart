@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:resumesux_domain/src/domain/domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
+import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 
 void main() async {
   // This example demonstrates basic resume generation using resumesux_domain.

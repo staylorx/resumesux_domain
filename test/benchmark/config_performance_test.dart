@@ -1,3 +1,4 @@
+import 'package:resumesux_logging/resumesux_logging.dart';
 import 'package:test/test.dart';
 import 'package:resumesux_domain/src/domain/domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
