@@ -8,12 +8,18 @@ class SaveAiResponsesUsecase {
   final JobReqRepository jobReqRepository;
   final GigRepository gigRepository;
   final AssetRepository assetRepository;
+  final ResumeRepository? resumeRepository;
+  final CoverLetterRepository? coverLetterRepository;
+  final FeedbackRepository? feedbackRepository;
 
   /// Creates a new instance of [SaveAiResponsesUsecase].
   SaveAiResponsesUsecase({
     required this.jobReqRepository,
     required this.gigRepository,
     required this.assetRepository,
+    this.resumeRepository,
+    this.coverLetterRepository,
+    this.feedbackRepository,
   });
 
   /// Saves AI responses for the job requirement, gigs, and assets.
@@ -63,6 +69,57 @@ class SaveAiResponsesUsecase {
       if (saveAssetAiResult.isLeft()) {
         final failure = saveAssetAiResult.getLeft().toNullable()!;
         logger.warning('Failed to save asset AI response: ${failure.message}');
+        // Continue anyway
+      }
+    }
+
+    // Save AI responses for resume
+    final resumeAiResponseJson = resumeRepository?.getLastAiResponseJson();
+    if (resumeAiResponseJson != null) {
+      final saveResumeAiResult = await resumeRepository!.saveAiResponse(
+        aiResponseJson: resumeAiResponseJson,
+        jobReqId: jobReqId,
+        content: '', // Content is in the JSON
+      );
+      if (saveResumeAiResult.isLeft()) {
+        final failure = saveResumeAiResult.getLeft().toNullable()!;
+        logger.warning('Failed to save resume AI response: ${failure.message}');
+        // Continue anyway
+      }
+    }
+
+    // Save AI responses for cover letter
+    final coverLetterAiResponseJson = coverLetterRepository
+        ?.getLastAiResponseJson();
+    if (coverLetterAiResponseJson != null) {
+      final saveCoverLetterAiResult = await coverLetterRepository!
+          .saveAiResponse(
+            aiResponseJson: coverLetterAiResponseJson,
+            jobReqId: jobReqId,
+            content: '', // Content is in the JSON
+          );
+      if (saveCoverLetterAiResult.isLeft()) {
+        final failure = saveCoverLetterAiResult.getLeft().toNullable()!;
+        logger.warning(
+          'Failed to save cover letter AI response: ${failure.message}',
+        );
+        // Continue anyway
+      }
+    }
+
+    // Save AI responses for feedback
+    final feedbackAiResponseJson = feedbackRepository?.getLastAiResponseJson();
+    if (feedbackAiResponseJson != null) {
+      final saveFeedbackAiResult = await feedbackRepository!.saveAiResponse(
+        aiResponseJson: feedbackAiResponseJson,
+        jobReqId: jobReqId,
+        content: '', // Content is in the JSON
+      );
+      if (saveFeedbackAiResult.isLeft()) {
+        final failure = saveFeedbackAiResult.getLeft().toNullable()!;
+        logger.warning(
+          'Failed to save feedback AI response: ${failure.message}',
+        );
         // Continue anyway
       }
     }

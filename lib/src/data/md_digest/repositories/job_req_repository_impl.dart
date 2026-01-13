@@ -17,6 +17,11 @@ class JobReqRepositoryImpl implements JobReqRepository {
     return _lastAiResponse != null ? jsonEncode(_lastAiResponse) : null;
   }
 
+  @override
+  void setLastAiResponse(Map<String, dynamic> response) {
+    _lastAiResponse = response;
+  }
+
   JobReqRepositoryImpl({
     required this.aiService,
     required this.applicationDatasource,
@@ -66,6 +71,7 @@ class JobReqRepositoryImpl implements JobReqRepository {
     final dto = DocumentDto(
       id: jobReqDto.id,
       content: jobReqDto.content,
+      contentType: 'text/markdown',
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
       documentType: 'jobreq',
     );
@@ -157,10 +163,11 @@ $content
     required String jobReqId,
   }) async {
     final dto = DocumentDto(
-      id: 'jobreq_response_$jobReqId',
-      content: content ?? '',
-      aiResponseJson: aiResponseJson,
-      documentType: 'jobreq_response',
+      id: 'jobreq_ai_$jobReqId',
+      content: aiResponseJson,
+      contentType: 'application/json',
+      aiResponseJson: '',
+      documentType: 'ai_response',
       jobReqId: jobReqId,
     );
     return applicationDatasource.saveAiResponseDocument(dto);
@@ -187,6 +194,7 @@ $content
     final dto = DocumentDto(
       id: jobReqDto.id,
       content: jobReqDto.content,
+      contentType: 'text/markdown',
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
       documentType: 'jobreq',
     );
@@ -215,6 +223,7 @@ $content
     final dto = DocumentDto(
       id: jobReqDto.id,
       content: jobReqDto.content,
+      contentType: 'text/markdown',
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
       documentType: 'jobreq',
     );

@@ -7,11 +7,13 @@ class GenerateResumeUsecase {
   final Logger logger = LoggerFactory.create(name: 'GenerateResumeUsecase');
   final DigestRepository digestRepository;
   final AiService aiService;
+  final ResumeRepository? resumeRepository;
 
   /// Creates a new instance of [GenerateResumeUsecase].
   GenerateResumeUsecase({
     required this.digestRepository,
     required this.aiService,
+    this.resumeRepository,
   });
 
   /// Generates a resume for the given job requirement and applicant.
@@ -70,6 +72,7 @@ class GenerateResumeUsecase {
     final content = result.getOrElse((_) => '');
     logger.info('AI response length: ${content.length}');
     logger.fine('AI response: $content');
+    resumeRepository?.setLastAiResponse({'content': content});
     return Right(Resume(content: content));
   }
 

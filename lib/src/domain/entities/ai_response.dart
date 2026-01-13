@@ -2,18 +2,19 @@ import 'package:equatable/equatable.dart';
 
 import 'doc.dart';
 
-/// Represents feedback document with its content.
-class Feedback extends Doc with EquatableMixin {
-  Feedback({
+/// Represents an AI response document with its content.
+/// AI responses are typically in JSON or Markdown format.
+class AiResponse extends Doc with EquatableMixin {
+  AiResponse({
     required super.content,
-    super.contentType = 'text/markdown',
+    super.contentType = 'application/json',
     super.createdAt,
     super.updatedAt,
   });
 
   @override
-  Feedback copyWith({String? content, String? contentType}) {
-    return Feedback(
+  AiResponse copyWith({String? content, String? contentType}) {
+    return AiResponse(
       content: content ?? this.content,
       contentType: contentType ?? this.contentType,
       createdAt: createdAt,

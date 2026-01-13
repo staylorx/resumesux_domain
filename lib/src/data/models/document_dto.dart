@@ -2,14 +2,17 @@
 class DocumentDto {
   final String id;
   final String content;
+  final String contentType;
   final String aiResponseJson;
   final DateTime createdAt;
   final String? jobReqId;
-  final String documentType; // 'resume', 'cover_letter', 'feedback'
+  final String
+  documentType; // 'resume', 'cover_letter', 'feedback', 'ai_response'
 
   DocumentDto({
     required this.id,
     required this.content,
+    required this.contentType,
     required this.aiResponseJson,
     required this.documentType,
     this.jobReqId,
@@ -21,6 +24,7 @@ class DocumentDto {
     return {
       'id': id,
       'content': content,
+      'contentType': contentType,
       'aiResponseJson': aiResponseJson,
       'createdAt': createdAt.toIso8601String(),
       'jobReqId': jobReqId,
@@ -33,6 +37,7 @@ class DocumentDto {
     return DocumentDto(
       id: map['id'] as String,
       content: map['content'] as String,
+      contentType: map['contentType'] as String,
       aiResponseJson: map['aiResponseJson'] as String,
       documentType: map['documentType'] as String,
       jobReqId: map['jobReqId'] as String?,

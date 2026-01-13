@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:resumesux_domain/resumesux_domain.dart';
 
 void main() {

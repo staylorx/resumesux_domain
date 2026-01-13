@@ -13,6 +13,7 @@ class JobReq extends Doc with EquatableMixin {
   JobReq({
     required this.title,
     required super.content,
+    super.contentType = 'text/markdown',
     this.salary,
     this.location,
     this.concern,
@@ -21,10 +22,11 @@ class JobReq extends Doc with EquatableMixin {
   });
 
   @override
-  JobReq copyWith({String? content}) {
+  JobReq copyWith({String? content, String? contentType}) {
     return JobReq(
       title: title,
       content: content ?? this.content,
+      contentType: contentType ?? this.contentType,
       salary: salary,
       location: location,
       concern: concern,
@@ -37,6 +39,7 @@ class JobReq extends Doc with EquatableMixin {
   List<Object?> get props => [
     title,
     content,
+    contentType,
     salary,
     location,
     concern,

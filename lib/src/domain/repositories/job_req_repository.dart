@@ -13,6 +13,7 @@ abstract class JobReqRepository implements DocRepository {
   Future<Either<Failure, Unit>> updateJobReq({required JobReq jobReq});
 
   /// Retrieves the last AI response as JSON string.
+  @override
   String? getLastAiResponseJson();
 
   /// Saves the AI response JSON for a job requirement to the database.

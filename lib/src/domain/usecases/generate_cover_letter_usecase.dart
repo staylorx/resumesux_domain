@@ -9,11 +9,13 @@ class GenerateCoverLetterUsecase {
   );
   final DigestRepository digestRepository;
   final AiService aiService;
+  final CoverLetterRepository? coverLetterRepository;
 
   /// Creates a new instance of [GenerateCoverLetterUsecase].
   GenerateCoverLetterUsecase({
     required this.digestRepository,
     required this.aiService,
+    this.coverLetterRepository,
   });
 
   /// Generates a cover letter for the given job requirement, resume, and applicant.
@@ -55,7 +57,13 @@ class GenerateCoverLetterUsecase {
     );
 
     final result = await aiService.generateContent(prompt: fullPrompt);
-    return result.map((content) => CoverLetter(content: content));
+    final either = result.map((content) => CoverLetter(content: content));
+    if (either.isRight()) {
+      coverLetterRepository?.setLastAiResponse({
+        'content': either.getOrElse((_) => CoverLetter(content: '')).content,
+      });
+    }
+    return either;
   }
 
   String _buildCoverLetterPrompt({

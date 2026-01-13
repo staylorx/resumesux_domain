@@ -14,6 +14,7 @@ class GenerateFeedbackUsecase {
   final JobReqRepository jobReqRepository;
   final GigRepository gigRepository;
   final AssetRepository assetRepository;
+  final FeedbackRepository? feedbackRepository;
 
   /// Creates a new instance of [GenerateFeedbackUsecase].
   GenerateFeedbackUsecase({
@@ -21,6 +22,7 @@ class GenerateFeedbackUsecase {
     required this.jobReqRepository,
     required this.gigRepository,
     required this.assetRepository,
+    this.feedbackRepository,
   });
 
   /// Generates feedback for the given job requirement, resume, cover letter, and applicant.
@@ -66,7 +68,13 @@ class GenerateFeedbackUsecase {
     );
 
     final result = await aiService.generateContent(prompt: fullPrompt);
-    return result.map((content) => Feedback(content: content));
+    final either = result.map((content) => Feedback(content: content));
+    if (either.isRight()) {
+      feedbackRepository?.setLastAiResponse({
+        'content': either.getOrElse((_) => Feedback(content: '')).content,
+      });
+    }
+    return either;
   }
 
   String _getToneInstruction({required double tone}) {

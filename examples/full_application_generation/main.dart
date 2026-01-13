@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
@@ -181,6 +183,7 @@ void main() async {
   final generateResumeUsecase = GenerateResumeUsecase(
     digestRepository: digestRepository,
     aiService: aiService,
+    resumeRepository: resumeRepository,
   );
 
   final generateCoverLetterUsecase = GenerateCoverLetterUsecase(
@@ -200,11 +203,18 @@ void main() async {
     assetRepository: digestRepository.assetRepository,
   );
 
+  final saveAiResponsesUsecase = SaveAiResponsesUsecase(
+    jobReqRepository: jobReqRepository,
+    gigRepository: digestRepository.gigRepository,
+    assetRepository: digestRepository.assetRepository,
+  );
+
   final generateApplicationUsecase = GenerateApplicationUsecase(
     generateResumeUsecase: generateResumeUsecase,
     generateCoverLetterUsecase: generateCoverLetterUsecase,
     generateFeedbackUsecase: generateFeedbackUsecase,
     getDigestUsecase: getDigestUsecase,
+    saveAiResponsesUsecase: saveAiResponsesUsecase,
   );
 
   print('Loading job requirement...');

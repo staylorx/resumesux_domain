@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
@@ -9,6 +10,7 @@ class FeedbackRepositoryImpl extends DocumentRepositoryImpl
   Logger get logger => LoggerFactory.create(name: 'FeedbackRepositoryImpl');
 
   final ApplicationDatasource applicationDatasource;
+  Map<String, dynamic>? _lastAiResponse;
 
   FeedbackRepositoryImpl({
     required super.fileRepository,
@@ -16,16 +18,45 @@ class FeedbackRepositoryImpl extends DocumentRepositoryImpl
   });
 
   @override
+  String? getLastAiResponseJson() {
+    return _lastAiResponse != null ? jsonEncode(_lastAiResponse) : null;
+  }
+
+  @override
+  void setLastAiResponse(Map<String, dynamic> response) {
+    _lastAiResponse = response;
+  }
+
+  @override
   Future<Either<Failure, Unit>> saveFeedback({
     required Feedback feedback,
     required String outputDir,
+    required String jobReqId,
   }) async {
     final filePath = fileRepository.getFeedbackFilePath(appDir: outputDir);
-    return saveToFile(
+    final fileResult = await saveToFile(
       filePath: filePath,
       content: feedback.content,
       documentType: 'Feedback',
     );
+    if (fileResult.isRight()) {
+      // Save to DB
+      final dto = DocumentDto(
+        id: 'feedback_$jobReqId',
+        content: feedback.content,
+        contentType: feedback.contentType,
+        aiResponseJson: getLastAiResponseJson() ?? '',
+        documentType: 'feedback',
+        jobReqId: jobReqId,
+      );
+      final dbResult = await applicationDatasource.saveDocument(dto);
+      if (dbResult.isLeft()) {
+        logger.warning(
+          'Failed to save feedback to DB: ${dbResult.getLeft().toNullable()?.message}',
+        );
+      }
+    }
+    return fileResult;
   }
 
   @override
@@ -35,10 +66,11 @@ class FeedbackRepositoryImpl extends DocumentRepositoryImpl
     required String jobReqId,
   }) async {
     final dto = DocumentDto(
-      id: 'feedback_$jobReqId',
-      content: content,
-      aiResponseJson: aiResponseJson,
-      documentType: 'feedback',
+      id: 'feedback_ai_$jobReqId',
+      content: aiResponseJson,
+      contentType: 'text/markdown',
+      aiResponseJson: '',
+      documentType: 'ai_response',
       jobReqId: jobReqId,
     );
     return applicationDatasource.saveDocument(dto);

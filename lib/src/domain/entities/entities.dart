@@ -2,6 +2,7 @@
 library;
 
 export '../value_objects/address.dart';
+export 'ai_response.dart';
 export 'applicant.dart';
 export 'application.dart';
 export 'asset.dart';

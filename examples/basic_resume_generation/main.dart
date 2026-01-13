@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:resumesux_domain/resumesux_domain.dart';
@@ -53,10 +55,16 @@ void main() async {
     applicationDatasource: applicationDatasource,
   );
 
+  final resumeRepository = ResumeRepositoryImpl(
+    fileRepository: FileRepositoryImpl(), // Assuming it has a default
+    applicationDatasource: applicationDatasource,
+  );
+
   print('Creating use case...');
   final generateResumeUsecase = GenerateResumeUsecase(
     digestRepository: digestRepository,
     aiService: aiService,
+    resumeRepository: resumeRepository,
   );
 
   print('Loading job requirement...');

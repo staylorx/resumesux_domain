@@ -46,6 +46,25 @@ class GigRepositoryImpl implements GigRepository {
 
       _allAiResponses.add(extractedData);
 
+      // Save AI response to datastore
+      final dto = DocumentDto(
+        id: 'gig_${path.hashCode}',
+        content: jsonEncode(extractedData),
+        contentType: 'application/json',
+        aiResponseJson: '',
+        documentType: 'ai_response',
+        jobReqId: null,
+      );
+      final saveResult = await applicationDatasource.saveAiResponseDocument(
+        dto,
+      );
+      if (saveResult.isLeft()) {
+        logger.warning(
+          'Failed to save AI response for gig $path: ${saveResult.getLeft().toNullable()?.message}',
+        );
+        // Continue anyway
+      }
+
       return Right(extractedData);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to extract gig data: $e'));
@@ -154,10 +173,11 @@ $content
     required String jobReqId,
   }) async {
     final dto = DocumentDto(
-      id: 'gig_responses_$jobReqId',
-      content: '',
-      aiResponseJson: aiResponseJson,
-      documentType: 'gig_responses',
+      id: 'gig_ai_$jobReqId',
+      content: aiResponseJson,
+      contentType: 'application/json',
+      aiResponseJson: '',
+      documentType: 'ai_response',
       jobReqId: jobReqId,
     );
     return applicationDatasource.saveAiResponseDocument(dto);

@@ -56,10 +56,12 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     final appDirPath = appDirResult.getOrElse((_) => '');
 
     // Save resume
+    final jobReqId = application.jobReq.hashCode.toString();
     final saveResumeResult = await resumeRepository.saveResume(
       resume: application.resume,
       outputDir: appDirPath,
       jobTitle: application.jobReq.title,
+      jobReqId: jobReqId,
     );
     if (saveResumeResult.isLeft()) {
       return saveResumeResult;
@@ -71,6 +73,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
         coverLetter: application.coverLetter,
         outputDir: appDirPath,
         jobTitle: application.jobReq.title,
+        jobReqId: jobReqId,
       );
       if (saveCoverResult.isLeft()) {
         return saveCoverResult;
@@ -82,6 +85,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
       final saveFeedbackResult = await feedbackRepository.saveFeedback(
         feedback: application.feedback,
         outputDir: appDirPath,
+        jobReqId: jobReqId,
       );
       if (saveFeedbackResult.isLeft()) {
         return saveFeedbackResult;

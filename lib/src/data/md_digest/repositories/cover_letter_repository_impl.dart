@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:fpdart/fpdart.dart';
 import 'package:logging/logging.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
@@ -9,6 +10,7 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
   Logger get logger => LoggerFactory.create(name: 'CoverLetterRepositoryImpl');
 
   final ApplicationDatasource applicationDatasource;
+  Map<String, dynamic>? _lastAiResponse;
 
   CoverLetterRepositoryImpl({
     required super.fileRepository,
@@ -16,20 +18,49 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
   });
 
   @override
+  String? getLastAiResponseJson() {
+    return _lastAiResponse != null ? jsonEncode(_lastAiResponse) : null;
+  }
+
+  @override
+  void setLastAiResponse(Map<String, dynamic> response) {
+    _lastAiResponse = response;
+  }
+
+  @override
   Future<Either<Failure, Unit>> saveCoverLetter({
     required CoverLetter coverLetter,
     required String outputDir,
     required String jobTitle,
+    required String jobReqId,
   }) async {
     final filePath = fileRepository.getCoverLetterFilePath(
       appDir: outputDir,
       jobTitle: jobTitle,
     );
-    return saveToFile(
+    final fileResult = await saveToFile(
       filePath: filePath,
       content: coverLetter.content,
       documentType: 'CoverLetter',
     );
+    if (fileResult.isRight()) {
+      // Save to DB
+      final dto = DocumentDto(
+        id: 'cover_letter_$jobReqId',
+        content: coverLetter.content,
+        contentType: coverLetter.contentType,
+        aiResponseJson: getLastAiResponseJson() ?? '',
+        documentType: 'cover_letter',
+        jobReqId: jobReqId,
+      );
+      final dbResult = await applicationDatasource.saveDocument(dto);
+      if (dbResult.isLeft()) {
+        logger.warning(
+          'Failed to save cover letter to DB: ${dbResult.getLeft().toNullable()?.message}',
+        );
+      }
+    }
+    return fileResult;
   }
 
   @override
@@ -39,10 +70,11 @@ class CoverLetterRepositoryImpl extends DocumentRepositoryImpl
     String? content,
   }) async {
     final dto = DocumentDto(
-      id: 'cover_letter_$jobReqId',
-      content: content!,
-      aiResponseJson: aiResponseJson,
-      documentType: 'cover_letter',
+      id: 'cover_letter_ai_$jobReqId',
+      content: aiResponseJson,
+      contentType: 'text/markdown',
+      aiResponseJson: '',
+      documentType: 'ai_response',
       jobReqId: jobReqId,
     );
     return applicationDatasource.saveDocument(dto);

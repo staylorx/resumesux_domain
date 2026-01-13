@@ -9,7 +9,6 @@ import '../test_utils.dart';
 void main() {
   late JobReqRepository jobReqRepository;
   late AiServiceImpl aiService;
-  late GenerateFeedbackUsecase generateFeedbackUsecase;
   late String suiteDir;
   late Logger logger;
   late SembastDatabaseService dbService;
@@ -152,6 +151,7 @@ void main() {
       late GenerateResumeUsecase generateResumeUsecase;
       late GenerateCoverLetterUsecase generateCoverLetterUsecase;
       late GenerateFeedbackUsecase generateFeedbackUsecase;
+      late SaveAiResponsesUsecase saveAiResponsesUsecase;
       late GenerateApplicationUsecase generateApplicationUsecase;
 
       setUp(() {
@@ -169,6 +169,10 @@ void main() {
         generateResumeUsecase = GenerateResumeUsecase(
           digestRepository: digestRepository,
           aiService: aiService,
+          resumeRepository: ResumeRepositoryImpl(
+            fileRepository: TestFileRepository(),
+            applicationDatasource: ApplicationDatasource(dbService: dbService),
+          ),
         );
 
         generateCoverLetterUsecase = GenerateCoverLetterUsecase(
@@ -183,11 +187,18 @@ void main() {
           assetRepository: digestRepository.assetRepository,
         );
 
+        saveAiResponsesUsecase = SaveAiResponsesUsecase(
+          jobReqRepository: jobReqRepository,
+          gigRepository: digestRepository.gigRepository,
+          assetRepository: digestRepository.assetRepository,
+        );
+
         generateApplicationUsecase = GenerateApplicationUsecase(
           generateResumeUsecase: generateResumeUsecase,
           generateCoverLetterUsecase: generateCoverLetterUsecase,
           generateFeedbackUsecase: generateFeedbackUsecase,
           getDigestUsecase: getDigestUsecase,
+          saveAiResponsesUsecase: saveAiResponsesUsecase,
         );
       });
 

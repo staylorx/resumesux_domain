@@ -46,6 +46,25 @@ class AssetRepositoryImpl implements AssetRepository {
 
       _allAiResponses.add(extractedData);
 
+      // Save AI response to datastore
+      final dto = DocumentDto(
+        id: 'asset_${path.hashCode}',
+        content: jsonEncode(extractedData),
+        contentType: 'application/json',
+        aiResponseJson: '',
+        documentType: 'ai_response',
+        jobReqId: null,
+      );
+      final saveResult = await applicationDatasource.saveAiResponseDocument(
+        dto,
+      );
+      if (saveResult.isLeft()) {
+        logger.warning(
+          'Failed to save AI response for asset $path: ${saveResult.getLeft().toNullable()?.message}',
+        );
+        // Continue anyway
+      }
+
       return Right(extractedData);
     } catch (e) {
       return Left(ServiceFailure(message: 'Failed to extract asset data: $e'));
@@ -168,10 +187,11 @@ $content
     required String jobReqId,
   }) async {
     final dto = DocumentDto(
-      id: 'asset_responses_$jobReqId',
-      content: '',
-      aiResponseJson: aiResponseJson,
-      documentType: 'asset_responses',
+      id: 'asset_ai_$jobReqId',
+      content: aiResponseJson,
+      contentType: 'application/json',
+      aiResponseJson: '',
+      documentType: 'ai_response',
       jobReqId: jobReqId,
     );
     return applicationDatasource.saveAiResponseDocument(dto);

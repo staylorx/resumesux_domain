@@ -11,6 +11,7 @@ class GenerateApplicationUsecase {
   final GenerateCoverLetterUsecase generateCoverLetterUsecase;
   final GenerateFeedbackUsecase generateFeedbackUsecase;
   final GetDigestUsecase getDigestUsecase;
+  final SaveAiResponsesUsecase saveAiResponsesUsecase;
 
   /// Creates a new instance of [GenerateApplicationUsecase].
   GenerateApplicationUsecase({
@@ -18,6 +19,7 @@ class GenerateApplicationUsecase {
     required this.generateCoverLetterUsecase,
     required this.generateFeedbackUsecase,
     required this.getDigestUsecase,
+    required this.saveAiResponsesUsecase,
   });
 
   /// Generates an application for the given job requirement.
@@ -123,6 +125,16 @@ class GenerateApplicationUsecase {
       coverLetter: coverLetter,
       feedback: feedback,
     );
+
+    // Save AI responses
+    final saveResult = await saveAiResponsesUsecase.call(
+      jobReqId: jobReq.hashCode.toString(),
+    );
+    if (saveResult.isLeft()) {
+      final failure = saveResult.getLeft().toNullable()!;
+      logger.warning('Failed to save AI responses: ${failure.message}');
+      // Continue anyway, as it's not critical
+    }
 
     progress('Application generated successfully');
     logger.info('Application generated successfully');

@@ -17,6 +17,7 @@ void main() {
   late GenerateCoverLetterUsecase generateCoverLetterUsecase;
   late GenerateFeedbackUsecase generateFeedbackUsecase;
   late GetDigestUsecase getDigestUsecase;
+  late SaveAiResponsesUsecase saveAiResponsesUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
   late FileRepository fileRepository;
   late String suiteDir;
@@ -121,11 +122,18 @@ void main() {
       assetRepository: digestRepository.assetRepository,
     );
 
+    saveAiResponsesUsecase = SaveAiResponsesUsecase(
+      jobReqRepository: jobReqRepository,
+      gigRepository: digestRepository.gigRepository,
+      assetRepository: digestRepository.assetRepository,
+    );
+
     generateApplicationUsecase = GenerateApplicationUsecase(
       generateResumeUsecase: generateResumeUsecase,
       generateCoverLetterUsecase: generateCoverLetterUsecase,
       generateFeedbackUsecase: generateFeedbackUsecase,
       getDigestUsecase: getDigestUsecase,
+      saveAiResponsesUsecase: saveAiResponsesUsecase,
     );
   });
 
@@ -187,6 +195,7 @@ void main() {
           resume: resume,
           outputDir: suiteDir,
           jobTitle: 'heavy_equipment_operator',
+          jobReqId: jobReq.hashCode.toString(),
         );
         expect(saveResult.isRight(), true);
         logger.info('Resume saved to output folder');
@@ -266,6 +275,7 @@ void main() {
           coverLetter: coverLetter,
           outputDir: suiteDir,
           jobTitle: 'heavy_equipment_operator',
+          jobReqId: jobReq.hashCode.toString(),
         );
         expect(saveResult.isRight(), true);
         logger.info('Cover letter saved to output folder');
