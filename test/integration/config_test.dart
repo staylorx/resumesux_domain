@@ -51,11 +51,11 @@ void main() {
       final lmstudioProvider = config.providers.firstWhere(
         (p) => p.name == 'lmstudio',
       );
-      expect(lmstudioProvider.url, 'http://127.0.0.1:1234');
+      expect(lmstudioProvider.url, 'http://127.0.0.1:1234/v1');
       expect(lmstudioProvider.key, 'dummy-key');
       expect(lmstudioProvider.isDefault, true);
       expect(lmstudioProvider.models.length, 1);
-      expect(lmstudioProvider.defaultModel?.name, 'qwen/qwen2.5-coder-14b');
+      expect(lmstudioProvider.defaultModel?.name, 'qwen2.5-7b-instruct');
 
       final openaiProvider = config.providers.firstWhere(
         (p) => p.name == 'openai',

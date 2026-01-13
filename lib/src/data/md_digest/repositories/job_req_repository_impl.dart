@@ -199,7 +199,7 @@ $content
       content: jobReqDto.content,
       contentType: 'text/markdown',
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
-      documentType: 'jobReq',
+      documentType: 'jobreq',
     );
     final result = await applicationDatasource.saveDocument(dto);
     return result.map((_) => jobReq);
@@ -228,7 +228,7 @@ $content
       content: jobReqDto.content,
       contentType: 'text/markdown',
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
-      documentType: 'jobReq',
+      documentType: 'jobreq',
     );
     return await applicationDatasource.saveDocument(dto);
   }
@@ -295,7 +295,7 @@ $content
       content: jobReqDto.content,
       contentType: 'text/markdown',
       aiResponseJson: jsonEncode(jobReqDto.toMap()),
-      documentType: 'jobReq',
+      documentType: 'jobreq',
     );
     return await applicationDatasource.saveDocument(dto);
   }

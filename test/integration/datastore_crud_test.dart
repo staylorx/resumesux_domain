@@ -127,8 +127,27 @@ void main() {
     });
 
     test('get all documents', () async {
-      // Add another document
-      final dto2 = DocumentDto(
+      // Save multiple documents to test getAll
+      final resumeDto = DocumentDto(
+        id: 'resume_1',
+        content: 'Resume content',
+        contentType: 'text/markdown',
+        aiResponseJson: '{"model": "test"}',
+        documentType: 'resume',
+        jobReqId: 'jobreq_1',
+      );
+      await datasource.saveDocument(resumeDto);
+
+      final jobReqDto = DocumentDto(
+        id: 'jobreq_1',
+        content: 'Job description',
+        contentType: 'text/markdown',
+        aiResponseJson: '{"title": "Software Engineer"}',
+        documentType: 'jobreq',
+      );
+      await datasource.saveDocument(jobReqDto);
+
+      final coverLetterDto = DocumentDto(
         id: 'cover_letter_1',
         content: 'Cover letter content',
         contentType: 'text/markdown',
@@ -136,12 +155,12 @@ void main() {
         documentType: 'cover_letter',
         jobReqId: 'jobreq_1',
       );
-      await datasource.saveDocument(dto2);
+      await datasource.saveDocument(coverLetterDto);
 
       final getAllResult = await datasource.getAllDocuments();
       expect(getAllResult.isRight(), true);
       final docs = getAllResult.getOrElse((_) => []);
-      expect(docs.length >= 3, true); // At least the ones we saved
+      expect(docs.length, 3);
       expect(docs.any((d) => d.id == 'resume_1'), true);
       expect(docs.any((d) => d.id == 'jobreq_1'), true);
       expect(docs.any((d) => d.id == 'cover_letter_1'), true);

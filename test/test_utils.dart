@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:fpdart/fpdart.dart';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:resumesux_domain/resumesux_domain.dart';
 
@@ -184,6 +187,113 @@ class TestAiHelper {
     settings: {'max_tokens': 4000, 'temperature': 0.8},
     isDefault: true,
   );
+}
+
+/// Mock HTTP client for testing AI service.
+/// Returns dummy OpenAI-compatible responses.
+class MockHttpClient implements http.Client {
+  @override
+  Future<http.Response> post(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
+    // Simulate successful response
+    return http.Response(
+      jsonEncode({
+        'choices': [
+          {
+            'message': {'content': _getDummyContent(body)},
+          },
+        ],
+      }),
+      200,
+      headers: {'content-type': 'application/json'},
+    );
+  }
+
+  String _getDummyContent(Object? body) {
+    if (body is String) {
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      final messages = data['messages'] as List?;
+      if (messages != null && messages.isNotEmpty) {
+        final prompt = messages[0]['content'] as String?;
+        if (prompt != null) {
+          if (prompt.contains('resume')) {
+            return '# Sample Resume\n\nThis is a generated resume.';
+          } else if (prompt.contains('cover letter')) {
+            return '# Sample Cover Letter\n\nThis is a generated cover letter.';
+          } else if (prompt.contains('feedback')) {
+            return '# Sample Feedback\n\nThis is generated feedback.';
+          } else if (prompt.contains('gig') || prompt.contains('experience')) {
+            return '[{"title": "Software Engineer", "concern": "Tech Company", "location": "Remote", "dates": "2020-2023", "achievements": ["Developed features", "Improved performance"]}]';
+          } else if (prompt.contains('asset') || prompt.contains('skill')) {
+            return '[{"content": "Experienced in Dart and Flutter"}]';
+          }
+        }
+      }
+    }
+    return 'This is a dummy AI response for testing.';
+  }
+
+  @override
+  Future<http.Response> get(Uri url, {Map<String, String>? headers}) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<http.Response> put(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<http.Response> patch(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<http.Response> delete(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<http.Response> head(Uri url, {Map<String, String>? headers}) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> read(Uri url, {Map<String, String>? headers}) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Uint8List> readBytes(Uri url, {Map<String, String>? headers}) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  void close() {}
 }
 
 /// Test implementation of FileRepository for testing purposes.

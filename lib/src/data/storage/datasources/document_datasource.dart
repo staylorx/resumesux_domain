@@ -127,6 +127,8 @@ class DocumentDatasource {
         return 'gig_responses';
       case 'asset_response':
         return 'asset_responses';
+      case 'ai_response':
+        return 'jobreq_responses';
       default:
         throw ArgumentError('Unknown AI response document type: $documentType');
     }
@@ -140,7 +142,7 @@ class DocumentDatasource {
         return 'cover_letters';
       case 'feedback':
         return 'feedbacks';
-      case 'jobReq':
+      case 'jobreq':
         return 'jobreqs';
       default:
         throw ArgumentError('Unknown document type: $documentType');
