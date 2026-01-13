@@ -24,7 +24,7 @@ config:
       key: "dummy-key"
       default: true
       models:
-        - name: "qwen/qwen2.5-coder-14b"
+        - name: "qwen2.5-7b-instruct"
           default: true
           settings:
             temperature: 0.8

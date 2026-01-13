@@ -48,7 +48,7 @@ void main() {
       );
       expect(provider.name, 'lmstudio');
       expect(provider.isDefault, true);
-      expect(provider.defaultModel!.name, 'qwen/qwen2.5-coder-14b');
+      expect(provider.defaultModel!.name, 'qwen2.5-7b-instruct');
     });
 
     test('get default model successfully', () async {
@@ -65,7 +65,7 @@ void main() {
       final model = result.getOrElse(
         (_) => throw Exception('Failed to get model'),
       );
-      expect(model.name, 'qwen/qwen2.5-coder-14b');
+      expect(model.name, 'qwen2.5-7b-instruct');
       expect(model.isDefault, true);
     });
 
@@ -147,7 +147,7 @@ void main() {
       expect((aiService as AiServiceImpl).provider.name, 'lmstudio');
       expect(
         (aiService as AiServiceImpl).provider.defaultModel?.name,
-        'qwen/qwen2.5-coder-14b',
+        'qwen2.5-7b-instruct',
       );
     });
 
@@ -197,7 +197,7 @@ void main() {
 
       verify(
         () => mockHttpClient.post(
-          Uri.parse('http://127.0.0.1:1234/chat/completions'),
+          Uri.parse('http://127.0.0.1:1234/v1/chat/completions'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer dummy-key',
