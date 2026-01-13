@@ -18,6 +18,7 @@ class AiServiceImpl with Loggable implements AiService {
   }
 
   /// Creates an AiServiceImpl instance for the given provider.
+  @Deprecated('Use AiServiceFactoryImpl.createAiServiceStatic instead')
   static Future<AiServiceImpl> create({
     Logger? logger,
     required ConfigRepository configRepository,

@@ -20,7 +20,7 @@ void main() {
   });
   late ConfigRepositoryImpl configRepository;
   late ConfigDatasource configDatasource;
-  late AiServiceImpl aiService;
+  late AiService aiService;
   late MockHttpClient mockHttpClient;
 
   setUp(() {
@@ -130,26 +130,37 @@ void main() {
       final configPath = 'test/data/config/valid_config.yaml';
 
       // Act
-      aiService = await AiServiceImpl.create(
+      final aiServiceResult = await AiServiceFactoryImpl.createAiServiceStatic(
         configRepository: configRepository,
         providerName: 'lmstudio',
         configPath: configPath,
         httpClient: mockHttpClient,
       );
+      expect(aiServiceResult.isRight(), true);
+      aiService = aiServiceResult.getOrElse(
+        (_) => throw Exception('Failed to create AI service'),
+      );
 
       // Assert
-      expect(aiService.provider.name, 'lmstudio');
-      expect(aiService.provider.defaultModel?.name, 'qwen/qwen2.5-coder-14b');
+      expect((aiService as AiServiceImpl).provider.name, 'lmstudio');
+      expect(
+        (aiService as AiServiceImpl).provider.defaultModel?.name,
+        'qwen/qwen2.5-coder-14b',
+      );
     });
 
     test('generate content with mocked successful response', () async {
       // Arrange
       final configPath = 'test/data/config/valid_config.yaml';
-      aiService = await AiServiceImpl.create(
+      final aiServiceResult = await AiServiceFactoryImpl.createAiServiceStatic(
         configRepository: configRepository,
         providerName: 'lmstudio',
         configPath: configPath,
         httpClient: mockHttpClient,
+      );
+      expect(aiServiceResult.isRight(), true);
+      aiService = aiServiceResult.getOrElse(
+        (_) => throw Exception('Failed to create AI service'),
       );
 
       final mockResponse = MockResponse();
@@ -197,11 +208,15 @@ void main() {
     test('handle API failure response', () async {
       // Arrange
       final configPath = 'test/data/config/valid_config.yaml';
-      aiService = await AiServiceImpl.create(
+      final aiServiceResult = await AiServiceFactoryImpl.createAiServiceStatic(
         configRepository: configRepository,
         providerName: 'lmstudio',
         configPath: configPath,
         httpClient: mockHttpClient,
+      );
+      expect(aiServiceResult.isRight(), true);
+      aiService = aiServiceResult.getOrElse(
+        (_) => throw Exception('Failed to create AI service'),
       );
 
       final mockResponse = MockResponse();
@@ -229,11 +244,15 @@ void main() {
     test('handle network failure', () async {
       // Arrange
       final configPath = 'test/data/config/valid_config.yaml';
-      aiService = await AiServiceImpl.create(
+      final aiServiceResult = await AiServiceFactoryImpl.createAiServiceStatic(
         configRepository: configRepository,
         providerName: 'lmstudio',
         configPath: configPath,
         httpClient: mockHttpClient,
+      );
+      expect(aiServiceResult.isRight(), true);
+      aiService = aiServiceResult.getOrElse(
+        (_) => throw Exception('Failed to create AI service'),
       );
 
       when(

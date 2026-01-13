@@ -1,6 +1,7 @@
 library;
 
 export 'ai_gen/services/ai_service.dart';
+export 'ai_gen/services/ai_service_factory_impl.dart';
 
 export 'config/config_schema.dart';
 export 'config/datasources/config_datasource.dart';

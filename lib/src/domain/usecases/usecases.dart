@@ -8,7 +8,6 @@ export 'get_default_provider_usecase.dart';
 export 'generate_resume_usecase.dart';
 export 'generate_cover_letter_usecase.dart';
 export 'generate_feedback_usecase.dart';
-export 'create_ai_service_usecase.dart';
 export 'create_job_req_usecase.dart';
 export 'update_job_req_usecase.dart';
 export 'get_job_req_usecase.dart';
