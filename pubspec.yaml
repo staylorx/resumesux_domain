@@ -31,5 +31,5 @@ dev_dependencies:
   test: ^1.28.0
   resumesux_db_sembast:
     path: packages/resumesux_db_sembast
-  resumesux_logging:
-    path: packages/resumesux_logging
+  id_logging:
+    git: https://github.com/staylorx/id_logging.git
