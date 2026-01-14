@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
-import 'package:test_readme_manager/test_readme_manager.dart';
+import 'package:test_suite_tool/test_suite_tool.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -17,15 +17,15 @@ void main() {
   late UpdateApplicantUsecase updateApplicantUsecase;
   late RemoveApplicantUsecase removeApplicantUsecase;
   late String suiteDir;
-  late TestSuiteReadmeManager readmeManager;
+  late TestSuiteManager readmeManager;
   late FileLoggerImpl logger;
 
   setUpAll(() async {
     suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
-    readmeManager = TestSuiteReadmeManager(
-      suiteDir: suiteDir,
-      suiteName: 'Applicant CRUD Integration Test',
+    readmeManager = TestSuiteManager(
+      suiteDir,
+      'Applicant CRUD Integration Test',
     );
 
     logger = FileLoggerImpl(

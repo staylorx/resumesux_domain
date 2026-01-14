@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
-import 'package:test_readme_manager/test_readme_manager.dart';
+import 'package:test_suite_tool/test_suite_tool.dart';
 import '../test_utils.dart';
 import 'package:resumesux_domain/src/domain/entities/folder_field.dart';
 
@@ -31,7 +31,7 @@ void main() {
   late ApplicationDatasource applicationDatasource;
   late String suiteDir;
   late Logger logger;
-  late TestSuiteReadmeManager readmeManager;
+  late TestSuiteManager readmeManager;
   late SembastDatabaseService dbService;
   late http.Client httpClient;
   late Config config;
@@ -40,11 +40,10 @@ void main() {
 
   logger = ConsoleLoggerImpl(name: 'SoftwareEngineerGenerationTest');
 
-  readmeManager = TestSuiteReadmeManager(
-    suiteDir: suiteDir,
-    suiteName: 'Software Engineer Generation Test',
+  readmeManager = TestSuiteManager(
+    suiteDir,
+    'Software Engineer Generation Test',
   );
-  readmeManager.initialize();
 
   logger = FileLoggerImpl(
     filePath: '$suiteDir/test_log.txt',

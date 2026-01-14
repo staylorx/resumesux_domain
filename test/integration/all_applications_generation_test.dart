@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
-import 'package:test_readme_manager/test_readme_manager.dart';
+import 'package:test_suite_tool/test_suite_tool.dart';
 import '../test_utils.dart';
 
 // Note: Test has a 30-minute timeout to allow graceful stopping.
@@ -16,7 +16,7 @@ void main() {
   late SembastDatabaseService dbService;
   late ApplicationRepository applicationRepository;
   late ApplicantRepository applicantRepository;
-  late TestSuiteReadmeManager readmeManager;
+  late TestSuiteManager readmeManager;
   late Config config;
 
   suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
@@ -26,11 +26,10 @@ void main() {
     name: 'AllApplicationsGenerationTests',
   );
 
-  readmeManager = TestSuiteReadmeManager(
-    suiteDir: suiteDir,
-    suiteName: 'All Applications Generation Test GROUPED',
+  readmeManager = TestSuiteManager(
+    suiteDir,
+    'All Applications Generation Test GROUPED',
   );
-  readmeManager.initialize();
 
   setUpAll(() async {
     httpClient = http.Client();

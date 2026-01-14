@@ -33,5 +33,5 @@ dev_dependencies:
   test: ^1.28.0
   resumesux_db_sembast:
     path: packages/resumesux_db_sembast
-  test_readme_manager:
-    path: packages/test_readme_manager
+  test_suite_tool:
+    path: packages/test_suite_tool

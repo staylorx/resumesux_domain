@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
-import 'package:test_readme_manager/test_readme_manager.dart';
+import 'package:test_suite_tool/test_suite_tool.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -17,7 +17,7 @@ void main() {
   late ApplicantRepository applicantRepository;
   late GetConfigUsecase getConfigUsecase;
   late GenerateApplicationUsecase generateApplicationUsecase;
-  late TestSuiteReadmeManager readmeManager;
+  late TestSuiteManager readmeManager;
 
   suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
   logger = FileLoggerImpl(
@@ -25,11 +25,10 @@ void main() {
     name: 'EndToEndApplicationGenerationTests',
   );
 
-  readmeManager = TestSuiteReadmeManager(
-    suiteDir: suiteDir,
-    suiteName: 'End-to-End Application Generation Test',
+  readmeManager = TestSuiteManager(
+    suiteDir,
+    'End-to-End Application Generation Test',
   );
-  readmeManager.initialize();
 
   setUpAll(() async {
     httpClient = http.Client();

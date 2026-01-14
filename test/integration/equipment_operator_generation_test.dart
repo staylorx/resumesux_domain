@@ -6,7 +6,7 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 import 'package:resumesux_domain/src/domain/entities/folder_field.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
-import 'package:test_readme_manager/test_readme_manager.dart';
+import 'package:test_suite_tool/test_suite_tool.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -33,7 +33,7 @@ void main() {
   late String suiteDir;
   late Logger logger;
   late ApplicationDatasource applicationDatasource;
-  late TestSuiteReadmeManager readmeManager;
+  late TestSuiteManager readmeManager;
   late SembastDatabaseService dbService;
   late Config config;
 
@@ -44,11 +44,10 @@ void main() {
     name: 'EquipmentOperatorGenerationTests',
   );
 
-  readmeManager = TestSuiteReadmeManager(
-    suiteDir: suiteDir,
-    suiteName: 'Heavy Equipment Operator Generation Test',
+  readmeManager = TestSuiteManager(
+    suiteDir,
+    'Heavy Equipment Operator Generation Test',
   );
-  readmeManager.initialize();
 
   setUpAll(() async {
     readmeManager.startGroup('Heavy Equipment Operator Tests');

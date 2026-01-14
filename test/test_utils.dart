@@ -5,6 +5,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:test_suite_tool/test_suite_tool.dart';
 
 /// Factory for creating temporary directories for tests.
 class TestDirFactory {
@@ -277,5 +278,18 @@ class TestFileRepository with Loggable implements FileRepository {
   }) async {
     // Always valid for testing
     return const Right(unit);
+  }
+}
+
+/// Test suite manager using the TestSuiteMixin.
+class TestSuiteManager with TestSuiteMixin {
+  TestSuiteManager(String suiteDir, String suiteName) {
+    config = SuiteDirConfig(
+      type: SuiteDirType.persisted,
+      basePath: suiteDir,
+      deleteOnTeardown: false, // Since suiteDir is already created and managed
+    );
+    this.suiteName = suiteName;
+    initialize();
   }
 }

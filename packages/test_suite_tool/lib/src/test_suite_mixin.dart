@@ -1,21 +1,43 @@
 import 'dart:io';
 import 'package:path/path.dart' as path;
 
-/// Manages README.md file for test suites, tracking progress and status.
-class TestSuiteReadmeManager {
-  final String suiteDir;
-  final String suiteName;
-  final DateTime startTime;
+/// Configuration for suite directory handling.
+class SuiteDirConfig {
+  final SuiteDirType type;
+  final String? basePath;
+  final bool deleteOnTeardown;
+
+  const SuiteDirConfig({
+    required this.type,
+    this.basePath,
+    this.deleteOnTeardown = true,
+  });
+}
+
+/// Enum for suite directory type.
+enum SuiteDirType { temporary, persisted }
+
+/// Mixin for managing test suites, including README generation and suite directory handling.
+mixin TestSuiteMixin {
+  String? suiteDir;
+  late final String suiteName;
+  late final SuiteDirConfig config;
+  late final DateTime startTime;
   final List<String> groups = [];
   final Map<String, TestEntry> testEntries = {};
   final Map<String, List<TestEntry>> groupTests = {};
   String? currentGroup;
 
-  TestSuiteReadmeManager({required this.suiteDir, required this.suiteName})
-      : startTime = DateTime.now();
-
-  /// Initializes the README.md with suite information.
+  /// Initializes the suite directory and README.md with suite information.
   void initialize() {
+    if (config.type == SuiteDirType.temporary) {
+      suiteDir = Directory.systemTemp.createTempSync('test_suite_${suiteName}_').path;
+    } else {
+      final base = config.basePath ?? path.join('build', 'output');
+      suiteDir = path.join(base, suiteName);
+    }
+    Directory(suiteDir!).createSync(recursive: true);
+    startTime = DateTime.now();
     _writeReadme();
   }
 
@@ -64,7 +86,30 @@ class TestSuiteReadmeManager {
     _writeReadme();
   }
 
+  /// Disposes the suite, deleting the directory if configured to do so.
+  void dispose() {
+    if (suiteDir != null && config.deleteOnTeardown) {
+      final dir = Directory(suiteDir!);
+      if (dir.existsSync()) {
+        dir.deleteSync(recursive: true);
+      }
+    }
+  }
+
+  /// Copies a file to the suite directory for artifact collection.
+  void collectArtifact(String sourcePath, {String? destName}) {
+    if (suiteDir != null) {
+      final file = File(sourcePath);
+      if (file.existsSync()) {
+        final name = destName ?? path.basename(sourcePath);
+        final destPath = path.join(suiteDir!, name);
+        file.copySync(destPath);
+      }
+    }
+  }
+
   void _writeReadme() {
+    if (suiteDir == null) return;
     final buffer = StringBuffer();
 
     buffer.writeln('# Test Suite: $suiteName - GROUPED');
@@ -123,8 +168,16 @@ class TestSuiteReadmeManager {
       buffer.writeln('- Running: $running');
     }
 
-    final readmePath = path.join(suiteDir, 'README.md');
+    final readmePath = path.join(suiteDir!, 'README.md');
     File(readmePath).writeAsStringSync(buffer.toString());
+  }
+}
+
+/// A tool class for managing test suites using the TestSuiteMixin.
+class TestSuiteTool with TestSuiteMixin {
+  TestSuiteTool({required SuiteDirConfig config, required String suiteName}) {
+    this.config = config;
+    this.suiteName = suiteName;
   }
 }
 
