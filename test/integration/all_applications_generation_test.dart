@@ -298,7 +298,7 @@ void main() {
       });
 
       for (final jobReqPath in jobReqPaths) {
-        String testName = 'Generate application for $jobReqPath';
+        String testName = '$scenarioName: Generate application for $jobReqPath';
         test(testName, () async {
           readmeManager.startTest(testName);
 

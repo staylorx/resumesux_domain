@@ -69,6 +69,61 @@ void main() {
     expect(destFile.existsSync(), isTrue);
   });
 
+  test('README respects grouping with test tables under group headings', () {
+    suite.initialize();
+    suite.startGroup('Group A');
+    suite.startTest('Test A1');
+    suite.endTest('Test A1', true);
+    suite.startTest('Test A2');
+    suite.endTest('Test A2', false, error: 'Failed');
+
+    suite.startGroup('Group B');
+    suite.startTest('Test B1');
+    suite.endTest('Test B1', true);
+
+    suite.finalize();
+
+    final readmePath = path.join(suite.suiteDir!, 'README.md');
+    final readmeContent = File(readmePath).readAsStringSync();
+
+    // Check that group headings are present
+    expect(readmeContent, contains('## Group A'));
+    expect(readmeContent, contains('## Group B'));
+
+    // Check that tables are under their respective groups
+    final lines = readmeContent.split('\n');
+    int groupAIndex = lines.indexWhere((line) => line == '## Group A');
+    int groupBIndex = lines.indexWhere((line) => line == '## Group B');
+
+    expect(groupAIndex, isNot(-1));
+    expect(groupBIndex, isNot(-1));
+
+    // Find the table under Group A
+    bool foundTableUnderA = false;
+    for (int i = groupAIndex + 1; i < lines.length && i < groupBIndex; i++) {
+      if (lines[i].startsWith('| Test | Status | Duration | Error |')) {
+        foundTableUnderA = true;
+        // Check that Test A1 and Test A2 are in the table
+        expect(lines.sublist(i, i + 4).join('\n'), contains('Test A1'));
+        expect(lines.sublist(i, i + 4).join('\n'), contains('Test A2'));
+        break;
+      }
+    }
+    expect(foundTableUnderA, isTrue);
+
+    // Find the table under Group B
+    bool foundTableUnderB = false;
+    for (int i = groupBIndex + 1; i < lines.length; i++) {
+      if (lines[i].startsWith('| Test | Status | Duration | Error |')) {
+        foundTableUnderB = true;
+        // Check that Test B1 is in the table
+        expect(lines.sublist(i, i + 3).join('\n'), contains('Test B1'));
+        break;
+      }
+    }
+    expect(foundTableUnderB, isTrue);
+  });
+
   group('persisted suite', () {
     late String persistedTempDir;
     late TestSuiteTool persistedSuite;
