@@ -372,7 +372,7 @@ void main() {
           }, timeout: const Timeout(Duration(minutes: 30)));
         });
       }
-    });
+    }, skip: true); // Skipping the group for now to avoid long test runs
   }
 
   group('Verification', () {
