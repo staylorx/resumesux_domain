@@ -130,6 +130,8 @@ class ApplicantDto {
   }
 
   /// Converts to domain entity.
+  /// Note: This creates an Applicant with empty gigs and assets.
+  /// The repository should load the actual gigs and assets separately.
   Applicant toDomain() {
     return Applicant(
       name: name,
@@ -148,8 +150,8 @@ class ApplicantDto {
       linkedin: linkedin,
       github: github,
       portfolio: portfolio,
-      gigs: [], // TODO: resolve from gigIds
-      assets: [], // TODO: resolve from assetIds
+      gigs: [],
+      assets: [],
     );
   }
 }
