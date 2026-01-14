@@ -144,13 +144,10 @@ $content
           content: content,
           path: file.path,
         );
-        final data = extractResult.getOrElse((_) => {});
         if (extractResult.isLeft()) {
-          logger?.warning(
-            'Failed to extract gig data from ${file.path}: ${extractResult.getLeft().toNullable()?.message}',
-          );
-          continue;
+          return Left(extractResult.getLeft().toNullable()!);
         }
+        final data = extractResult.getOrElse((_) => {});
         if (data.isNotEmpty) {
           logger?.debug('Extracted gig data: $data');
         }

@@ -160,6 +160,7 @@ class ApplicantRepositoryImpl with Loggable implements ApplicantRepository {
       return Left(gigsResult.getLeft().toNullable()!);
     }
     final gigs = gigsResult.getOrElse((_) => []);
+    logger?.info('Imported ${gigs.length} gigs from digest');
 
     // Get assets
     final assetsResult = await assetRepository.getAllAssets();
@@ -167,6 +168,7 @@ class ApplicantRepositoryImpl with Loggable implements ApplicantRepository {
       return Left(assetsResult.getLeft().toNullable()!);
     }
     final assets = assetsResult.getOrElse((_) => []);
+    logger?.info('Imported ${assets.length} assets from digest');
 
     final updatedApplicant = applicant.copyWith(gigs: gigs, assets: assets);
     return Right(updatedApplicant);

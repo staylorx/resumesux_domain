@@ -136,34 +136,10 @@ $content
           content: content,
           path: file.path,
         );
-        final data = extractResult.getOrElse((_) => {});
         if (extractResult.isLeft()) {
-          logger?.warning(
-            'Failed to extract asset data from ${file.path}: ${extractResult.getLeft().toNullable()?.message}',
-          );
-          // Fallback to basic extraction
-          final type = _getAssetType(path: file.path);
-          final asset = Asset(
-            tags: [Tag(name: type)],
-            content: content,
-          );
-          assets.add(asset);
-
-          // Persist the asset to datastore
-          final dto = AssetDto(
-            id: 'asset_${asset.content.hashCode}',
-            tagNames: asset.tags.map((tag) => tag.name).toList(),
-            content: asset.content,
-          );
-          final saveResult = await applicationDatasource.saveAsset(dto);
-          if (saveResult.isLeft()) {
-            logger?.warning(
-              'Failed to persist asset from ${file.path}: ${saveResult.getLeft().toNullable()?.message}',
-            );
-            // Continue anyway
-          }
-          continue;
+          return Left(extractResult.getLeft().toNullable()!);
         }
+        final data = extractResult.getOrElse((_) => {});
         if (data.isNotEmpty) {
           logger?.debug('Extracted asset data: $data');
         }
