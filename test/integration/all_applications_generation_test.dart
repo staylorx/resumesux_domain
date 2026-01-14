@@ -139,232 +139,236 @@ void main() {
     'test/data/jobreqs/TelecomPlus/Customer Churn Prediction Model Development/data_scientist.md',
   ];
 
-  // scenarios structure: each scenario has name, digestPath, and jobReqPaths
-  final scenarios = [
+  // personas structure: each persona has name and digestPath
+  final personas = [
     {
       'name': 'Equipment Operator',
       'digestPath': 'test/data/digest/heavy_equipment_operator',
-      'jobReqPaths': allJobReqPaths,
     },
     {
       'name': 'Data Scientist',
       'digestPath': 'test/data/digest/data_scientist',
-      'jobReqPaths': allJobReqPaths,
     },
     {
       'name': 'Software Engineer',
       'digestPath': 'test/data/digest/software_engineer',
-      'jobReqPaths': allJobReqPaths,
     },
   ];
 
-  for (final scenario in scenarios) {
-    final scenarioName = scenario['name'] as String;
-    final digestPath = scenario['digestPath'] as String;
-    final jobReqPaths = scenario['jobReqPaths'] as List<String>;
+  for (final jobReqPath in allJobReqPaths) {
+    // Extract a readable name for the job req, e.g., "ConstuctionPro Builders - Equipment Operator"
+    final pathParts = jobReqPath.split('/');
+    final company = pathParts[pathParts.length - 3];
+    final jobTitle = pathParts[pathParts.length - 2];
+    final jobReqName = '$company - $jobTitle';
 
-    String groupName = 'Scenario: $scenarioName';
+    String groupName = 'JobReq: $jobReqName';
     group(groupName, () {
       readmeManager.startGroup(groupName);
 
-      late GigRepository gigRepository;
-      late AssetRepository assetRepository;
-      late Applicant loadedApplicant;
-      late GenerateResumeUsecase generateResumeUsecase;
-      late GenerateCoverLetterUsecase generateCoverLetterUsecase;
-      late GenerateFeedbackUsecase generateFeedbackUsecase;
-      late SaveJobReqAiResponseUsecase saveJobReqAiResponseUsecase;
-      late SaveGigAiResponseUsecase saveGigAiResponseUsecase;
-      late SaveAssetAiResponseUsecase saveAssetAiResponseUsecase;
-      late SaveResumeAiResponseUsecase saveResumeAiResponseUsecase;
-      late SaveCoverLetterAiResponseUsecase saveCoverLetterAiResponseUsecase;
-      late SaveFeedbackAiResponseUsecase saveFeedbackAiResponseUsecase;
-      late GenerateApplicationUsecase generateApplicationUsecase;
+      for (final persona in personas) {
+        final personaName = persona['name'] as String;
+        final digestPath = persona['digestPath'] as String;
 
-      setUp(() async {
-        gigRepository = createGigRepositoryImpl(
-          logger: logger,
-          digestPath: digestPath,
-          aiService: aiService,
-          applicationDatasource: createApplicationDatasource(
-            dbService: dbService,
-          ),
-        );
+        group('Persona: $personaName', () {
+          late GigRepository gigRepository;
+          late AssetRepository assetRepository;
+          late Applicant loadedApplicant;
+          late GenerateResumeUsecase generateResumeUsecase;
+          late GenerateCoverLetterUsecase generateCoverLetterUsecase;
+          late GenerateFeedbackUsecase generateFeedbackUsecase;
+          late SaveJobReqAiResponseUsecase saveJobReqAiResponseUsecase;
+          late SaveGigAiResponseUsecase saveGigAiResponseUsecase;
+          late SaveAssetAiResponseUsecase saveAssetAiResponseUsecase;
+          late SaveResumeAiResponseUsecase saveResumeAiResponseUsecase;
+          late SaveCoverLetterAiResponseUsecase saveCoverLetterAiResponseUsecase;
+          late SaveFeedbackAiResponseUsecase saveFeedbackAiResponseUsecase;
+          late GenerateApplicationUsecase generateApplicationUsecase;
 
-        assetRepository = createAssetRepositoryImpl(
-          logger: logger,
-          digestPath: digestPath,
-          aiService: aiService,
-          applicationDatasource: createApplicationDatasource(
-            dbService: dbService,
-          ),
-        );
-
-        // Load applicant with gigs and assets
-        final importResult = await applicantRepository.importDigest(
-          applicant: applicant,
-          digestPath: digestPath,
-        );
-        loadedApplicant = importResult.getOrElse(
-          (failure) =>
-              throw Exception('Failed to import digest: ${failure.message}'),
-        );
-
-        generateResumeUsecase = GenerateResumeUsecase(
-          aiService: aiService,
-          logger: logger,
-          resumeRepository: createResumeRepositoryImpl(
-            logger: logger,
-            fileRepository: TestFileRepository(),
-            applicationDatasource: createApplicationDatasource(
-              dbService: dbService,
-            ),
-          ),
-        );
-
-        generateCoverLetterUsecase = GenerateCoverLetterUsecase(
-          aiService: aiService,
-          logger: logger,
-        );
-
-        generateFeedbackUsecase = GenerateFeedbackUsecase(
-          logger: logger,
-          aiService: aiService,
-          jobReqRepository: jobReqRepository,
-          gigRepository: gigRepository,
-          assetRepository: assetRepository,
-        );
-
-        saveJobReqAiResponseUsecase = SaveJobReqAiResponseUsecase(
-          jobReqRepository: jobReqRepository,
-          logger: logger,
-        );
-
-        saveGigAiResponseUsecase = SaveGigAiResponseUsecase(
-          gigRepository: gigRepository,
-          logger: logger,
-        );
-
-        saveAssetAiResponseUsecase = SaveAssetAiResponseUsecase(
-          assetRepository: assetRepository,
-          logger: logger,
-        );
-
-        saveResumeAiResponseUsecase = SaveResumeAiResponseUsecase(
-          resumeRepository: createResumeRepositoryImpl(
-            logger: logger,
-            fileRepository: TestFileRepository(),
-            applicationDatasource: createApplicationDatasource(
-              dbService: dbService,
-            ),
-          ),
-          logger: logger,
-        );
-
-        saveCoverLetterAiResponseUsecase = SaveCoverLetterAiResponseUsecase(
-          coverLetterRepository: createCoverLetterRepositoryImpl(
-            logger: logger,
-            fileRepository: TestFileRepository(),
-            applicationDatasource: createApplicationDatasource(
-              dbService: dbService,
-            ),
-          ),
-          logger: logger,
-        );
-
-        saveFeedbackAiResponseUsecase = SaveFeedbackAiResponseUsecase(
-          feedbackRepository: createFeedbackRepositoryImpl(
-            logger: logger,
-            fileRepository: TestFileRepository(),
-            applicationDatasource: createApplicationDatasource(
-              dbService: dbService,
-            ),
-          ),
-          logger: logger,
-        );
-
-        generateApplicationUsecase = GenerateApplicationUsecase(
-          generateResumeUsecase: generateResumeUsecase,
-          generateCoverLetterUsecase: generateCoverLetterUsecase,
-          generateFeedbackUsecase: generateFeedbackUsecase,
-          saveJobReqAiResponseUsecase: saveJobReqAiResponseUsecase,
-          saveGigAiResponseUsecase: saveGigAiResponseUsecase,
-          saveAssetAiResponseUsecase: saveAssetAiResponseUsecase,
-          saveResumeAiResponseUsecase: saveResumeAiResponseUsecase,
-          saveCoverLetterAiResponseUsecase: saveCoverLetterAiResponseUsecase,
-          saveFeedbackAiResponseUsecase: saveFeedbackAiResponseUsecase,
-          logger: logger,
-        );
-      });
-
-      for (final jobReqPath in jobReqPaths) {
-        String testName = '$scenarioName: Generate application for $jobReqPath';
-        test(testName, () async {
-          readmeManager.startTest(testName);
-
-          try {
-            logger.info(
-              "Applying for jobreq at $jobReqPath using digest at $digestPath for scenario $scenarioName",
-            );
-
-            final jobReqResult = await jobReqRepository.getJobReq(
-              path: jobReqPath,
-            );
-            final jobReq = jobReqResult.getOrElse(
-              (failure) => throw Exception(
-                'Failed to get jobreq at $jobReqPath: ${failure.message}',
+          setUp(() async {
+            gigRepository = createGigRepositoryImpl(
+              logger: logger,
+              digestPath: digestPath,
+              aiService: aiService,
+              applicationDatasource: createApplicationDatasource(
+                dbService: dbService,
               ),
             );
 
-            final result = await generateApplicationUsecase.call(
-              jobReq: jobReq,
-              applicant: loadedApplicant,
-              config: config,
-              prompt: 'Generate a professional application.',
-              includeCover: true,
-              includeFeedback: true,
-              progress: (message) => logger.info(message),
+            assetRepository = createAssetRepositoryImpl(
+              logger: logger,
+              digestPath: digestPath,
+              aiService: aiService,
+              applicationDatasource: createApplicationDatasource(
+                dbService: dbService,
+              ),
             );
 
-            expect(
-              result.isRight(),
-              true,
-              reason: 'Failed to generate application for $jobReqPath',
+            // Load applicant with gigs and assets
+            final importResult = await applicantRepository.importDigest(
+              applicant: applicant,
+              digestPath: digestPath,
+            );
+            loadedApplicant = importResult.getOrElse(
+              (failure) =>
+                  throw Exception('Failed to import digest: ${failure.message}'),
             );
 
-            final application = result.getOrElse(
-              (_) => throw Exception('Failed to generate application'),
+            generateResumeUsecase = GenerateResumeUsecase(
+              aiService: aiService,
+              logger: logger,
+              resumeRepository: createResumeRepositoryImpl(
+                logger: logger,
+                fileRepository: TestFileRepository(),
+                applicationDatasource: createApplicationDatasource(
+                  dbService: dbService,
+                ),
+              ),
             );
 
-            final handle = ApplicationHandle.generate();
-            final saveAppResult = await applicationRepository.save(
-              handle: handle,
-              application: application,
-            );
-            expect(
-              saveAppResult.isRight(),
-              true,
-              reason: 'Failed to save application to DB for $jobReqPath',
+            generateCoverLetterUsecase = GenerateCoverLetterUsecase(
+              aiService: aiService,
+              logger: logger,
             );
 
-            final saveArtifactsResult = await applicationRepository
-                .saveApplicationArtifacts(
-                  application: application,
-                  config: config,
-                  outputDir: suiteDir,
-                );
-            expect(
-              saveArtifactsResult.isRight(),
-              true,
-              reason: 'Failed to save application artifacts for $jobReqPath',
+            generateFeedbackUsecase = GenerateFeedbackUsecase(
+              logger: logger,
+              aiService: aiService,
+              jobReqRepository: jobReqRepository,
+              gigRepository: gigRepository,
+              assetRepository: assetRepository,
             );
 
-            readmeManager.endTest(testName, true);
-          } catch (e) {
-            readmeManager.endTest(testName, false, error: e.toString());
-            rethrow;
-          }
-        }, timeout: const Timeout(Duration(minutes: 30)));
+            saveJobReqAiResponseUsecase = SaveJobReqAiResponseUsecase(
+              jobReqRepository: jobReqRepository,
+              logger: logger,
+            );
+
+            saveGigAiResponseUsecase = SaveGigAiResponseUsecase(
+              gigRepository: gigRepository,
+              logger: logger,
+            );
+
+            saveAssetAiResponseUsecase = SaveAssetAiResponseUsecase(
+              assetRepository: assetRepository,
+              logger: logger,
+            );
+
+            saveResumeAiResponseUsecase = SaveResumeAiResponseUsecase(
+              resumeRepository: createResumeRepositoryImpl(
+                logger: logger,
+                fileRepository: TestFileRepository(),
+                applicationDatasource: createApplicationDatasource(
+                  dbService: dbService,
+                ),
+              ),
+              logger: logger,
+            );
+
+            saveCoverLetterAiResponseUsecase = SaveCoverLetterAiResponseUsecase(
+              coverLetterRepository: createCoverLetterRepositoryImpl(
+                logger: logger,
+                fileRepository: TestFileRepository(),
+                applicationDatasource: createApplicationDatasource(
+                  dbService: dbService,
+                ),
+              ),
+              logger: logger,
+            );
+
+            saveFeedbackAiResponseUsecase = SaveFeedbackAiResponseUsecase(
+              feedbackRepository: createFeedbackRepositoryImpl(
+                logger: logger,
+                fileRepository: TestFileRepository(),
+                applicationDatasource: createApplicationDatasource(
+                  dbService: dbService,
+                ),
+              ),
+              logger: logger,
+            );
+
+            generateApplicationUsecase = GenerateApplicationUsecase(
+              generateResumeUsecase: generateResumeUsecase,
+              generateCoverLetterUsecase: generateCoverLetterUsecase,
+              generateFeedbackUsecase: generateFeedbackUsecase,
+              saveJobReqAiResponseUsecase: saveJobReqAiResponseUsecase,
+              saveGigAiResponseUsecase: saveGigAiResponseUsecase,
+              saveAssetAiResponseUsecase: saveAssetAiResponseUsecase,
+              saveResumeAiResponseUsecase: saveResumeAiResponseUsecase,
+              saveCoverLetterAiResponseUsecase: saveCoverLetterAiResponseUsecase,
+              saveFeedbackAiResponseUsecase: saveFeedbackAiResponseUsecase,
+              logger: logger,
+            );
+          });
+
+          String testName = '$personaName: Generate application for $jobReqName';
+          test(testName, () async {
+            readmeManager.startTest(testName);
+
+            try {
+              logger.info(
+                "Applying for jobreq at $jobReqPath using digest at $digestPath for persona $personaName",
+              );
+
+              final jobReqResult = await jobReqRepository.getJobReq(
+                path: jobReqPath,
+              );
+              final jobReq = jobReqResult.getOrElse(
+                (failure) => throw Exception(
+                  'Failed to get jobreq at $jobReqPath: ${failure.message}',
+                ),
+              );
+
+              final result = await generateApplicationUsecase.call(
+                jobReq: jobReq,
+                applicant: loadedApplicant,
+                config: config,
+                prompt: 'Generate a professional application.',
+                includeCover: true,
+                includeFeedback: true,
+                progress: (message) => logger.info(message),
+              );
+
+              expect(
+                result.isRight(),
+                true,
+                reason: 'Failed to generate application for $jobReqPath',
+              );
+
+              final application = result.getOrElse(
+                (_) => throw Exception('Failed to generate application'),
+              );
+
+              final handle = ApplicationHandle.generate();
+              final saveAppResult = await applicationRepository.save(
+                handle: handle,
+                application: application,
+              );
+              expect(
+                saveAppResult.isRight(),
+                true,
+                reason: 'Failed to save application to DB for $jobReqPath',
+              );
+
+              final saveArtifactsResult = await applicationRepository
+                  .saveApplicationArtifacts(
+                    application: application,
+                    config: config,
+                    outputDir: suiteDir,
+                  );
+              expect(
+                saveArtifactsResult.isRight(),
+                true,
+                reason: 'Failed to save application artifacts for $jobReqPath',
+              );
+
+              readmeManager.endTest(testName, true);
+            } catch (e) {
+              readmeManager.endTest(testName, false, error: e.toString());
+              rethrow;
+            }
+          }, timeout: const Timeout(Duration(minutes: 30)));
+        });
       }
     });
   }
