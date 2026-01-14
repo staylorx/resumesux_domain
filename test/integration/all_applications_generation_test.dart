@@ -212,7 +212,7 @@ void main() {
             loadedApplicant = importResult.getOrElse(
               (failure) =>
                   throw Exception('Failed to import digest: ${failure.message}'),
-            );
+            ).copyWith(name: '${applicant.name} - $personaName');
 
             generateResumeUsecase = GenerateResumeUsecase(
               aiService: aiService,
