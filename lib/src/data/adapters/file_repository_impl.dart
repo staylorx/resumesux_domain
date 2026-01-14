@@ -85,7 +85,13 @@ class FileRepositoryImpl with Loggable implements FileRepository {
   }) {
     try {
       // Use folderOrder from config if provided, otherwise default to current behavior
-      final folderOrder = config.folderOrder ?? [FolderField.concern, FolderField.applicant_name, FolderField.jobreq_title];
+      final folderOrder =
+          config.folderOrder ??
+          [
+            FolderField.concern,
+            FolderField.applicant_name,
+            FolderField.jobreq_title,
+          ];
 
       final pathSegments = <String>[];
       for (final field in folderOrder) {
@@ -201,7 +207,11 @@ class FileRepositoryImpl with Loggable implements FileRepository {
         .toLowerCase();
   }
 
-  String? _getFieldValue(FolderField field, JobReq jobReq, Applicant applicant) {
+  String? _getFieldValue(
+    FolderField field,
+    JobReq jobReq,
+    Applicant applicant,
+  ) {
     switch (field) {
       case FolderField.applicant_name:
         return applicant.name;

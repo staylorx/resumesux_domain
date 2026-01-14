@@ -3,12 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
+import 'package:test_readme_manager/test_readme_manager.dart';
 import '../test_utils.dart';
 
-// TODO once this test starts it's                  hard to get it to stop gracefully.
-// check all of our code and ensure it respondes to cancel signals appropriately.
-
-// TODO: break out the readme manager into a separate package, so we can focus on getting to work as a quality mixin for all our integration tests.
+// Note: Test has a 30-minute timeout to allow graceful stopping.
 void main() {
   late JobReqRepository jobReqRepository;
   late AiService aiService;
@@ -367,7 +365,7 @@ void main() {
             readmeManager.endTest(testName, false, error: e.toString());
             rethrow;
           }
-        }, timeout: Timeout.none);
+        }, timeout: const Timeout(Duration(minutes: 30)));
       }
     });
   }
@@ -377,75 +375,75 @@ void main() {
 
     String testName = 'Verify all applications saved correctly';
     test(testName, () async {
-    readmeManager.startTest(testName);
+      readmeManager.startTest(testName);
 
-    try {
-      // Assert applications saved to DB
-      final datasource = createApplicationDatasource(dbService: dbService);
-      final appsResult = await datasource.getAllApplications();
-      expect(
-        appsResult.isRight(),
-        true,
-        reason: 'Failed to retrieve applications from DB',
-      );
-      final apps = appsResult.getOrElse((_) => []);
-      expect(
-        apps.length,
-        15, // 3 scenarios * 5 jobreqs
-        reason: 'Expected 15 applications in DB, found ${apps.length}',
-      );
-
-      // Assert that output directory structure is correct
-      final outputDirectory = Directory(suiteDir);
-      expect(outputDirectory.existsSync(), true);
-
-      final companyDirs = outputDirectory
-          .listSync()
-          .whereType<Directory>()
-          .toList();
-      logger.info(
-        'Found ${companyDirs.length} company directories: ${companyDirs.map((d) => d.path.split(Platform.pathSeparator).last).toList()}',
-      );
-      expect(companyDirs.length, 5, reason: 'Expected 5 company directories');
-
-      // Check that each company directory has the expected substructure
-      for (final companyDir in companyDirs) {
-        final subDirs = companyDir.listSync().whereType<Directory>().toList();
-        logger.info(
-          'Company ${companyDir.path.split(Platform.pathSeparator).last} has ${subDirs.length} subdirectories: ${subDirs.map((d) => d.path.split(Platform.pathSeparator).last).toList()}',
-        );
+      try {
+        // Assert applications saved to DB
+        final datasource = createApplicationDatasource(dbService: dbService);
+        final appsResult = await datasource.getAllApplications();
         expect(
-          subDirs.length,
-          3, // 3 applicants per job
-          reason:
-              'Expected 3 application directories (one per applicant) in ${companyDir.path}',
+          appsResult.isRight(),
+          true,
+          reason: 'Failed to retrieve applications from DB',
         );
-
-        final appDir = subDirs.first;
-        final files = appDir.listSync().whereType<File>().toList();
+        final apps = appsResult.getOrElse((_) => []);
         expect(
-          files.length,
-          greaterThanOrEqualTo(1),
-          reason: 'Expected at least 1 file in ${appDir.path}',
+          apps.length,
+          15, // 3 scenarios * 5 jobreqs
+          reason: 'Expected 15 applications in DB, found ${apps.length}',
         );
 
-        // Check for resume file
-        final resumeFiles = files
-            .where((file) => file.path.contains('resume_'))
+        // Assert that output directory structure is correct
+        final outputDirectory = Directory(suiteDir);
+        expect(outputDirectory.existsSync(), true);
+
+        final companyDirs = outputDirectory
+            .listSync()
+            .whereType<Directory>()
             .toList();
-        expect(
-          resumeFiles.length,
-          1,
-          reason: 'Expected 1 resume file in ${appDir.path}',
+        logger.info(
+          'Found ${companyDirs.length} company directories: ${companyDirs.map((d) => d.path.split(Platform.pathSeparator).last).toList()}',
         );
-        expect(resumeFiles.first.existsSync(), true);
-      }
+        expect(companyDirs.length, 5, reason: 'Expected 5 company directories');
 
-      readmeManager.endTest(testName, true);
-    } catch (e) {
-      readmeManager.endTest(testName, false, error: e.toString());
-      rethrow;
-    }
-  });
+        // Check that each company directory has the expected substructure
+        for (final companyDir in companyDirs) {
+          final subDirs = companyDir.listSync().whereType<Directory>().toList();
+          logger.info(
+            'Company ${companyDir.path.split(Platform.pathSeparator).last} has ${subDirs.length} subdirectories: ${subDirs.map((d) => d.path.split(Platform.pathSeparator).last).toList()}',
+          );
+          expect(
+            subDirs.length,
+            3, // 3 applicants per job
+            reason:
+                'Expected 3 application directories (one per applicant) in ${companyDir.path}',
+          );
+
+          final appDir = subDirs.first;
+          final files = appDir.listSync().whereType<File>().toList();
+          expect(
+            files.length,
+            greaterThanOrEqualTo(1),
+            reason: 'Expected at least 1 file in ${appDir.path}',
+          );
+
+          // Check for resume file
+          final resumeFiles = files
+              .where((file) => file.path.contains('resume_'))
+              .toList();
+          expect(
+            resumeFiles.length,
+            1,
+            reason: 'Expected 1 resume file in ${appDir.path}',
+          );
+          expect(resumeFiles.first.existsSync(), true);
+        }
+
+        readmeManager.endTest(testName, true);
+      } catch (e) {
+        readmeManager.endTest(testName, false, error: e.toString());
+        rethrow;
+      }
+    });
   });
 }

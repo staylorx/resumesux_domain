@@ -3,6 +3,7 @@ import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
+import 'package:test_readme_manager/test_readme_manager.dart';
 import '../test_utils.dart';
 import 'package:resumesux_domain/src/domain/entities/folder_field.dart';
 
@@ -85,12 +86,13 @@ void main() {
       providers: [TestAiHelper.defaultProvider],
       customPrompt: null,
       appendPrompt: false,
-      applicant: Applicant(
-        name: 'Test Applicant',
-        email: 'test@example.com',
-      ),
+      applicant: Applicant(name: 'Test Applicant', email: 'test@example.com'),
       digestPath: 'digest',
-      folderOrder: [FolderField.concern, FolderField.applicant_name, FolderField.jobreq_title],
+      folderOrder: [
+        FolderField.concern,
+        FolderField.applicant_name,
+        FolderField.jobreq_title,
+      ],
     );
 
     fileRepository = TestFileRepository();
