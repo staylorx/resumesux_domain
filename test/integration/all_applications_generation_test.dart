@@ -320,9 +320,9 @@ void main() {
               (_) => throw Exception('Failed to generate application'),
             );
 
-            // TODO: replace this with createApplicationUsecase call once fixed
+            final handle = ApplicationHandle.generate();
             final saveAppResult = await applicationRepository.save(
-              handle: ApplicationHandle.generate(),
+              handle: handle,
               application: application,
             );
             expect(

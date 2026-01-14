@@ -1,9 +1,6 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:crypto/crypto.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:intl/intl.dart';
-
 import 'package:markdown/markdown.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
@@ -85,11 +82,9 @@ class FileRepositoryImpl with Loggable implements FileRepository {
   }) {
     try {
       final concern = jobReq.concern?.name ?? 'unknown';
-      final title = jobReq.title;
-      final hashInput = '$concern$title';
-      final hash = sha256.convert(utf8.encode(hashInput)).toString();
       final concernDir = _sanitizeName(name: concern);
-      final appDirPath = '$baseOutputDir/$concernDir/$hash';
+      final appDirPath =
+          '$baseOutputDir/$concernDir/${_sanitizeName(name: jobReq.title)}';
 
       final appDir = Directory(appDirPath);
       if (!appDir.existsSync()) {

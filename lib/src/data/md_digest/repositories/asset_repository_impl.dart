@@ -122,7 +122,6 @@ $content
         return Right([]);
       }
 
-      // TODO: is the same as the collection in Applicatant of Asset?
       final assets = <Asset>[];
 
       // Read files in assets directory

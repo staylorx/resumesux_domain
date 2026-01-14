@@ -133,7 +133,6 @@ $content
         return Right([]);
       }
 
-      // TODO: is this the same as the applicant collection of Gig?
       final gigs = <Gig>[];
       final files = gigsDir.listSync().whereType<File>().where(
         (file) => file.path.endsWith('.md'),
