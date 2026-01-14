@@ -3,7 +3,6 @@ import 'package:fpdart/fpdart.dart';
 import 'package:intl/intl.dart';
 import 'package:markdown/markdown.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
-import 'package:resumesux_domain/src/domain/entities/folder_field.dart';
 
 /// Implementation of FileRepository using dart:io.
 /// This belongs in the adapters layer as it deals with framework concerns.

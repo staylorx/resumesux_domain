@@ -31,7 +31,8 @@ mixin TestSuiteMixin {
   /// Initializes the suite directory and README.md with suite information.
   void initialize() {
     if (config.type == SuiteDirType.temporary) {
-      suiteDir = Directory.systemTemp.createTempSync('test_suite_${suiteName}_').path;
+      suiteDir =
+          Directory.systemTemp.createTempSync('test_suite_${suiteName}_').path;
     } else {
       final base = config.basePath ?? path.join('build', 'output');
       suiteDir = path.join(base, suiteName);

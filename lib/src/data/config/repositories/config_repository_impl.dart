@@ -5,7 +5,6 @@ import 'package:json_schema/json_schema.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:resumesux_domain/resumesux_domain.dart';
-import 'package:resumesux_domain/src/domain/entities/folder_field.dart';
 
 import '../../data.dart';
 

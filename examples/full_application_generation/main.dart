@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
 import 'package:resumesux_domain/resumesux_domain.dart';
-import 'package:resumesux_domain/src/domain/entities/folder_field.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 
 // Simple file repository for example

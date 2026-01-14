@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'applicant.dart';
 import 'ai_provider.dart';
-import 'folder_field.dart';
+import '../enums/folder_field.dart';
 
 /// Represents the application configuration including output settings and AI providers.
 class Config with EquatableMixin {

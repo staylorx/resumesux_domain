@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
-import 'package:test_suite_tool/test_suite_tool.dart';
 import '../test_utils.dart';
 
 // Note: Test has a 30-minute timeout to allow graceful stopping.
@@ -145,10 +144,7 @@ void main() {
       'name': 'Equipment Operator',
       'digestPath': 'test/data/digest/heavy_equipment_operator',
     },
-    {
-      'name': 'Data Scientist',
-      'digestPath': 'test/data/digest/data_scientist',
-    },
+    {'name': 'Data Scientist', 'digestPath': 'test/data/digest/data_scientist'},
     {
       'name': 'Software Engineer',
       'digestPath': 'test/data/digest/software_engineer',
@@ -181,7 +177,8 @@ void main() {
           late SaveGigAiResponseUsecase saveGigAiResponseUsecase;
           late SaveAssetAiResponseUsecase saveAssetAiResponseUsecase;
           late SaveResumeAiResponseUsecase saveResumeAiResponseUsecase;
-          late SaveCoverLetterAiResponseUsecase saveCoverLetterAiResponseUsecase;
+          late SaveCoverLetterAiResponseUsecase
+          saveCoverLetterAiResponseUsecase;
           late SaveFeedbackAiResponseUsecase saveFeedbackAiResponseUsecase;
           late GenerateApplicationUsecase generateApplicationUsecase;
 
@@ -209,10 +206,13 @@ void main() {
               applicant: applicant,
               digestPath: digestPath,
             );
-            loadedApplicant = importResult.getOrElse(
-              (failure) =>
-                  throw Exception('Failed to import digest: ${failure.message}'),
-            ).copyWith(name: '${applicant.name} - $personaName');
+            loadedApplicant = importResult
+                .getOrElse(
+                  (failure) => throw Exception(
+                    'Failed to import digest: ${failure.message}',
+                  ),
+                )
+                .copyWith(name: '${applicant.name} - $personaName');
 
             generateResumeUsecase = GenerateResumeUsecase(
               aiService: aiService,
@@ -295,13 +295,15 @@ void main() {
               saveGigAiResponseUsecase: saveGigAiResponseUsecase,
               saveAssetAiResponseUsecase: saveAssetAiResponseUsecase,
               saveResumeAiResponseUsecase: saveResumeAiResponseUsecase,
-              saveCoverLetterAiResponseUsecase: saveCoverLetterAiResponseUsecase,
+              saveCoverLetterAiResponseUsecase:
+                  saveCoverLetterAiResponseUsecase,
               saveFeedbackAiResponseUsecase: saveFeedbackAiResponseUsecase,
               logger: logger,
             );
           });
 
-          String testName = '$personaName: Generate application for $jobReqName';
+          String testName =
+              '$personaName: Generate application for $jobReqName';
           test(testName, () async {
             readmeManager.startTest(testName);
 

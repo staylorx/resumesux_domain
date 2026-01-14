@@ -129,7 +129,9 @@ void main() {
     late TestSuiteTool persistedSuite;
 
     setUp(() {
-      persistedTempDir = Directory.systemTemp.createTempSync('test_suite_tool_test_persisted_').path;
+      persistedTempDir = Directory.systemTemp
+          .createTempSync('test_suite_tool_test_persisted_')
+          .path;
       persistedSuite = TestSuiteTool(
         config: SuiteDirConfig(
           type: SuiteDirType.persisted,
@@ -149,7 +151,8 @@ void main() {
       persistedSuite.initialize();
 
       expect(Directory(persistedSuite.suiteDir!).existsSync(), isTrue);
-      expect(persistedSuite.suiteDir, path.join(persistedTempDir, 'Test Suite Persisted'));
+      expect(persistedSuite.suiteDir,
+          path.join(persistedTempDir, 'Test Suite Persisted'));
     });
   });
 }

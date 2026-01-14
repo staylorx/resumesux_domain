@@ -3,7 +3,6 @@ import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
-import 'package:test_suite_tool/test_suite_tool.dart';
 import '../test_utils.dart';
 
 void main() {
