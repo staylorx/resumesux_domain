@@ -4,6 +4,10 @@ config:
   includeCover: true
   includeFeedback: true
   digestPath: "digest"
+  folderOrder:
+    - concern
+    - applicant_name
+    - jobreq_title
   applicant:
     name: "John Doe"
     preferred_name: "John"

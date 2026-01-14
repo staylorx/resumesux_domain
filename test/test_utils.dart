@@ -13,6 +13,8 @@ class TestSuiteReadmeManager {
   final DateTime startTime;
   final List<String> groups = [];
   final Map<String, TestEntry> testEntries = {};
+  final Map<String, List<TestEntry>> groupTests = {};
+  String? currentGroup;
 
   TestSuiteReadmeManager({required this.suiteDir, required this.suiteName})
     : startTime = DateTime.now();
@@ -25,16 +27,29 @@ class TestSuiteReadmeManager {
   /// Records the start of a test group.
   void startGroup(String groupName) {
     groups.add(groupName);
+    currentGroup = groupName;
+    groupTests[groupName] = [];
     _writeReadme();
   }
 
   /// Records the start of a test.
   void startTest(String testName) {
-    testEntries[testName] = TestEntry(
+    final entry = TestEntry(
       name: testName,
       startTime: DateTime.now(),
       status: TestStatus.running,
     );
+    testEntries[testName] = entry;
+    if (currentGroup != null) {
+      groupTests[currentGroup!]!.add(entry);
+    } else {
+      const defaultGroup = 'General';
+      if (!groups.contains(defaultGroup)) {
+        groups.add(defaultGroup);
+        groupTests[defaultGroup] = [];
+      }
+      groupTests[defaultGroup]!.add(entry);
+    }
     _writeReadme();
   }
 
@@ -57,7 +72,7 @@ class TestSuiteReadmeManager {
   void _writeReadme() {
     final buffer = StringBuffer();
 
-    buffer.writeln('# Test Suite: $suiteName');
+    buffer.writeln('# Test Suite: $suiteName - GROUPED');
     buffer.writeln('');
     buffer.writeln('Started: ${startTime.toIso8601String()}');
     buffer.writeln('Suite Directory: $suiteDir');
@@ -72,26 +87,31 @@ class TestSuiteReadmeManager {
     }
 
     if (testEntries.isNotEmpty) {
-      buffer.writeln('## Test Results');
-      buffer.writeln('');
-      buffer.writeln('| Test | Status | Duration | Error |');
-      buffer.writeln('|------|--------|----------|-------|');
+      for (final group in groups) {
+        buffer.writeln('## $group');
+        buffer.writeln('');
+        final tests = groupTests[group] ?? [];
+        if (tests.isNotEmpty) {
+          buffer.writeln('| Test | Status | Duration | Error |');
+          buffer.writeln('|------|--------|----------|-------|');
 
-      for (final entry in testEntries.values) {
-        final duration = entry.endTime != null
-            ? '${entry.endTime!.difference(entry.startTime).inSeconds}s'
-            : 'Running';
-        final statusEmoji = entry.status == TestStatus.passed
-            ? '✅'
-            : entry.status == TestStatus.failed
-            ? '❌'
-            : '⏳';
-        final error = entry.error ?? '';
-        buffer.writeln(
-          '| ${entry.name} | $statusEmoji ${entry.status.name} | $duration | $error |',
-        );
+          for (final entry in tests) {
+            final duration = entry.endTime != null
+                ? '${entry.endTime!.difference(entry.startTime).inSeconds}s'
+                : 'Running';
+            final statusEmoji = entry.status == TestStatus.passed
+                ? '✅'
+                : entry.status == TestStatus.failed
+                ? '❌'
+                : '⏳';
+            final error = entry.error ?? '';
+            buffer.writeln(
+              '| ${entry.name} | $statusEmoji ${entry.status.name} | $duration | $error |',
+            );
+          }
+          buffer.writeln('');
+        }
       }
-      buffer.writeln('');
 
       final passed = testEntries.values
           .where((e) => e.status == TestStatus.passed)
@@ -335,6 +355,8 @@ class TestFileRepository with Loggable implements FileRepository {
   Either<Failure, String> createApplicationDirectory({
     required String baseOutputDir,
     required JobReq jobReq,
+    required Applicant applicant,
+    required Config config,
   }) {
     // Sanitize company name for concernDir
     final companyName = jobReq.concern?.name ?? 'unknown_company';
@@ -344,13 +366,16 @@ class TestFileRepository with Loggable implements FileRepository {
         .toLowerCase();
     final concernDir = path.join(baseOutputDir, sanitizedCompany);
 
-    // Sanitize job title for dirName
+    // Sanitize applicant name and job title for dirName
+    final sanitizedApplicant = applicant.name
+        .replaceAll(RegExp(r'[^\w\s-]'), '')
+        .replaceAll(RegExp(r'\s+'), '_')
+        .toLowerCase();
     final sanitizedTitle = jobReq.title
         .replaceAll(RegExp(r'[^\w\s-]'), '')
         .replaceAll(RegExp(r'\s+'), '_')
         .toLowerCase();
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final dirName = '${timestamp}_$sanitizedTitle';
+    final dirName = '${sanitizedApplicant}_-_${sanitizedTitle}';
     final appDir = path.join(concernDir, dirName);
 
     try {

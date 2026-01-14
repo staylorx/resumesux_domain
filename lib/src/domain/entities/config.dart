@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'applicant.dart';
 import 'ai_provider.dart';
+import 'folder_field.dart';
 
 /// Represents the application configuration including output settings and AI providers.
 class Config with EquatableMixin {
@@ -19,6 +20,8 @@ class Config with EquatableMixin {
   final Applicant applicant;
   // Path to the digest directory
   final String digestPath;
+  // Order of fields to use for creating output folder structure
+  final List<FolderField>? folderOrder;
 
   const Config({
     required this.outputDir,
@@ -29,6 +32,7 @@ class Config with EquatableMixin {
     required this.appendPrompt,
     required this.applicant,
     required this.digestPath,
+    this.folderOrder,
   });
 
   Config copyWith({
@@ -40,6 +44,7 @@ class Config with EquatableMixin {
     bool? appendPrompt,
     Applicant? applicant,
     String? digestPath,
+    List<FolderField>? folderOrder,
   }) {
     return Config(
       outputDir: outputDir ?? this.outputDir,
@@ -50,6 +55,7 @@ class Config with EquatableMixin {
       appendPrompt: appendPrompt ?? this.appendPrompt,
       applicant: applicant ?? this.applicant,
       digestPath: digestPath ?? this.digestPath,
+      folderOrder: folderOrder ?? this.folderOrder,
     );
   }
 
@@ -63,5 +69,6 @@ class Config with EquatableMixin {
     appendPrompt,
     applicant,
     digestPath,
+    folderOrder,
   ];
 }

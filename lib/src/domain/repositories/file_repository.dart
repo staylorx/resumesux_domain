@@ -23,14 +23,15 @@ abstract class FileRepository {
   /// Returns success or a failure.
   Either<Failure, Unit> validateDirectory({required String path});
 
-  /// Creates the application directory path for the given job requirement.
+  /// Creates the application directory path for the given job requirement and applicant.
   /// Returns the path to the application directory.
   ///
-  /// The directory structure is: baseOutputDir/concernDir/dirName/
-  /// where concernDir is the sanitized company name and dirName is timestamp + sanitized title.
+  /// The directory structure is determined by the config's folderOrder.
   Either<Failure, String> createApplicationDirectory({
     required String baseOutputDir,
     required JobReq jobReq,
+    required Applicant applicant,
+    required Config config,
   });
 
   /// Gets the path for the resume file in the application directory.

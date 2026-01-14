@@ -3,6 +3,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:intl/intl.dart';
 import 'package:markdown/markdown.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/entities/folder_field.dart';
 
 /// Implementation of FileRepository using dart:io.
 /// This belongs in the adapters layer as it deals with framework concerns.
@@ -79,12 +80,31 @@ class FileRepositoryImpl with Loggable implements FileRepository {
   Either<Failure, String> createApplicationDirectory({
     required String baseOutputDir,
     required JobReq jobReq,
+    required Applicant applicant,
+    required Config config,
   }) {
     try {
-      final concern = jobReq.concern?.name ?? 'unknown';
-      final concernDir = _sanitizeName(name: concern);
-      final appDirPath =
-          '$baseOutputDir/$concernDir/${_sanitizeName(name: jobReq.title)}';
+      // Use folderOrder from config if provided, otherwise default to current behavior
+      final folderOrder = config.folderOrder ?? [FolderField.concern, FolderField.applicant_name, FolderField.jobreq_title];
+
+      final pathSegments = <String>[];
+      for (final field in folderOrder) {
+        final segment = _getFieldValue(field, jobReq, applicant);
+        if (segment != null) {
+          pathSegments.add(_sanitizeName(name: segment));
+        }
+      }
+
+      // Special handling: if the last two fields are applicant_name and jobreq_title, combine them with ' - '
+      if (folderOrder.length >= 2 &&
+          folderOrder[folderOrder.length - 2] == FolderField.applicant_name &&
+          folderOrder.last == FolderField.jobreq_title) {
+        final applicantSegment = pathSegments.removeLast();
+        final jobTitleSegment = pathSegments.removeLast();
+        pathSegments.add('$applicantSegment - $jobTitleSegment');
+      }
+
+      final appDirPath = '$baseOutputDir/${pathSegments.join('/')}';
 
       final appDir = Directory(appDirPath);
       if (!appDir.existsSync()) {
@@ -179,5 +199,22 @@ class FileRepositoryImpl with Loggable implements FileRepository {
         .replaceAll(RegExp(r'[^\w\s-]'), '')
         .replaceAll(' ', '_')
         .toLowerCase();
+  }
+
+  String? _getFieldValue(FolderField field, JobReq jobReq, Applicant applicant) {
+    switch (field) {
+      case FolderField.applicant_name:
+        return applicant.name;
+      case FolderField.jobreq_title:
+        return jobReq.title;
+      case FolderField.concern:
+        return jobReq.concern?.name;
+      case FolderField.applicant_location:
+        return applicant.address?.city;
+      case FolderField.jobreq_location:
+        return jobReq.location;
+      case FolderField.concern_location:
+        return jobReq.concern?.location;
+    }
   }
 }

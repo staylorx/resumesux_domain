@@ -25,12 +25,15 @@ class ApplicationRepositoryImpl with Loggable implements ApplicationRepository {
   @override
   Future<Either<Failure, Unit>> saveApplicationArtifacts({
     required Application application,
+    required Config config,
     required String outputDir,
   }) async {
     // Create application directory
     final appDirResult = fileRepository.createApplicationDirectory(
       baseOutputDir: outputDir,
       jobReq: application.jobReq,
+      applicant: application.applicant,
+      config: config,
     );
     if (appDirResult.isLeft()) {
       return appDirResult.map((_) => unit);

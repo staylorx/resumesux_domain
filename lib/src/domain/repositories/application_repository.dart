@@ -13,6 +13,7 @@ abstract class ApplicationRepository {
   /// Saves the application artifacts (resume, cover letter, feedback) to the specified output directory.
   Future<Either<Failure, Unit>> saveApplicationArtifacts({
     required Application application,
+    required Config config,
     required String outputDir,
   });
 

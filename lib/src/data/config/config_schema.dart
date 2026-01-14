@@ -20,6 +20,21 @@ const Map<String, dynamic> configSchema = {
         'includeFeedback': {'type': 'boolean'},
         // Optional path to the digest directory (defaults to 'digest')
         'digestPath': {'type': 'string'},
+        // Optional array defining the order of fields for output folder structure
+        'folderOrder': {
+          'type': 'array',
+          'items': {
+            'type': 'string',
+            'enum': [
+              'applicant_name',
+              'jobreq_title',
+              'concern',
+              'applicant_location',
+              'jobreq_location',
+              'concern_location',
+            ],
+          },
+        },
         // Applicant information object with personal details
         'applicant': {
           'type': 'object',

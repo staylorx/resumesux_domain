@@ -155,7 +155,7 @@ Extracted AI Responses:
     return '''
 $customPrompt
 
-Start with a summary paragraph that summarizes who the applicant is, what job they are applying for, and where the job is located if available. Use the provided applicant information, job requirement information, and extracted AI responses to build this summary.
+Always start with a summary paragraph titled "### Summary Paragraph" that summarizes who the applicant is, what job they are applying for, and where the job is located if available. Use the provided applicant information, job requirement information, and extracted AI responses to build this summary.
 
 $applicantSummary
 
@@ -177,7 +177,7 @@ $toneInstruction $lengthInstruction Include suggestions for improvement on how w
 Do not include the generated job requirements, resume, or cover letter content in your response. The only exception is the summary paragraph which tells us who applied for what. Provide only the feedback analysis in markdown format.
 Output only the plain markdown content without any code blocks, backticks, or additional explanatory text.
 Add a section at the end that summarizes an opinion of a hiring manager reviewing this application: qualified, not qualified, maybe, yes, no, or needs more information. Add this as "tl;dr" for a quick view.
-If there are hidden ideas or biases that a hiring manager might pick up on, put them down here also. 
+If there are hidden ideas or biases that a hiring manager might pick up on, put them down here also.
 Do not be afraid to be direct and honest in this section. If you think you're being polite in the main feedback, this is the place to be candid including avoiding overly "politically correct" language.
 Respect the tone and length instructions provided.
 ''';

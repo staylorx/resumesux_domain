@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
 import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/entities/folder_field.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 
 // Simple file repository for example
@@ -45,6 +46,8 @@ class ExampleFileRepository implements FileRepository {
   Either<Failure, String> createApplicationDirectory({
     required String baseOutputDir,
     required JobReq jobReq,
+    required Applicant applicant,
+    required Config config,
   }) {
     final companyName = jobReq.concern?.name ?? 'unknown_company';
     final sanitizedCompany = companyName
@@ -53,12 +56,15 @@ class ExampleFileRepository implements FileRepository {
         .toLowerCase();
     final concernDir = '$baseOutputDir/$sanitizedCompany';
 
+    final sanitizedApplicant = applicant.name
+        .replaceAll(RegExp(r'[^\w\s-]'), '')
+        .replaceAll(RegExp(r'\s+'), '_')
+        .toLowerCase();
     final sanitizedTitle = jobReq.title
         .replaceAll(RegExp(r'[^\w\s-]'), '')
         .replaceAll(RegExp(r'\s+'), '_')
         .toLowerCase();
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final dirName = '${timestamp}_$sanitizedTitle';
+    final dirName = '${sanitizedApplicant}_-_$sanitizedTitle';
     final appDir = '$concernDir/$dirName';
 
     try {
@@ -322,10 +328,48 @@ void main() async {
     'Applicant data imported successfully. Gigs: ${gigs.length}, Assets: ${assets.length}',
   );
 
+  // Create a dummy config for the example
+  final config = Config(
+    outputDir: 'output',
+    includeCover: true,
+    includeFeedback: true,
+    providers: [
+      AiProvider(
+        name: 'lmstudio',
+        url: 'http://127.0.0.1:1234/v1',
+        key: 'dummy-key',
+        models: [
+          AiModel(
+            name: 'qwen2.5-7b-instruct',
+            isDefault: true,
+            settings: {'temperature': 0.8},
+          ),
+        ],
+        defaultModel: AiModel(
+          name: 'qwen2.5-7b-instruct',
+          isDefault: true,
+          settings: {'temperature': 0.8},
+        ),
+        settings: {'max_tokens': 4000, 'temperature': 0.8},
+        isDefault: true,
+      ),
+    ],
+    customPrompt: null,
+    appendPrompt: false,
+    applicant: applicant,
+    digestPath: 'digest',
+    folderOrder: [
+      FolderField.concern,
+      FolderField.applicant_name,
+      FolderField.jobreq_title,
+    ],
+  );
+
   print('Generating full application...');
   final result = await generateApplicationUsecase.call(
     jobReq: jobReq,
     applicant: applicant,
+    config: config,
     prompt: 'Generate a professional application.',
     includeCover: true,
     includeFeedback: true,
@@ -344,6 +388,7 @@ void main() async {
   final outputDir = Directory.systemTemp.path;
   final saveResult = await applicationRepository.saveApplicationArtifacts(
     application: application,
+    config: config,
     outputDir: outputDir,
   );
 

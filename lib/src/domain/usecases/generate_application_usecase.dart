@@ -37,6 +37,7 @@ class GenerateApplicationUsecase {
   /// Parameters:
   /// - [jobReq]: The job requirement entity.
   /// - [applicant]: The applicant information.
+  /// - [config]: The application configuration.
   /// - [prompt]: The prompt for AI generation.
   /// - [includeCover]: Whether to include a cover letter.
   /// - [includeFeedback]: Whether to include feedback.
@@ -48,6 +49,7 @@ class GenerateApplicationUsecase {
   Future<Either<Failure, Application>> call({
     required JobReq jobReq,
     required Applicant applicant,
+    required Config config,
     required String prompt,
     required bool includeCover,
     required bool includeFeedback,

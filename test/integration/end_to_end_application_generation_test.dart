@@ -324,6 +324,7 @@ void main() {
         final applicationResult = await generateApplicationUsecase.call(
           jobReq: jobReq,
           applicant: enrichedApplicant,
+          config: config,
           prompt: config.customPrompt ?? 'Generate application',
           includeCover: config.includeCover,
           includeFeedback: config.includeFeedback,
@@ -369,6 +370,7 @@ void main() {
         final saveArtifactsResult = await applicationRepository
             .saveApplicationArtifacts(
               application: application,
+              config: config,
               outputDir: suiteDir,
             );
         expect(

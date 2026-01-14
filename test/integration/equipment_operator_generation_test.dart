@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
+import 'package:resumesux_domain/src/domain/entities/folder_field.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 import '../test_utils.dart';
 
@@ -33,6 +34,7 @@ void main() {
   late ApplicationDatasource applicationDatasource;
   late TestSuiteReadmeManager readmeManager;
   late SembastDatabaseService dbService;
+  late Config config;
 
   suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
@@ -72,6 +74,22 @@ void main() {
   });
 
   setUp(() {
+    // Create dummy config for testing
+    config = Config(
+      outputDir: 'output',
+      includeCover: true,
+      includeFeedback: true,
+      providers: [TestAiHelper.defaultProvider],
+      customPrompt: null,
+      appendPrompt: false,
+      applicant: Applicant(
+        name: 'Test Applicant',
+        email: 'test@example.com',
+      ),
+      digestPath: 'digest',
+      folderOrder: [FolderField.concern, FolderField.applicant_name, FolderField.jobreq_title],
+    );
+
     fileRepository = TestFileRepository();
 
     gigRepository = createGigRepositoryImpl(
@@ -391,6 +409,7 @@ void main() {
         final result = await generateApplicationUsecase.call(
           jobReq: jobReq,
           applicant: applicant,
+          config: config,
           prompt: 'Generate a professional application.',
           includeCover: true,
           includeFeedback: true,
@@ -412,6 +431,7 @@ void main() {
         final saveStopwatch = Stopwatch()..start();
         final saveResult = await applicationRepository.saveApplicationArtifacts(
           application: application,
+          config: config,
           outputDir: suiteDir,
         );
         saveStopwatch.stop();

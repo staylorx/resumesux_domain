@@ -5,6 +5,7 @@ import 'package:json_schema/json_schema.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:resumesux_domain/resumesux_domain.dart';
+import 'package:resumesux_domain/src/domain/entities/folder_field.dart';
 
 import '../../data.dart';
 
@@ -190,6 +191,18 @@ class ConfigRepositoryImpl with Loggable implements ConfigRepository {
     final appendPrompt = configMapInner['appendPrompt'] as bool? ?? false;
     final digestPath = configMapInner['digestPath'] as String? ?? 'digest';
 
+    // Parse folderOrder
+    final folderOrderRaw = configMapInner['folderOrder'] as List<dynamic>?;
+    final folderOrder = folderOrderRaw?.map((item) {
+      final fieldName = item as String;
+      return FolderField.values.firstWhere(
+        (field) => field.name == fieldName,
+        orElse: () => throw ValidationFailure(
+          message: 'Invalid folder field: $fieldName',
+        ),
+      );
+    }).toList();
+
     // Parse applicant
     final applicantMap = Map<String, dynamic>.from(
       configMapInner['applicant'] as Map,
@@ -319,6 +332,7 @@ class ConfigRepositoryImpl with Loggable implements ConfigRepository {
         providers: providers,
         applicant: applicant,
         digestPath: digestPath,
+        folderOrder: folderOrder,
       ),
     );
   }

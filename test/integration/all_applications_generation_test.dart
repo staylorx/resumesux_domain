@@ -5,6 +5,10 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
 import '../test_utils.dart';
 
+// TODO once this test starts it's                  hard to get it to stop gracefully.
+// check all of our code and ensure it respondes to cancel signals appropriately.
+
+// TODO: break out the readme manager into a separate package, so we can focus on getting to work as a quality mixin for all our integration tests.
 void main() {
   late JobReqRepository jobReqRepository;
   late AiService aiService;
@@ -15,6 +19,7 @@ void main() {
   late ApplicationRepository applicationRepository;
   late ApplicantRepository applicantRepository;
   late TestSuiteReadmeManager readmeManager;
+  late Config config;
 
   suiteDir = TestDirFactory.instance.createUniqueTestSuiteDir();
 
@@ -25,7 +30,7 @@ void main() {
 
   readmeManager = TestSuiteReadmeManager(
     suiteDir: suiteDir,
-    suiteName: 'All Applications Generation Test',
+    suiteName: 'All Applications Generation Test GROUPED',
   );
   readmeManager.initialize();
 
@@ -35,6 +40,19 @@ void main() {
       logger: logger,
       httpClient: httpClient,
       provider: TestAiHelper.defaultProvider,
+    );
+
+    // Load config
+    final configDatasource = createConfigDatasource();
+    final configRepository = createConfigRepositoryImpl(
+      logger: logger,
+      configDatasource: configDatasource,
+    );
+    final configResult = await configRepository.loadConfig(
+      configPath: 'config.yaml',
+    );
+    config = configResult.getOrElse(
+      (failure) => throw 'Failed to load config: $failure',
     );
 
     dbService = SembastDatabaseService(
@@ -304,6 +322,7 @@ void main() {
             final result = await generateApplicationUsecase.call(
               jobReq: jobReq,
               applicant: loadedApplicant,
+              config: config,
               prompt: 'Generate a professional application.',
               includeCover: true,
               includeFeedback: true,
@@ -334,6 +353,7 @@ void main() {
             final saveArtifactsResult = await applicationRepository
                 .saveApplicationArtifacts(
                   application: application,
+                  config: config,
                   outputDir: suiteDir,
                 );
             expect(
@@ -352,8 +372,11 @@ void main() {
     });
   }
 
-  String testName = 'Verify all applications saved correctly';
-  test(testName, () async {
+  group('Verification', () {
+    readmeManager.startGroup('Verification');
+
+    String testName = 'Verify all applications saved correctly';
+    test(testName, () async {
     readmeManager.startTest(testName);
 
     try {
@@ -393,9 +416,9 @@ void main() {
         );
         expect(
           subDirs.length,
-          greaterThanOrEqualTo(1),
+          3, // 3 applicants per job
           reason:
-              'Expected at least 1 application directory in ${companyDir.path}',
+              'Expected 3 application directories (one per applicant) in ${companyDir.path}',
         );
 
         final appDir = subDirs.first;
@@ -423,5 +446,6 @@ void main() {
       readmeManager.endTest(testName, false, error: e.toString());
       rethrow;
     }
+  });
   });
 }
