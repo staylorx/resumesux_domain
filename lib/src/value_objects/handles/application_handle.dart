@@ -1,26 +1,13 @@
-// domain/value_objects/task_handle.dart - Domain-opaque handle
-import 'package:uuid/uuid.dart';
+import 'package:equatable/equatable.dart';
 
-class ApplicationHandle {
-  final String _value;
+class ApplicationHandle with EquatableMixin {
+  final String value;
 
-  const ApplicationHandle(this._value);
-
-  // Factory for use cases to generate handles
-  factory ApplicationHandle.generate() => ApplicationHandle(const Uuid().v4());
-
-  // Parse from CLI input/string
-  factory ApplicationHandle.fromString(String value) =>
-      ApplicationHandle(value);
+  const ApplicationHandle(this.value);
 
   @override
-  String toString() => _value; // CLI-friendly output
+  String toString() => value;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ApplicationHandle && _value == other._value;
-
-  @override
-  int get hashCode => _value.hashCode;
+  List<Object?> get props => [value];
 }

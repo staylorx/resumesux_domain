@@ -1,24 +1,15 @@
 // domain/value_objects/asset_handle.dart - Domain-opaque handle
-import 'package:uuid/uuid.dart';
 
-class AssetHandle {
-  final String _value;
+import 'package:equatable/equatable.dart';
 
-  const AssetHandle(this._value);
+class AssetHandle with EquatableMixin {
+  final String value;
 
-  // Factory for use cases to generate handles
-  factory AssetHandle.generate() => AssetHandle(const Uuid().v4());
-
-  // Parse from CLI input/string
-  factory AssetHandle.fromString(String value) => AssetHandle(value);
+  const AssetHandle(this.value);
 
   @override
-  String toString() => _value; // CLI-friendly output
+  String toString() => value; // CLI-friendly output
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) || other is AssetHandle && _value == other._value;
-
-  @override
-  int get hashCode => _value.hashCode;
+  List<Object?> get props => [value];
 }
