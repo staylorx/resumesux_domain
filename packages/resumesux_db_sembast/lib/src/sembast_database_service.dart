@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:resumesux_domain/resumesux_domain.dart';
-import 'package:sembast/sembast_io.dart';
-import 'package:sembast/sembast_memory.dart';
+import 'package:sembast/sembast.dart' as sembast;
+import 'package:sembast/sembast_io.dart' as sembast_io;
+import 'package:sembast/sembast_memory.dart' as sembast_memory;
 
 class SembastDatabaseService implements DatabaseService {
-  Database? _db;
+  sembast.Database? _db;
   final String? dbPath;
   final String dbName;
 
@@ -17,9 +18,9 @@ class SembastDatabaseService implements DatabaseService {
     if (dbPath != null) {
       final dbPathFull = path.join(Directory.current.path, dbPath!, dbName);
       await Directory(path.dirname(dbPathFull)).create(recursive: true);
-      _db = await databaseFactoryIo.openDatabase(dbPathFull);
+      _db = await sembast_io.databaseFactoryIo.openDatabase(dbPathFull);
     } else {
-      _db = await databaseFactoryMemory.openDatabase(dbName);
+      _db = await sembast_memory.databaseFactoryMemory.openDatabase(dbName);
     }
   }
 
@@ -31,9 +32,9 @@ class SembastDatabaseService implements DatabaseService {
     dynamic transaction,
   }) async {
     final db = _db!;
-    final store = stringMapStoreFactory.store(storeName);
+    final store = sembast.stringMapStoreFactory.store(storeName);
     final record = store.record(key);
-    await record.put((transaction as Transaction?) ?? db, value);
+    await record.put((transaction as sembast.Transaction?) ?? db as sembast.Database, value);
   }
 
   @override
@@ -43,9 +44,9 @@ class SembastDatabaseService implements DatabaseService {
     dynamic transaction,
   }) async {
     final db = _db!;
-    final store = stringMapStoreFactory.store(storeName);
+    final store = sembast.stringMapStoreFactory.store(storeName);
     final record = store.record(key);
-    return await record.get((transaction as Transaction?) ?? db);
+    return await record.get((transaction as sembast.Transaction?) ?? db as sembast.Database);
   }
 
   @override
@@ -54,16 +55,16 @@ class SembastDatabaseService implements DatabaseService {
     dynamic transaction,
   }) async {
     final db = _db!;
-    final store = stringMapStoreFactory.store(storeName);
-    final records = await store.find((transaction as Transaction?) ?? db);
+    final store = sembast.stringMapStoreFactory.store(storeName);
+    final records = await store.find((transaction as sembast.Transaction?) ?? db as sembast.Database);
     return records.map((r) => r.value).toList();
   }
 
   @override
   Future<void> drop({required String storeName, dynamic transaction}) async {
     final db = _db!;
-    final store = stringMapStoreFactory.store(storeName);
-    await store.drop((transaction as Transaction?) ?? db);
+    final store = sembast.stringMapStoreFactory.store(storeName);
+    await store.drop((transaction as sembast.Transaction?) ?? db as sembast.Database);
   }
 
   @override
@@ -73,9 +74,9 @@ class SembastDatabaseService implements DatabaseService {
     dynamic transaction,
   }) async {
     final db = _db!;
-    final store = stringMapStoreFactory.store(storeName);
+    final store = sembast.stringMapStoreFactory.store(storeName);
     final record = store.record(key);
-    await record.delete((transaction as Transaction?) ?? db);
+    await record.delete((transaction as sembast.Transaction?) ?? db as sembast.Database);
   }
 
   Future<void> close() async {
