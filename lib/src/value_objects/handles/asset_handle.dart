@@ -1,6 +1,11 @@
-// domain/value_objects/asset_handle.dart - Domain-opaque handle
-
 import 'package:equatable/equatable.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
+
+class AssetWithHandle {
+  final AssetHandle handle;
+  final Asset asset;
+  AssetWithHandle({required this.handle, required this.asset});
+}
 
 class AssetHandle with EquatableMixin {
   final String value;
