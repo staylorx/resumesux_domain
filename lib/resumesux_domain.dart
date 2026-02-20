@@ -20,5 +20,6 @@ export 'src/value_objects/tags.dart';
 export 'src/value_objects/handles/application_handle.dart';
 export 'src/value_objects/handles/applicant_handle.dart';
 export 'src/value_objects/handles/jobreq_handle.dart';
+export 'src/value_objects/failure.dart';
 
 export 'src/enums/folder_field.dart';
