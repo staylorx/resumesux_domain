@@ -1,11 +1,12 @@
 name: resumesux_db_sembast
+resolution: workspace
 description: Sembast implementation of DatabaseService for resumesux_domain.
 version: 1.0.0
 license: Apache-2.0
 publish_to: none
 
 environment:
-  sdk: ^3.10.0
+  sdk: ^3.11.0
 
 dependencies:
   lints: ^6.0.0

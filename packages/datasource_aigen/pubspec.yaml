@@ -1,0 +1,21 @@
+name: datasource_aigen
+resolution: workspace
+description: AI generation datasource implementation for Resume Suckage
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  domain_entities:
+    path: ../domain_entities
+  domain_contracts:
+    path: ../domain_contracts
+  http: ^1.0.0
+  mcp_dart: ^1.2.1
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.28.0
+  mocktail: ^1.0.4

@@ -1,0 +1,10 @@
+name: resumesux_domain
+packages:
+  - packages/*
+
+scripts:
+  analyze: melos exec -- dart analyze .
+  format: melos exec -- dart format .
+  test: melos exec -- dart test
+  clean: melos exec -- flutter clean
+  pub: melos exec -- dart pub get

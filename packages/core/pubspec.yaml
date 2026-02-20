@@ -1,0 +1,33 @@
+name: core
+resolution: workspace
+description: Core wireup and facade for Resume Suckage clean architecture
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  domain_entities:
+    path: ../domain_entities
+  domain_usecases:
+    path: ../domain_usecases
+  domain_contracts:
+    path: ../domain_contracts
+  dataservice_config:
+    path: ../dataservice_config
+  dataservice_sembast:
+    path: ../dataservice_sembast
+  dataservice_markdown:
+    path: ../dataservice_markdown
+  dataservice_aigen:
+    path: ../dataservice_aigen
+  fpdart: ^1.2.0
+  id_logging:
+    git:
+      url: https://github.com/staylorx/id_logging
+      ref: main
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.28.0

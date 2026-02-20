@@ -1,0 +1,17 @@
+/// Abstract base class for documents.
+abstract class Doc {
+  final String content;
+  final String contentType;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  Doc({
+    required this.content,
+    required this.contentType,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
+
+  Doc copyWith({String? content, String? contentType});
+}
