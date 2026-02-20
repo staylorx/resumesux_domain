@@ -22,6 +22,5 @@ export 'src/value_objects/handles/applicant_handle.dart';
 export 'src/value_objects/handles/asset_handle.dart';
 export 'src/value_objects/handles/gig_handle.dart';
 export 'src/value_objects/handles/jobreq_handle.dart';
-export 'src/value_objects/failure.dart';
 
 export 'src/enums/folder_field.dart';
