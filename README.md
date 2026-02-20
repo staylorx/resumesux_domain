@@ -1,62 +1,120 @@
-# Resume Suckage Domain
+# ResumesUX Domain
 
-A clean architecture Dart package for resume and job application generation using AI. This package provides the domain and data layers for the ResumesUX application, including entities, use cases, and data repositories with AI service integration. Supports multiple AI providers like LM Studio.
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://pub.dev/packages/resumesux_domain)
+[![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 
-## Features
+A Dart package providing domain entities and value objects for resume and job application management. This package implements the domain layer following Clean Architecture principles, featuring immutable entities, value objects, and enums for type-safe business logic.
 
-- Clean architecture implementation (domain, data, presentation layers)
-- AI-powered resume and cover letter generation
-- Support for multiple AI providers
-- Job requirement preprocessing
-- Feedback generation for applications
+## Installation
 
-## Using the Database Package
+Add this package to your `pubspec.yaml`:
 
-This package provides a separate database implementation using Sembast. For applications that need persistent storage, include the `resumesux_db_sembast` package:
-
-### In your pubspec.yaml:
 ```yaml
 dependencies:
   resumesux_domain:
     path: ../path/to/resumesux_domain
-  resumesux_db_sembast:
-    path: ../path/to/resumesux_domain/packages/resumesux_db_sembast
 ```
 
-### Usage:
+Then run:
+
+```bash
+flutter pub get
+# or
+dart pub get
+```
+
+## Usage
+
+Import the package in your Dart code:
+
 ```dart
-import 'package:resumesux_db_sembast/resumesux_db_sembast.dart';
-
-final dbService = SembastDatabaseService(
-  dbPath: 'data',
-  dbName: 'my_app.db',
-);
-await dbService.initialize();
+import 'package:resumesux_domain/resumesux_domain.dart';
 ```
+
+### Basic Example
+
+Create an applicant entity:
+
+```dart
+final applicant = Applicant(
+  name: 'John Doe',
+  email: 'john.doe@example.com',
+  phone: '+1-555-0123',
+  linkedin: 'https://linkedin.com/in/johndoe',
+  gigs: [
+    Gig(
+      title: 'Software Engineer',
+      company: 'Tech Corp',
+      description: 'Developed mobile applications using Flutter',
+      startDate: DateTime(2020, 1, 1),
+      endDate: DateTime(2023, 12, 31),
+    ),
+  ],
+  assets: [],
+);
+```
+
+Create a resume:
+
+```dart
+final resume = Resume(
+  content: '# John Doe\n\nExperienced software engineer...',
+  contentType: 'text/markdown',
+);
+```
+
+## API Overview
+
+### Core Entities
+
+- **`Applicant`**: Job applicant with personal info, experience, and assets
+- **`Resume`**: Resume document content
+- **`JobReq`**: Job requirement details
+- **`Application`**: Complete job application
+- **`CoverLetter`**: Cover letter content
+- **`Feedback`**: Application feedback
+- **`Gig`**: Work experience entry
+- **`Asset`**: Additional applicant assets
+- **`Config`**: Application configuration
+- **`AiProvider`**: AI provider information
+- **`AiResponse`**: AI service responses
+- **`Concern`**: Job matching criteria
+
+### Value Objects
+
+- **`Address`**: Structured address
+- **`AiModel`**: AI model specifications
+- **`Tags`**: Categorization tags
+- **`Handles`**: Unique entity identifiers (ApplicantHandle, ApplicationHandle, etc.)
+
+### Enums
+
+- **`FolderField`**: Folder organization fields
+
+### Base Classes
+
+- **`Doc`**: Abstract base for document types
+
+## Architecture
+
+This package follows Clean Architecture principles:
+
+- **Domain Layer**: Business logic, entities, value objects, and enums
+- Framework-agnostic design for use with any Dart/Flutter presentation framework
 
 ## Testing
 
-This package includes comprehensive unit and integration tests. Integration tests that involve AI generation require a local AI provider to be running.
+Unit tests are included for entities and value objects. Run tests with:
 
-### Using LM Studio
+```bash
+flutter test
+# or
+dart test
+```
 
-We primarily use LM Studio for testing AI integrations:
+## Contributing
 
-1. Download and install LM Studio from [lmstudio.ai](https://lmstudio.ai/)
-2. Download a compatible model (e.g., a Llama or Mistral model)
-3. Start the local server in LM Studio (typically on `http://localhost:1234`)
-4. Ensure your `config.yaml` is configured to use the local LM Studio endpoint
-5. Run tests with `flutter test` or `dart test`
-
-### Using Ollama
-
-Ollama is also compatible and can be used as an alternative:
-
-1. Install Ollama from [ollama.ai](https://ollama.ai/)
-2. Pull a model: `ollama pull llama2` (or another compatible model)
-3. Start the Ollama server
-4. Configure your `config.yaml` to point to the Ollama endpoint (usually `http://localhost:11434/v1`)
-5. Run tests as usual
+Contributions are welcome! Please ensure changes maintain Clean Architecture principles and include tests.
 
 ## License
 
