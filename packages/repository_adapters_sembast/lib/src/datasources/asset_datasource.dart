@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 
-import '../models/asset_dto.dart';
+import 'package:resumesux_domain/src/data/models/asset_dto.dart';
 
 /// Datasource for persisting asset data.
 class AssetDatasource {

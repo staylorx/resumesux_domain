@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-import '../models/applicant_dto.dart';
+import 'package:resumesux_domain/src/data/models/applicant_dto.dart';
 
 /// Datasource for persisting applicant data.
 class ApplicantDatasource {

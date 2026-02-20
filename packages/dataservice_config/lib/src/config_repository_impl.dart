@@ -6,7 +6,7 @@ import 'package:path/path.dart' as p;
 
 import 'package:resumesux_domain/resumesux_domain.dart';
 
-import '../../data.dart';
+import 'package:resumesux_domain/src/data/data.dart';
 
 // Odd name for now
 const String kAppName = 'resumesux';

@@ -19,6 +19,7 @@ export 'md_digest/repositories/application_repository_impl.dart';
 
 export 'storage/datasources/application_datasource.dart';
 
+export 'models/applicant_dto.dart';
 export 'models/document_dto.dart';
 export 'models/job_req_dto.dart';
 export 'models/application_dto.dart';

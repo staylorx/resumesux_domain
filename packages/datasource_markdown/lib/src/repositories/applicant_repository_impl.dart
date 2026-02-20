@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 
-import '../../models/applicant_dto.dart';
+import 'package:resumesux_domain/src/data/models/applicant_dto.dart';
 
 class ApplicantRepositoryImpl with Loggable implements ApplicantRepository {
   final ApplicationDatasource applicationDatasource;

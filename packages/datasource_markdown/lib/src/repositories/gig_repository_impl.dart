@@ -5,7 +5,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/domain/value_objects/handles/gig_handle.dart';
 
-import '../../data.dart';
+import 'package:resumesux_domain/src/data/data.dart';
 
 /// Implementation of the GigRepository.
 class GigRepositoryImpl with Loggable implements GigRepository {

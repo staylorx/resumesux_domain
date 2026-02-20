@@ -31,7 +31,7 @@ void main() {
   );
 
   setUpAll(() async {
-    httpClient = http.Client();
+    httpClient = MockHttpClient();
     aiService = createAiServiceImpl(
       logger: logger,
       httpClient: httpClient,

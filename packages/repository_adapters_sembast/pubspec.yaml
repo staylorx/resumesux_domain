@@ -1,4 +1,4 @@
-name: datasource_sembast
+name: repository_adapters_sembast
 resolution: workspace
 description: Sembast datasource implementation for Resume Suckage
 version: 1.0.0

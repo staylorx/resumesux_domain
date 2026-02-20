@@ -51,7 +51,7 @@ void main() {
   setUpAll(() async {
     readmeManager.startGroup('Software Engineer Tests');
 
-    httpClient = http.Client();
+    httpClient = MockHttpClient();
     aiService = createAiServiceImpl(
       logger: logger,
       httpClient: httpClient,

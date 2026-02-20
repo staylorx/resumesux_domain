@@ -10,10 +10,10 @@
 <module fileurl="file://$PROJECT_DIR$/packages/datasource_aigen/melos_datasource_aigen.iml" filepath="$PROJECT_DIR$/packages/datasource_aigen/melos_datasource_aigen.iml"/>
 <module fileurl="file://$PROJECT_DIR$/packages/datasource_config/melos_datasource_config.iml" filepath="$PROJECT_DIR$/packages/datasource_config/melos_datasource_config.iml"/>
 <module fileurl="file://$PROJECT_DIR$/packages/datasource_markdown/melos_datasource_markdown.iml" filepath="$PROJECT_DIR$/packages/datasource_markdown/melos_datasource_markdown.iml"/>
-<module fileurl="file://$PROJECT_DIR$/packages/datasource_sembast/melos_datasource_sembast.iml" filepath="$PROJECT_DIR$/packages/datasource_sembast/melos_datasource_sembast.iml"/>
 <module fileurl="file://$PROJECT_DIR$/packages/domain_contracts/melos_domain_contracts.iml" filepath="$PROJECT_DIR$/packages/domain_contracts/melos_domain_contracts.iml"/>
 <module fileurl="file://$PROJECT_DIR$/packages/domain_entities/melos_domain_entities.iml" filepath="$PROJECT_DIR$/packages/domain_entities/melos_domain_entities.iml"/>
 <module fileurl="file://$PROJECT_DIR$/packages/domain_usecases/melos_domain_usecases.iml" filepath="$PROJECT_DIR$/packages/domain_usecases/melos_domain_usecases.iml"/>
+<module fileurl="file://$PROJECT_DIR$/packages/repository_adapters_sembast/melos_repository_adapters_sembast.iml" filepath="$PROJECT_DIR$/packages/repository_adapters_sembast/melos_repository_adapters_sembast.iml"/>
 <module fileurl="file://$PROJECT_DIR$/packages/resumesux_db_sembast/melos_resumesux_db_sembast.iml" filepath="$PROJECT_DIR$/packages/resumesux_db_sembast/melos_resumesux_db_sembast.iml"/>
 <module fileurl="file://$PROJECT_DIR$/packages/test_suite_tool/melos_test_suite_tool.iml" filepath="$PROJECT_DIR$/packages/test_suite_tool/melos_test_suite_tool.iml"/>
 <module fileurl="file://$PROJECT_DIR$/melos_resumesux_domain.iml" filepath="$PROJECT_DIR$/melos_resumesux_domain.iml"/>

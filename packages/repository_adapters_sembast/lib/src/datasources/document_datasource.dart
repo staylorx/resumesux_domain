@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
 
-import '../models/document_dto.dart';
+import 'package:resumesux_domain/src/data/models/document_dto.dart';
 
 /// Datasource for persisting document data and AI responses.
 class DocumentDatasource {

@@ -10,8 +10,8 @@ environment:
 dependencies:
   domain_contracts:
     path: ../domain_contracts
-  datasource_sembast:
-    path: ../datasource_sembast
+  repository_adapters_sembast:
+    path: ../repository_adapters_sembast
 
 dev_dependencies:
   lints: ^6.0.0

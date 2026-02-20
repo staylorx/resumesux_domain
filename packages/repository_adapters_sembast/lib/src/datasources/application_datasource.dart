@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:resumesux_domain/resumesux_domain.dart';
 import 'package:resumesux_domain/src/data/data.dart';
-import '../models/applicant_dto.dart';
+import 'package:resumesux_domain/src/data/models/applicant_dto.dart';
 import 'applicant_datasource.dart';
 import 'asset_datasource.dart';
 import 'document_datasource.dart';

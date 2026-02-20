@@ -1,12 +1,5 @@
-/// Exports for sembast datasource.
+/// Exports for sembast repository adapters.
 library;
-
-export 'src/models/applicant_dto.dart';
-export 'src/models/application_dto.dart';
-export 'src/models/asset_dto.dart';
-export 'src/models/document_dto.dart';
-export 'src/models/gig_dto.dart';
-export 'src/models/job_req_dto.dart';
 
 export 'src/datasources/applicant_datasource.dart';
 export 'src/datasources/application_datasource.dart';

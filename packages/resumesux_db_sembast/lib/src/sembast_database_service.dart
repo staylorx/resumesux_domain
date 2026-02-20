@@ -34,7 +34,7 @@ class SembastDatabaseService implements DatabaseService {
     final db = _db!;
     final store = sembast.stringMapStoreFactory.store(storeName);
     final record = store.record(key);
-    await record.put((transaction as sembast.Transaction?) ?? db as sembast.Database, value);
+    await record.put((transaction as sembast.Transaction?) ?? db, value);
   }
 
   @override
@@ -46,7 +46,7 @@ class SembastDatabaseService implements DatabaseService {
     final db = _db!;
     final store = sembast.stringMapStoreFactory.store(storeName);
     final record = store.record(key);
-    return await record.get((transaction as sembast.Transaction?) ?? db as sembast.Database);
+    return await record.get((transaction as sembast.Transaction?) ?? db);
   }
 
   @override
@@ -56,7 +56,9 @@ class SembastDatabaseService implements DatabaseService {
   }) async {
     final db = _db!;
     final store = sembast.stringMapStoreFactory.store(storeName);
-    final records = await store.find((transaction as sembast.Transaction?) ?? db as sembast.Database);
+    final records = await store.find(
+      (transaction as sembast.Transaction?) ?? db,
+    );
     return records.map((r) => r.value).toList();
   }
 
@@ -64,7 +66,7 @@ class SembastDatabaseService implements DatabaseService {
   Future<void> drop({required String storeName, dynamic transaction}) async {
     final db = _db!;
     final store = sembast.stringMapStoreFactory.store(storeName);
-    await store.drop((transaction as sembast.Transaction?) ?? db as sembast.Database);
+    await store.drop((transaction as sembast.Transaction?) ?? db);
   }
 
   @override
@@ -76,7 +78,7 @@ class SembastDatabaseService implements DatabaseService {
     final db = _db!;
     final store = sembast.stringMapStoreFactory.store(storeName);
     final record = store.record(key);
-    await record.delete((transaction as sembast.Transaction?) ?? db as sembast.Database);
+    await record.delete((transaction as sembast.Transaction?) ?? db);
   }
 
   Future<void> close() async {
