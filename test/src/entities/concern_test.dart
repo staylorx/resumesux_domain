@@ -104,25 +104,30 @@ void main() {
 
       test('Then instances with different tags are not equal', () {
         // Arrange
-        final concern1 =
-            Concern(name: 'Google', tags: domain_tags.Tags.fromList(['tech']));
+        final concern1 = Concern(
+          name: 'Google',
+          tags: domain_tags.Tags.fromList(['tech']),
+        );
         final concern2 = Concern(
-            name: 'Google', tags: domain_tags.Tags.fromList(['search']));
+          name: 'Google',
+          tags: domain_tags.Tags.fromList(['search']),
+        );
 
         // Act & Assert
         expect(concern1, isNot(equals(concern2)));
       });
 
       test(
-          'Then instance with null description equals instance with null description',
-          () {
-        // Arrange
-        final concern1 = Concern(name: 'Google');
-        final concern2 = Concern(name: 'Google', description: null);
+        'Then instance with null description equals instance with null description',
+        () {
+          // Arrange
+          final concern1 = Concern(name: 'Google');
+          final concern2 = Concern(name: 'Google', description: null);
 
-        // Act & Assert
-        expect(concern1, equals(concern2));
-      });
+          // Act & Assert
+          expect(concern1, equals(concern2));
+        },
+      );
     });
 
     group('When copying with modifications', () {
@@ -182,14 +187,17 @@ void main() {
       test('Then copyWith modifies tags only', () {
         // Act
         final copy = original.copyWith(
-            tags: domain_tags.Tags.fromList(['cars', 'battery']));
+          tags: domain_tags.Tags.fromList(['cars', 'battery']),
+        );
 
         // Assert
         expect(copy.name, equals(original.name));
         expect(copy.description, equals(original.description));
         expect(copy.location, equals(original.location));
         expect(
-            copy.tags, equals(domain_tags.Tags.fromList(['cars', 'battery'])));
+          copy.tags,
+          equals(domain_tags.Tags.fromList(['cars', 'battery'])),
+        );
       });
     });
 
@@ -249,16 +257,22 @@ void main() {
           name: 'Google LLC',
           description: 'Multinational technology company',
           location: 'Mountain View, California',
-          tags: domain_tags.Tags.fromList(
-              ['technology', 'search', 'advertising', 'cloud']),
+          tags: domain_tags.Tags.fromList([
+            'technology',
+            'search',
+            'advertising',
+            'cloud',
+          ]),
         );
 
         // Assert
         expect(google.name, equals('Google LLC'));
         expect(google.description, equals('Multinational technology company'));
         expect(google.location, equals('Mountain View, California'));
-        expect(google.tags.values,
-            containsAll(['technology', 'search', 'advertising', 'cloud']));
+        expect(
+          google.tags.values,
+          containsAll(['technology', 'search', 'advertising', 'cloud']),
+        );
       });
 
       test('Then it can represent an educational institution', () {
@@ -267,16 +281,21 @@ void main() {
           name: 'Stanford University',
           description: 'Private research university',
           location: 'Stanford, California',
-          tags: domain_tags.Tags.fromList(
-              ['education', 'research', 'university']),
+          tags: domain_tags.Tags.fromList([
+            'education',
+            'research',
+            'university',
+          ]),
         );
 
         // Assert
         expect(stanford.name, equals('Stanford University'));
         expect(stanford.description, equals('Private research university'));
         expect(stanford.location, equals('Stanford, California'));
-        expect(stanford.tags.values,
-            containsAll(['education', 'research', 'university']));
+        expect(
+          stanford.tags.values,
+          containsAll(['education', 'research', 'university']),
+        );
       });
 
       test('Then it can represent a nonprofit organization', () {
@@ -285,16 +304,21 @@ void main() {
           name: 'American Red Cross',
           description: 'Humanitarian organization',
           location: 'Washington, D.C.',
-          tags: domain_tags.Tags.fromList(
-              ['nonprofit', 'humanitarian', 'emergency']),
+          tags: domain_tags.Tags.fromList([
+            'nonprofit',
+            'humanitarian',
+            'emergency',
+          ]),
         );
 
         // Assert
         expect(redCross.name, equals('American Red Cross'));
         expect(redCross.description, equals('Humanitarian organization'));
         expect(redCross.location, equals('Washington, D.C.'));
-        expect(redCross.tags.values,
-            containsAll(['nonprofit', 'humanitarian', 'emergency']));
+        expect(
+          redCross.tags.values,
+          containsAll(['nonprofit', 'humanitarian', 'emergency']),
+        );
       });
 
       test('Then it can be updated for company rebranding', () {

@@ -27,8 +27,8 @@ class Application with EquatableMixin {
     this.feedback,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   Application copyWith({
     Applicant? applicant,
@@ -52,12 +52,12 @@ class Application with EquatableMixin {
 
   @override
   List<Object?> get props => [
-        applicant,
-        jobReq,
-        resume,
-        coverLetter,
-        feedback,
-        createdAt,
-        updatedAt,
-      ];
+    applicant,
+    jobReq,
+    resume,
+    coverLetter,
+    feedback,
+    createdAt,
+    updatedAt,
+  ];
 }

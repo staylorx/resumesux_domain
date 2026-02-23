@@ -10,7 +10,7 @@ class Concern with EquatableMixin {
   final String? location;
   final Tags tags;
   Concern({required this.name, this.description, this.location, Tags? tags})
-      : tags = tags ?? Tags.empty();
+    : tags = tags ?? Tags.empty();
 
   Concern copyWith({
     String? name,
