@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'doc.dart';
 
 /// Represents feedback document with its content.
-class Feedback extends Doc with EquatableMixin {
+class Feedback extends Document with EquatableMixin {
   Feedback({
     required super.content,
     super.contentType = 'text/markdown',

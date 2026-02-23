@@ -4,7 +4,7 @@ import '../docs/doc.dart';
 
 /// Represents an AI response document with its content.
 /// AI responses are typically in JSON or Markdown format.
-class AiResponse extends Doc with EquatableMixin {
+class AiResponse extends Document with EquatableMixin {
   AiResponse({
     required super.content,
     super.contentType = 'application/json',

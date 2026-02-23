@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'doc.dart';
 
 /// Represents a resume document with its content.
-class Resume extends Doc with EquatableMixin {
+class Resume extends Document with EquatableMixin {
   Resume({
     required super.content,
     super.contentType = 'text/markdown',
