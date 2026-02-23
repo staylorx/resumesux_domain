@@ -93,7 +93,7 @@ final resume = Resume(
 
 ### Base Classes
 
-- **`Doc`**: Abstract base for document types
+- **`Document`**: Abstract base for document types
 
 ## Architecture
 
