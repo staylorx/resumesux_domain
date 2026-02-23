@@ -1,20 +1,23 @@
 library;
 
-export 'src/aigen/ai_response.dart';
+export 'src/config/config.dart';
+
 export 'src/repositories/applicant.dart';
 export 'src/repositories/application.dart';
 export 'src/repositories/asset.dart';
-export 'src/config/config.dart';
+export 'src/repositories/gig.dart';
+export 'src/repositories/job_req.dart';
+
+export 'src/docs/resume.dart';
 export 'src/docs/cover_letter.dart';
 export 'src/docs/doc.dart';
 export 'src/docs/feedback.dart';
-export 'src/repositories/gig.dart';
-export 'src/repositories/job_req.dart';
+
 export 'src/aigen/ai_provider.dart';
-export 'src/docs/resume.dart';
+export 'src/aigen/ai_model.dart';
+export 'src/aigen/ai_response.dart';
 
 export 'src/value_objects/address.dart';
-export 'src/value_objects/ai_model.dart';
 export 'src/value_objects/tags.dart';
 export 'src/value_objects/concern.dart';
 export 'src/value_objects/handles/application_handle.dart';

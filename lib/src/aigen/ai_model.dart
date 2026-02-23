@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../aigen/ai_provider.dart';
+import 'ai_provider.dart';
 
 /// Represents an AI model configuration.
 class AiModel with EquatableMixin {

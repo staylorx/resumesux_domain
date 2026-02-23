@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../value_objects/ai_model.dart';
+import 'ai_model.dart';
 
 /// Represents an AI provider configuration.
 class AiProvider with EquatableMixin {
@@ -44,12 +44,12 @@ class AiProvider with EquatableMixin {
 
   @override
   List<Object> get props => [
-        name,
-        url,
-        key,
-        models,
-        defaultModel ?? '',
-        settings,
-        isDefault,
-      ];
+    name,
+    url,
+    key,
+    models,
+    defaultModel ?? '',
+    settings,
+    isDefault,
+  ];
 }
