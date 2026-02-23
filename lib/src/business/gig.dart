@@ -1,9 +1,10 @@
 import 'package:equatable/equatable.dart';
+import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Represents a professional gig or job experience.
 /// It can also be a volunteer position or internship.
 class Gig with EquatableMixin {
-  final String? concern;
+  final Concern? concern;
   final String? location;
   final String title;
   final String? dates;
@@ -18,7 +19,7 @@ class Gig with EquatableMixin {
   });
 
   Gig copyWith({
-    String? concern,
+    Concern? concern,
     String? location,
     String? title,
     String? dates,
