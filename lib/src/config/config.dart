@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../repositories/applicant.dart';
+import '../business/applicant.dart';
 import '../aigen/ai_provider.dart';
 import '../enums/folder_field.dart';
 
@@ -61,14 +61,14 @@ class Config with EquatableMixin {
 
   @override
   List<Object?> get props => [
-        outputDir,
-        includeCover,
-        includeFeedback,
-        providers,
-        customPrompt,
-        appendPrompt,
-        applicant,
-        digestPath,
-        folderOrder,
-      ];
+    outputDir,
+    includeCover,
+    includeFeedback,
+    providers,
+    customPrompt,
+    appendPrompt,
+    applicant,
+    digestPath,
+    folderOrder,
+  ];
 }

@@ -2,11 +2,11 @@ library;
 
 export 'src/config/config.dart';
 
-export 'src/repositories/applicant.dart';
-export 'src/repositories/application.dart';
-export 'src/repositories/asset.dart';
-export 'src/repositories/gig.dart';
-export 'src/repositories/job_req.dart';
+export 'src/business/applicant.dart';
+export 'src/business/application.dart';
+export 'src/business/asset.dart';
+export 'src/business/gig.dart';
+export 'src/business/job_req.dart';
 
 export 'src/docs/resume.dart';
 export 'src/docs/cover_letter.dart';
