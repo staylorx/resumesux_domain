@@ -2,8 +2,10 @@ import 'package:equatable/equatable.dart';
 
 /// Represents a collection of tags as an immutable set of strings.
 class Tags with EquatableMixin {
+  /// The underlying set of tag values.
   final Set<String> values;
 
+  /// Creates a Tags instance wrapping the given set of values.
   const Tags(this.values);
 
   /// Creates an empty Tags instance.
@@ -30,6 +32,7 @@ class Tags with EquatableMixin {
   /// Checks if the collection is not empty.
   bool get isNotEmpty => values.isNotEmpty;
 
+  /// Returns a copy of this collection with the given values replaced.
   Tags copyWith({Set<String>? values}) {
     return Tags(values ?? this.values);
   }

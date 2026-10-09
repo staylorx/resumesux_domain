@@ -5,24 +5,34 @@ import '../enums/folder_field.dart';
 
 /// Represents the application configuration including output settings and AI providers.
 class Config with EquatableMixin {
+  /// Directory where generated application output is written.
   final String outputDir;
-  // Whether to include cover letter in the generated application
+
+  /// Whether to include a cover letter in the generated application.
   final bool includeCover;
-  // Whether to include feedback in the generated application
+
+  /// Whether to include feedback in the generated application.
   final bool includeFeedback;
-  // List of AI providers configured
+
+  /// List of AI providers configured for generation.
   final List<AiProvider> providers;
-  // Optional custom prompt for AI generation
+
+  /// Optional custom prompt for AI generation.
   final String? customPrompt;
-  // Indicates if the custom prompt should be appended to default prompts
+
+  /// Whether the custom prompt should be appended to default prompts.
   final bool appendPrompt;
-  // Applicant information
+
+  /// The applicant the configuration applies to.
   final Applicant applicant;
-  // Path to the digest directory
+
+  /// Path to the digest directory.
   final String digestPath;
-  // Order of fields to use for creating output folder structure
+
+  /// Order of fields used to create the output folder structure.
   final List<FolderField>? folderOrder;
 
+  /// Constructs a [Config] with the given settings.
   const Config({
     required this.outputDir,
     required this.includeCover,
@@ -35,6 +45,7 @@ class Config with EquatableMixin {
     this.folderOrder,
   });
 
+  /// Returns a copy of this [Config] with the given fields replaced.
   Config copyWith({
     String? outputDir,
     bool? includeCover,

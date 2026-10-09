@@ -3,6 +3,7 @@ import 'doc.dart';
 
 /// Represents a cover letter document with its content.
 class CoverLetter extends Document with EquatableMixin {
+  /// Constructs a [CoverLetter] with the given content.
   CoverLetter({
     required super.content,
     super.contentType = 'text/markdown',

@@ -3,13 +3,25 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Represents a job requirement or job posting.
 class JobReq extends Document with EquatableMixin {
+  /// The title of the job.
   final String title;
+
+  /// The advertised salary, as free text.
   final String? salary;
+
+  /// The location of the job.
   final String? location;
+
+  /// The concern (company or organization) posting the job.
   final Concern? concern;
+
+  /// When the job was created or posted.
   final DateTime? createdDate;
+
+  /// Where the job posting was found.
   final String? whereFound;
 
+  /// Constructs a [JobReq] with the given details.
   JobReq({
     required this.title,
     required super.content,

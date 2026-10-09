@@ -11,14 +11,28 @@ import '../docs/resume.dart';
 /// Applications are saved to disk in a structured format, within an output directory
 /// specified by the user, then in `<concern>/<job_title>/application_<timestamp>/*.md` files
 class Application with EquatableMixin {
+  /// The applicant the application belongs to.
   final Applicant applicant;
+
+  /// The job requirement the application targets.
   final JobReq jobReq;
+
+  /// The resume document included in the application.
   final Resume resume;
+
+  /// An optional cover letter document, or null if not included.
   final CoverLetter? coverLetter;
+
+  /// An optional feedback document, or null if not included.
   final Feedback? feedback;
+
+  /// When the application was created.
   final DateTime createdAt;
+
+  /// When the application was last updated.
   final DateTime updatedAt;
 
+  /// Constructs an [Application]; timestamps default to the current time.
   Application({
     required this.applicant,
     required this.jobReq,
@@ -30,6 +44,7 @@ class Application with EquatableMixin {
   }) : createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
 
+  /// Returns a copy of this [Application] with the given fields replaced.
   Application copyWith({
     Applicant? applicant,
     JobReq? jobReq,

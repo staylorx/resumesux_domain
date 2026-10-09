@@ -10,11 +10,16 @@ import 'package:resumesux_domain/resumesux_domain.dart';
 
 /// Represents an asset (license, certification, education, etc.) containing content and optional associated tags.
 class Asset with EquatableMixin {
+  /// The text content of the asset.
   final String content;
+
+  /// Tags categorizing the asset (e.g. education, license, certification).
   final Tags tags;
 
+  /// Constructs an [Asset] with the given content and optional tags.
   Asset({Tags? tags, required this.content}) : tags = tags ?? Tags.empty();
 
+  /// Returns a copy of this [Asset] with the given fields replaced.
   Asset copyWith({Tags? tags, String? content}) {
     return Asset(tags: tags ?? this.tags, content: content ?? this.content);
   }

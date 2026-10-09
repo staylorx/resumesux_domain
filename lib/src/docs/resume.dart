@@ -4,6 +4,7 @@ import 'doc.dart';
 
 /// Represents a resume document with its content.
 class Resume extends Document with EquatableMixin {
+  /// Constructs a [Resume] with the given content.
   Resume({
     required super.content,
     super.contentType = 'text/markdown',

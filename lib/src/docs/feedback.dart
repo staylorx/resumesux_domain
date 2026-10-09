@@ -4,6 +4,7 @@ import 'doc.dart';
 
 /// Represents feedback document with its content.
 class Feedback extends Document with EquatableMixin {
+  /// Constructs a [Feedback] with the given content.
   Feedback({
     required super.content,
     super.contentType = 'text/markdown',
